@@ -1,7 +1,7 @@
 <?php
 // Paramètres de connexion à la base de données
 $host = "localhost";  // Adresse du serveur MySQL (ou IP)
-$dbname = "bdd";  // Nom de la base de données
+$dbname = "budget_db";  // Nom de la base de données
 $username = "root";  // Nom d'utilisateur MySQL
 $password = "";  // Mot de passe (laisser vide en local)
 

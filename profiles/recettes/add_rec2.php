@@ -42,8 +42,8 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                             <select name="numc" style="width: 100%; padding: 7px;" required>
                                 <option value="">Sélectionner un compte</option>
                                 <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["numc"]) ?>">
-                                    <?= htmlspecialchars($num["numc"]) ?>
+                                <option value="<?= htmlspecialchars($num["numCompte"]) ?>">
+                                    <?= htmlspecialchars($num["numCompte"]) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>

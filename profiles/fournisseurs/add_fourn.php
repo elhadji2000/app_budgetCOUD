@@ -5,27 +5,21 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
     // Redirige vers la page de connexion
     exit();
 }
-
 ?>
 <?php include '../../includes/fonctions.php';?>
 <?php include '../../includes/header.php';?>
-<?php 
-    $nums = getNumCompte();
-?>
 
 <div class='container'>
     <?php include '../../shared/menu.php';?>
 </div>
 <main>
     <div class='container'>
-        <div class='text-center' style='margin-bottom:40px;color:rgba(70, 86, 164, 0.84);'>
-            <h3>MISE À JOUR APRES REMANIEMENT !</h3>
-            <strong style='color:rgba(78, 120, 93, 0.91);'><i>NB: Le montant peut etre positif ou negatif selon que la
-                    dotation ait augmentè ou diminuè.</i></strong>
+        <div class='text-center' style='margin-bottom:45px;color:#4655a4;'>
+            <h3>ENREGISTRER UN FOURNISSEUR !!</h3>
         </div>
 
         <!-- Formulaire centré avec design -->
-        <form action='traitement_dot.php' method='POST'>
+        <form action='traitement_fourn.php' method='POST'>
             <div
                 style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
 
@@ -34,30 +28,37 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
                     <?php endif;?>
                     <tr>
-                        <td style='padding: 10px 0;'><strong>Numéro du Compte :</strong></td>
+                        <td style='padding: 10px 0;'><strong>Code Fournisseur :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <select name="rem_numc" style="width: 100%; padding: 7px;" required>
-                                <option value="">Sélectionner un compte</option>
-                                <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["numCompte"]) ?>">
-                                    <?= htmlspecialchars($num["numCompte"]) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <input type='text' name='numFourn' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
-                        <td style='padding: 10px 0;'><strong>Date de Remaniement :</strong></td>
+                    <td style='padding: 10px 0;'><strong>Nom :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='date' name='rem_date' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='nom' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
-                        <td style='padding: 10px 0;'><strong>Montant Differentiel :</strong></td>
+                    <td style='padding: 10px 0;'><strong>adresse :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='number' name='rem_volume' step='1' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='adresse' style='width: 100%; padding: 5px;' required />
+                        </td>
+                    </tr>
+                    <tr>
+                    <td style='padding: 10px 0;'><strong>Contact :</strong></td>
+                        <td style='padding: 10px 0;'>
+                            <input type='text' name='contact' style='width: 100%; padding: 5px;' required />
+                        </td>
+                    </tr>
+                    <tr>
+                    <td style='padding: 10px 0;'><strong>Nature :</strong></td>
+                        <td style='padding: 10px 0;'>
+                            <input type='text' name='nature' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                 </table>
+
             </div>
             <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
                 style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
@@ -79,7 +80,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 La dotation a été enregistrée avec succès !
+                🎉 Le fournisseur a été enregistrée avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>

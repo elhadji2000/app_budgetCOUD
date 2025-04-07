@@ -18,7 +18,7 @@ if (!isset($_SESSION['user'])) {
         <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
             style="max-width: 250px;" onkeyup="filterTable()">
         <h3 class="mb-0 text-center">LES FOURNISSEURS ENREGISTRÉS</h3>
-        <a href="new_recette.php" class="btn btn-success"><strong>nouveau</strong></a>
+        <a href="add_fourn.php" class="btn btn-success"><strong>nouveau</strong></a>
     </div>
 
     <!-- Tableau -->
@@ -35,15 +35,15 @@ if (!isset($_SESSION['user'])) {
             </thead>
             <tbody id="tableBody">
                 <?php
-            $recettes = getAllFournisseurs();
-            if (!empty($recettes)) {
-                foreach ($recettes as $recette) {
+            $fournisseurs = getAllFournisseurs();
+            if (!empty($fournisseurs)) {
+                foreach ($fournisseurs as $fournisseur) {
                     echo "<tr>
-                            <td>{$recette['numf']}</td>
-                            <td>{$recette['nom']}</td>
-                            <td>{$recette['adresse']}</td>
-                            <td>{$recette['contact']}</td>
-                            <td>{$recette['nature']}</td>
+                            <td>{$fournisseur['numfourn']}</td>
+                            <td>{$fournisseur['nom']}</td>
+                            <td>{$fournisseur['adresse']}</td>
+                            <td>{$fournisseur['contact']}</td>
+                            <td>{$fournisseur['nature']}</td>
                           </tr>";
                 }
             } else {

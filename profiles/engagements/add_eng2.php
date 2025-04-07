@@ -5,8 +5,15 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
     // Redirige vers la page de connexion
     exit();
 }
+
 ?>
-<?php include '../../includes/fonctions.php';?>
+<?php include '../../includes/fonctions.php';
+$numCompte = $_POST['numc'];
+$idCompte = getIdCompteByNum($numCompte);
+$data = getCompteByNum($numCompte);
+$details = getDetailsCompte($numCompte);
+$fourns = getAllFourniseurs();
+?>
 <?php include '../../includes/header.php';?>
 
 <div class='container'>
@@ -16,7 +23,8 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
     <!-- ##########  ESPACE POUR DETAILS DES ENGEMENT DU COMPTE DONNER ################ -->
     <div class='container' style='margin-bottom:40px;'>
         <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-            <strong style='color:rgba(78, 120, 93, 0.91);'><i>6456 : restauration</i></strong>
+            <strong style='color:rgba(78, 120, 93, 0.91);'><i><?= $data['numCompte']; ?>:
+                    <?= $data['libelle']; ?></i></strong>
             <h4>SITUATION ACTUEL DU COMPTE !!</h4>
         </div>
 
@@ -27,24 +35,32 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                 <tr>
                     <td class="text-left" style='padding: 5px; text-align: left;'><strong>DOTATION INITIALE</strong>
                     </td>
-                    <td style='padding: 5px; text-align: right;'><strong>5,000,000,000</strong></td>
+                    <td style='padding: 5px; text-align: right;'>
+                        <strong><?= number_format($details['dotationInitiale'], 0, ',', ','); ?> FCFA</strong>
+                    </td>
                 </tr>
 
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>DOTATION REMANIEE</strong></td>
-                    <td style='padding: 5px; text-align: right;'><strong>5,000,000,000</strong></td>
+                    <td style='padding: 5px; text-align: right;'>
+                        <strong><?= number_format($details['dotationRemaniee'], 0, ',', ','); ?> FCFA</strong>
+                    </td>
                 </tr>
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>TOTAL ENGAGEMENT</strong></td>
-                    <td style='padding: 5px; text-align: right;'><strong>2,000,000,000</strong></td>
+                    <td style='padding: 5px; text-align: right;'>
+                        <a href="#"><strong><?= number_format($details['totalEngagement'], 0, ',', ','); ?> FCFA</strong></a>
+                    </td>
                 </tr>
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>ECART</strong></td>
-                    <td style='padding: 5px; text-align: right;'><strong>3,000,000,000</strong></td>
+                    <td style='padding: 5px; text-align: right;color: green;'>
+                        <strong><?= number_format($details['ecart'], 0, ',', ','); ?> FCFA</strong>
+                    </td>
                 </tr>
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>TOTAL DES O.P</strong></td>
-                    <td style='padding: 5px; text-align: right;'><strong>0</strong></td>
+                    <td style='padding: 5px; text-align: right;'><strong>0 FCFA</strong></td>
                 </tr>
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>REGLEMENTS EFFECTIS</strong></td>
@@ -65,7 +81,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
         </div>
 
         <!-- Formulaire centré avec design -->
-        <form action='add_eng2.php' method='POST'>
+        <form action='traitement_eng.php' method='POST'>
             <div
                 style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 5px;'>
 
@@ -76,55 +92,59 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     <tr>
                         <td style='padding: 5px 0;'><strong>NUMERO DU COMPTE :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='montant' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>NUMERO IMPUTATION :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type='number' name='montant' step='1' style='width: 100%; padding: 5px;' required />
+                        <input type="hidden" name="idCompte" value="<?= htmlspecialchars($idCompte) ?>" />
+                            <input type='text' value="<?= $numCompte; ?>" readonly
+                                style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>DATE D'IMPUTATION :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='date' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type="date" value="<?= date('Y-m-d') ?>" readonly
+                                style="width: 100%; padding: 5px;" required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>DATE ENGAGEMENT :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='date' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type='date' name='dateEng' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>OBJET :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='libelle' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>REFERENCE :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='bc' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>SERVICE CONSERNÈ :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='service' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                     <tr>
-                        <td style='padding: 5px 0;'><strong>REPRENEUR :</strong></td>
+                        <td style='padding: 5px 0;'><strong>FOURNISSEUR :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <select name="idFourn" style="width: 100%; padding: 8px;" required>
+                                <option value="">Sélectionner un fournisseur</option>
+                                <?php foreach ($fourns as $fourn) : ?>
+                                <option value="<?= htmlspecialchars($fourn["idFourn"]) ?>">
+                                    <?= htmlspecialchars($fourn["numFourn"]) ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 5px 0;'><strong>MONTANT :</strong></td>
                         <td style='padding: 5px 0;'>
-                            <input type='text' name='dateRemanie' style='width: 100%; padding: 5px;' required />
+                            <input type='text' name='montant' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                 </table>
@@ -137,5 +157,6 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
         </form>
     </div>
 </main>
+
 <?php include '../../includes/footer.php';
 ?>

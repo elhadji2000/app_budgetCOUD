@@ -27,10 +27,11 @@ if (!isset($_SESSION['user'])) {
             <thead style="color: white !important;">
                 <tr class="table-primary">
                     <th>N°</th>
-                    <th>NumC</th>
+                    <th>NumCompte</th>
                     <th>Libelle</th>
-                    <th>NumCP</th>
+                    <th>NumCp</th>
                     <th>Code</th>
+                    <th>Nature</th>
                     <th>Action(s)</th>
                 </tr>
             </thead>
@@ -43,10 +44,11 @@ if (!isset($_SESSION['user'])) {
                     $n++;
                     echo "<tr>
                     <td>{$n}</td>
-                            <td>{$compte['numc']}</td>
+                            <td>{$compte['numCompte']}</td>
                             <td>{$compte['libelle']}</td>
-                            <td>{$compte['numcp']}</td>
+                            <td>{$compte['numCp']}</td>
                             <td>{$compte['code']}</td>
+                            <td>{$compte['nature']}</td>
                             <td><a href=''>archiver</a></td>
                           </tr>";
                 }

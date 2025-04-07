@@ -20,6 +20,8 @@ if (!empty($_POST['utilisateur']) && !empty($_POST['motdepasse']) && !empty($_PO
         $_SESSION['user'] = $row['nom']; // Stocker le nom de l'utilisateur
         $_SESSION['priv'] = $row['priv']; // Stocker le rôle si nécessaire
         $_SESSION['an'] = $an;
+        $_SESSION['matricule'] = $row['log'];
+        $_SESSION['idUser'] = $row['idUser'];
 
         // Redirection vers la page du profil après connexion
         header("Location: ../shared/accueil.php");

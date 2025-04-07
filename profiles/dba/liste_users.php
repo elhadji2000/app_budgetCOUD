@@ -28,10 +28,9 @@ if (!isset($_SESSION['user'])) {
                 <tr class="table-primary">
                     <th>Nom</th>
                     <th>Log</th>
-                    <th>Priv</th>
+                    <th>Rôle</th>
                     <th>Email</th>
                     <th>Type_mdp</th>
-                    <th>Repsec</th>
                     <th>Action(s)</th>
                 </tr>
             </thead>
@@ -50,9 +49,6 @@ if (!isset($_SESSION['user'])) {
                             <?= ucfirst($user['type_mdp']); ?>
                         </span>
                     </td>
-
-
-                    <td><?= $user['repsec']; ?></td>
                     <td><a href="#">dèsactiver</a></td>
                 </tr>
                 <?php endforeach;?>

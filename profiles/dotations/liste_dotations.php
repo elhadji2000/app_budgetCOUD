@@ -26,23 +26,32 @@ if (!isset($_SESSION['user'])) {
         <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>NumC</th>
+                    <th>N°</th>
+                    <th>Num_Compte</th>
                     <th>Date de dotation</th>
                     <th>Volume</th>
                     <th>Type</th>
+                    <th>User</th>
                     <th>Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 <?php
                 $dotations = getAllDotations();
+                $n=1;
                 if (!empty($dotations)) :
                     foreach ($dotations as $dotation) : ?>
                 <tr>
-                    <td><?= $dotation['numc']; ?></td>
-                    <td><?= $dotation['an']; ?></td>
+                    <td><?= $n++; ?></td>
+                    <td><?= $dotation['numCompte']; ?></td>
+                    <td><?= $dotation['date']; ?></td>
                     <td><?= number_format($dotation['volume'], 0, ',', ','); ?> FCFA</td>
-                    <td>Initiale</td>
+                    <td>
+                        <span class="badge <?= ($dotation['type'] == 'initiale') ? 'bg-info' : 'bg-warning'; ?>">
+                            <?= ucfirst($dotation['type']); ?>
+                        </span>
+                    </td>
+                    <td><?= $dotation['log']; ?></td>
                     <td><a href="#">supprimer</a></td>
                 </tr>
                 <?php endforeach;?>
