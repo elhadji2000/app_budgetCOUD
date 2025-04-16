@@ -1,0 +1,6 @@
+ /* Sticky Footer CSS */
+ html, body {
+    height: 100%; /* Assurez-vous que le body prend toute la hauteur de la fenêtre */
+    margin: 0; /* Supprime la marge par défaut du body */
+}
+
