@@ -62,8 +62,9 @@ $max_date = date("Y-m-d"); // aujourd'hui
                 <tr>
                     <td style='padding: 5px; text-align: left;'><strong>TOTAL ENGAGEMENT</strong></td>
                     <td style='padding: 5px; text-align: right;'>
-                        <a href="#"><strong><?= number_format($details['totalEngagement'], 0, ',', ','); ?>
-                                FCFA</strong></a>
+                        <a href="liste_engsByCompte.php?numc=<?php echo $numCompte; ?>">
+                            <strong><?= number_format($details['totalEngagement'], 0, ',', ','); ?> FCFA</strong>
+                        </a>
                     </td>
                 </tr>
                 <tr>

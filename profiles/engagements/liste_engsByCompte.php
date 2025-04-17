@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -6,74 +5,90 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';?>
+<?php include '../../includes/fonctions.php';
+$numCompte = $_GET['numc'];
+$data = getCompteByNum($numCompte);
+$engs = getEngsByCompte($numCompte);
+?>
 <?php include '../../includes/header.php';?>
 <main>
     <div class='container'>
         <?php include '../../shared/menu.php';?>
     </div>
-
+    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
+        <h4>
+            <i style='color:rgba(78, 120, 93, 0.91);'><?= $data['numCompte']; ?>:<?= $data['libelle']; ?></i>
+        </h4>
+    </div>
     <!-- Barre de recherche -->
     <div class="d-flex container justify-content-between align-items-center py-2 px-3"
         style="color: #4655a4; font-size: 13px; font-weight: 400;">
         <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
             style="max-width: 250px;" onkeyup="filterTable()">
-        <h3 class="mb-0 text-center">LES FOURNISSEURS ENREGISTRÉS</h3>
-        <a href="add_fourn.php" class="btn btn-success"><strong>nouveau</strong></a>
+        <h3 class="mb-0 text-center">LES ENGAGEMENTS</h3>
+        <strong></strong>
     </div>
 
     <!-- Tableau -->
     <div class='container-fluid' style="margin-bottom: 20px;">
-        <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
+        <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
                     <th>N°</th>
-                    <th>NumF</th>
-                    <th>Nom</th>
-                    <th>Adresse</th>
-                    <th>Contact</th>
-                    <th>Nature</th>
-                    <th>Action(s)</th>
+                    <th>NumEngs</th>
+                    <th>date</th>
+                    <th>service</th>
+                    <th>libelle</th>
+                    <th>bc</th>
+                    <th>Montant</th>
+                    <th>Fourniseur</th>
+                    <th>details</th>
+                    <th>suppr</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 <?php
-$fournisseurs = getAllFournisseurs();
-$n=1;
-if (!empty($fournisseurs)):
-    foreach ($fournisseurs as $fournisseur):
-?>
+                $n = 1;
+                if (!empty($engs)) :
+                    foreach ($engs as $eng) : ?>
                 <tr>
                     <td><?= $n; ?></td>
-                    <td><?= $fournisseur['numFourn']; ?></td>
-                    <td><?= $fournisseur['nom']; ?></td>
-                    <td><?= $fournisseur['adresse']; ?></td>
-                    <td><?= $fournisseur['contact']; ?></td>
-                    <td><?= $fournisseur['nature']; ?></td>
                     <td>
-                        <?php if (!isFournisseurUsed($fournisseur['idFourn'])): ?>
-                        <a href="supprimer_engagement.php?id=<?= $fournisseur['idFourn'] ?>"
-                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Fournisseur ?')">Supprimer</a>
+                        <?= 'BE'.$eng['an'] . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?>
+                    </td>
+                    <td><?= $eng['dateEng']; ?></td>
+                    <td><?= $eng['service']; ?></td>
+                    <td><?= $eng['libelle']; ?></td>
+                    <td><?= $eng['bc']; ?></td>
+                    <td><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
+                    <td><?= $eng['numFourn']; ?></td>
+                    <td>
+                        <a href="eng_details.php?id=<?= $eng['idEng'] ?>">details</a>
+                    </td>
+                    <td>
+                        <?php if (!isEngagementUsed($eng['idEng'])): ?>
+                        <a href="supprimer_engagement.php?id=<?= $eng['idEng'] ?>"
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet engagement ?')">Supprimer</a>
                         <?php else: ?>
                         <span style="color: grey; cursor: not-allowed;"
-                            title="Fournisseur utilisé, suppression désactivée">Supprimer</span>
+                            title="Engagement utilisé, suppression désactivée">Supprimer</span>
                         <?php endif; ?>
                     </td>
                 </tr>
                 <?php
-                $n++;
-    endforeach;
-else:
-?>
+                    $n++;
+                    endforeach;
+                ?>
+                <?php else : ?>
                 <tr>
-                    <td colspan="5" class="text-danger">Aucune recette trouvée</td>
+                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
                 </tr>
                 <?php endif; ?>
 
             </tbody>
             <tbody id="noResultRow" style="display: none;">
                 <tr>
-                    <td colspan="5" class="text-danger">Aucun résultat trouvé</td>
+                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
                 </tr>
             </tbody>
         </table>
