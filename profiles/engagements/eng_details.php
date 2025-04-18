@@ -58,7 +58,7 @@ $tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
                     <p>Type : <i><?= $engagement['service']; ?></i></p>
                     <p>Nature : <?= $engagement['libelleCp']; ?></i></p>
                     <p>Objet : <i><?= $engagement['libelle']; ?></i></p>
-                    <p>Montant : <i><?= number_format($engagement['montant'], 0, ',', ','); ?> FCFA</i></p>
+                    <p>Montant : <i style="float: right;"><?= number_format($engagement['montant'], 0, ',', ','); ?> FCFA</i></p>
                 </td>
                 <td style="border: 1px solid black; padding: 10px; vertical-align: top;">
                     <p><b>Imputation</b></p>
@@ -84,12 +84,12 @@ $tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
                 </td>
                 <td style="border: 1px solid black; padding: 10px; vertical-align: top;">
                     <p><b>SITUATION DES ENGAGEMENTS</b></p>
-                    <p>Crédits ouverts : <i><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i></p>
+                    <p>Crédits ouverts : <i style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i></p>
                     <p>Modification de crédits :</p>
                     <p>Engagements antérieurs :</p>
                     <p>Annulation d"engagement :</p>
-                    <p>Disponible avant le bon : <i><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i></p>
-                    <p>Nouveau disponible : <i><?= number_format($ecart, 0, ',', ','); ?> FCFA</i></p>
+                    <p>Disponible avant le bon : <i style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i></p>
+                    <p>Nouveau disponible : <i style="float: right;"><?= number_format($ecart, 0, ',', ','); ?> FCFA</i></p>
                 </td>
                 <td
                     style="text-align: center; border: 1px solid black; padding: 10px; text-decoration: underline; vertical-align: top;">
