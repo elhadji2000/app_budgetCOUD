@@ -22,6 +22,13 @@ if (!empty($_POST['utilisateur']) && !empty($_POST['motdepasse']) && !empty($_PO
         $_SESSION['an'] = $an;
         $_SESSION['matricule'] = $row['log'];
         $_SESSION['idUser'] = $row['idUser'];
+        $_SESSION['type_mdp'] = $row['type_mdp'];
+
+        if($_SESSION['type_mdp'] == "default"){
+            // Redirection vers la page modifier mot de passe
+            header("Location: ../shared/updated_mdp.php");
+            exit();
+        }
 
         // Redirection vers la page du profil après connexion
         header("Location: ../shared/accueil.php");

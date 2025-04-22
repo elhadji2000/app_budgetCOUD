@@ -15,9 +15,29 @@ $anneeActuelle = date("Y");
         <!-- LIEN CONSULTER LEXECUTION -->
         <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
         <td>
-            <a href="dashboard.php" class="text-white" style="color: white; text-decoration: none;">
-                <strong>Consulter l'exécution</strong>
-            </a>
+            <div class="dropdown">
+                <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
+                    href="#" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <strong>Consulter l'exécution</strong>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li>
+                        <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/actuel_1.php">
+                            <strong>actuel</strong>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dotations/add_rem_dot.php">
+                            <strong>Borner</strong>
+                        </a>
+                    </li>
+
+                    <li><a class="dropdown-item" href="http://localhost/BUDGET/profiles/dotations/liste_dotations.php">
+                            <strong>Journaliere</strong>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </td>
         <?php endif; ?>
 
@@ -183,7 +203,8 @@ if ($anneeSession == $anneeActuelle): ?>
         </td>
         <?php endif; ?>
 
-        <td><a href="rapport.php" class="text-white" style="color: white; text-decoration: none;"><strong>Mot de
+        <td><a href="http://localhost/BUDGET/shared/updated_mdp.php" class="text-white"
+                style="color: white; text-decoration: none;"><strong>Mot de
                     passe</strong></a></td>
     </tr>
 </table>

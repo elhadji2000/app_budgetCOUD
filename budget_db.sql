@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 16 avr. 2025 à 14:57
+-- Généré le : mar. 22 avr. 2025 à 14:09
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -247,7 +247,7 @@ INSERT INTO `comptep` (`idCp`, `numCp`, `libelle`, `dateSys`, `nature`) VALUES
 CREATE TABLE `dotations` (
   `idDot` int(11) NOT NULL,
   `date` date DEFAULT NULL,
-  `volume` decimal(10,2) DEFAULT NULL,
+  `volume` decimal(13,2) DEFAULT NULL,
   `dateSys` datetime DEFAULT current_timestamp(),
   `type` varchar(50) DEFAULT NULL,
   `an` year(4) DEFAULT NULL,
@@ -260,7 +260,11 @@ CREATE TABLE `dotations` (
 --
 
 INSERT INTO `dotations` (`idDot`, `date`, `volume`, `dateSys`, `type`, `an`, `idUser`, `idCompte`) VALUES
-(1, '2025-04-16', 3000000.00, '2025-04-16 09:38:08', 'initiale', '2025', 1, 2);
+(1, '2025-04-16', 3000000.00, '2025-04-16 09:38:08', 'initiale', '2025', 1, 2),
+(2, '2025-04-22', 150000000.00, '2025-04-22 10:53:50', 'initiale', '2025', 1, 3),
+(3, '2025-04-22', 100000000.00, '2025-04-22 10:54:16', 'initiale', '2025', 1, 4),
+(4, '2025-04-22', 50000000.00, '2025-04-22 10:54:36', 'initiale', '2025', 1, 6),
+(5, '2025-04-22', 14000000.00, '2025-04-22 10:55:03', 'initiale', '2025', 1, 7);
 
 -- --------------------------------------------------------
 
@@ -274,7 +278,7 @@ CREATE TABLE `engagements` (
   `service` varchar(100) DEFAULT NULL,
   `libelle` varchar(255) DEFAULT NULL,
   `bc` varchar(100) DEFAULT NULL,
-  `montant` decimal(12,2) DEFAULT NULL,
+  `montant` decimal(13,2) DEFAULT NULL,
   `dateSys` datetime DEFAULT current_timestamp(),
   `idFourn` int(11) DEFAULT NULL,
   `idCompte` int(11) DEFAULT NULL
@@ -354,7 +358,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`idUser`, `nom`, `log`, `mdp`, `email`, `priv`, `type_mdp`, `date_sys`) VALUES
-(1, 'Madiop DIOP', '936076/M', 'ac63f10d9cbef20bcfc0dd345dcee90058e0d2e4', 'diopelhadjimadiop@gmail.com', 'admin', 'updated', '2025-04-16');
+(1, 'Madiop DIOP', '936076/M', 'f6a7651443d5867f394fe61ab082aac01c3c25fd', 'diopelhadjimadiop@gmail.com', 'admin', 'updated', '2025-04-16');
 
 --
 -- Index pour les tables déchargées
@@ -419,19 +423,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `compte`
 --
 ALTER TABLE `compte`
-  MODIFY `idCompte` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+  MODIFY `idCompte` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
 
 --
 -- AUTO_INCREMENT pour la table `comptep`
 --
 ALTER TABLE `comptep`
-  MODIFY `idCp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `idCp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT pour la table `dotations`
 --
 ALTER TABLE `dotations`
-  MODIFY `idDot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idDot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `engagements`

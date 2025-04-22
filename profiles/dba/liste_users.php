@@ -17,8 +17,8 @@ if (!isset($_SESSION['user'])) {
         style="color: #4655a4; font-size: 13px; font-weight: 400;">
         <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
             style="max-width: 250px;" onkeyup="filterTable()">
-        <h3 class="mb-0 text-center">LES UTILISATEURS</h3>
-        <strong></strong>
+        <h3 class="mb-0 text-center">LES UTILISATEURS ENREGISTRÈS </h3>
+        <a href="add_user.php" class="btn btn-success"><strong>nouveau</strong></a>
     </div>
 
     <!-- Tableau -->
@@ -57,14 +57,14 @@ if (!isset($_SESSION['user'])) {
                 <?php $n++; endforeach;?>
                 <?php else : ?>
                 <tr>
-                    <td colspan="5" class="text-danger">Aucun utilisateur trouvé</td>
+                    <td colspan="7" class="text-danger">Aucun utilisateur trouvé</td>
                 </tr>
                 <?php endif; ?>
 
             </tbody>
             <tbody id="noResultRow" style="display: none;">
                 <tr>
-                    <td colspan="5" class="text-danger">Aucun résultat trouvé</td>
+                    <td colspan="7" class="text-danger">Aucun résultat trouvé</td>
                 </tr>
             </tbody>
         </table>

@@ -25,14 +25,14 @@ if (!isset($_SESSION['user'])) {
     <div class='container-fluid' style="margin-bottom: 20px;">
         <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
-                <tr class="table-primary">
-                    <th>N°</th>
-                    <th>Num_Compte</th>
-                    <th>Date de dotation</th>
-                    <th>Volume</th>
-                    <th>Type</th>
-                    <th>User</th>
-                    <th>Action(s)</th>
+                <tr>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">Num_Compte</th>
+                    <th style="background-color: #4655a4;">Date de dotation</th>
+                    <th style="background-color: #4655a4;">Volume</th>
+                    <th style="background-color: #4655a4;">Type</th>
+                    <th style="background-color: #4655a4;">User</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

@@ -663,5 +663,32 @@ function ajouterOp($dateOp, $idEng, $numFact, $typeOp) {
 }
 
 
+function getPasswordHashByUserId($userId) {
+    global $connexion;
+
+    $userId = (int) $userId; // Sécurisation de l'ID (casting entier)
+
+    $sql = "SELECT mdp FROM users WHERE idUser = $userId";
+    $result = mysqli_query($connexion, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['mdp'];
+    }
+
+    return null; // En cas d'échec ou d'utilisateur non trouvé
+}
+
+function updateUserPassword($id, $newHash) {
+    global $connexion;
+
+    // Attention à bien échapper les variables pour éviter les injections SQL
+    $id = (int) $id;
+    $newHash = mysqli_real_escape_string($connexion, $newHash);
+    $type_mdp = mysqli_real_escape_string($connexion, 'updated');
+
+    $sql = "UPDATE users SET mdp = '$newHash', type_mdp = '$type_mdp' WHERE idUser = $id";
+    mysqli_query($connexion, $sql);
+}
 
 ?>

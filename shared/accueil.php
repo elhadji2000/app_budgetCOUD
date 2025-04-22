@@ -19,4 +19,35 @@ if (!isset($_SESSION['user'])) {
     </div>
 </main>
 
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 votre mot de passe a été modifiè avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
+
 <?php include '../includes/footer.php';?>
