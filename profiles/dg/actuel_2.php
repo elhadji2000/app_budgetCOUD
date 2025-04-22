@@ -6,9 +6,10 @@ if (!isset($_SESSION['user'])) {
 }
 ?>
 <?php include '../../includes/fonctions.php';
-$sommeDotations = sommeDot();
-$sommeEngs = sommeEngs();
-$taux = ($sommeEngs*100)/$sommeDotations;
+$idCp = $_GET['idCp'];
+$comptep = getComptePById($idCp);
+$TDotations = 0;
+$TEngs = 0;
 ?>
 <?php include '../../includes/header.php';?>
 <main>
@@ -18,7 +19,7 @@ $taux = ($sommeEngs*100)/$sommeDotations;
 
     <!-- Barre de recherche -->
     <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h3>REALISATIONS: <?= number_format($sommeDotations, 0, ',', ','); ?>FCFA / <?= number_format($sommeEngs, 0, ',', ','); ?>FCFA soit <?= number_format($taux, 2); ?>%</h3>
+        <h2>Etat du compte principal <?= $comptep['numCp']; ?> : <?= $comptep['libelle']; ?></h2>
     </div>
 
     <!-- Tableau -->
@@ -38,21 +39,31 @@ $taux = ($sommeEngs*100)/$sommeDotations;
                 </thead>
                 <tbody id="tableBody">
                     <?php
-                $execs1 = getExecution_1();
+                $execs1 = getExecution_2($idCp);
                 $n=1;
                 if (!empty($execs1)) :
                     foreach ($execs1 as $exec) : ?>
                     <tr>
-                        <td><?= $exec['numCp']; ?></td>
-                        <td style='text-align: left;padding: 15px;'><?= $exec['libelle']; ?></td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalDotations'], 0, ',', ','); ?> FCFA</td>
+                        <td><?= $exec['numCompte']; ?></td>
+                        <td style="text-align: left; padding: 15px; max-width: 400px;">
+                            <?= $exec['libelleC']; ?>
+                        </td>
+
                         <td style='text-align: right;padding: 15px;'>
-                            <a href="actuel_2.php?idCp=<?php echo $exec['idCp']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> FCFA</a>
+                            <?= number_format($exec['totalDotations'], 0, ',', ','); ?> FCFA
+                        </td>
+                        <td style='text-align: right;padding: 15px;'>
+                            <a href="actuel_3.php?numCompte=<?php echo $exec['numCompte']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?>
+                                FCFA</a>
                         </td>
                         <td style='text-align: right;padding: 15px;'><?= number_format($exec['taux'], 2); ?>%</td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> FCFA</td>
+                        <td style='text-align: right;padding: 15px;'>
+                            <?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> FCFA</td>
                     </tr>
-                    <?php endforeach;?>
+                    <?php 
+                    $TDotations += $exec['totalDotations'];
+                    $TEngs += $exec['totalEngs'];
+                    endforeach;?>
                     <?php else : ?>
                     <tr>
                         <td colspan="5" class="text-danger">Aucune recette trouvée</td>
@@ -60,6 +71,18 @@ $taux = ($sommeEngs*100)/$sommeDotations;
                     <?php endif; ?>
 
                 </tbody>
+                <tfooter>
+                    <tr>
+                        <th colspan="2" style="background-color: #4655a4;texte-align:center;">Total principal</th>
+                        <th style="background-color: #4655a4;text-align: right;">
+                            <?= number_format($TDotations, 0, ',', ','); ?> FCFA</th>
+                        <th style="background-color: #4655a4;text-align: right;">
+                            <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
+                        <th style="background-color: #4655a4;texte-align:center;">-</th>
+                        <th style="background-color: #4655a4;texte-align:center;text-align: right;">
+                            <?=number_format(($TDotations - $TEngs) , 0, ',', ','); ?> FCFA</th>
+                    </tr>
+                </tfooter>
             </table>
         </div>
         <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"

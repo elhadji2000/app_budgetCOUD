@@ -1,4 +1,3 @@
-
 <?php 
 /********************************************************************************** 
 Connectez-vous à votre base de données MySQL 
@@ -287,12 +286,13 @@ function getEngsByCompte($numCompte) {
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn, d.an  
+    $query = "SELECT c.numCompte,cp.numCp, op.numFact, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn, f.nom, d.an  
               FROM engagements AS eng
               JOIN compte AS c ON c.idCompte = eng.idCompte 
               JOIN comptep AS cp ON c.idCp = cp.idCp 
               JOIN dotations AS d ON c.idCompte = d.idCompte 
               JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+              LEFT JOIN operations AS op ON op.idEng=eng.idEng
               WHERE d.an = '$anneeEnCours' AND c.numCompte = '$numCompte'";
 
     $result = $connexion->query($query);
@@ -691,4 +691,96 @@ function updateUserPassword($id, $newHash) {
     mysqli_query($connexion, $sql);
 }
 
+function getExecution_1(){
+    global $connexion;
+   // $anneeEnCours = date("Y"); // Récupère l'année en cours
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "SELECT cp.idCp, cp.numCp, cp.libelle, COALESCE(SUM(d.volume),0) as totalDotations, COALESCE(SUM(eng.montant),0) as totalEngs, COALESCE(SUM(eng.montant)*100/SUM(d.volume),0) as taux FROM comptep cp
+                JOIN compte c ON c.idCp=cp.idCp
+                JOIN dotations d ON d.idCompte=c.idCompte
+                LEFT JOIN engagements eng ON eng.idCompte=c.idCompte
+                WHERE d.an='$anneeEnCours'
+                GROUP BY cp.numCp";
+    
+    $result = $connexion->query($query);
+    if($result->num_rows > 0){
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    else {
+        return [];
+    }
+}
+function getExecution_2($idCp){
+    global $connexion;
+   // $anneeEnCours = date("Y"); // Récupère l'année en cours
+    $anneeEnCours = $_SESSION['an'];
+    $idCp = (int) $idCp;
+
+    $query = "SELECT cp.idCp, cp.numCp, cp.libelle,c.numCompte,c.libelle as libelleC, COALESCE(SUM(d.volume),0) as totalDotations, COALESCE(SUM(eng.montant),0) as totalEngs, COALESCE(SUM(eng.montant)*100/SUM(d.volume),0) as taux FROM comptep cp
+                JOIN compte c ON c.idCp=cp.idCp
+                JOIN dotations d ON d.idCompte=c.idCompte
+                LEFT JOIN engagements eng ON eng.idCompte=c.idCompte
+                WHERE d.an='$anneeEnCours' and cp.idCp='$idCp'
+                GROUP BY c.numCompte";
+    
+    $result = $connexion->query($query);
+    if($result->num_rows > 0){
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    else {
+        return [];
+    }
+}
+function getComptePById($idCp) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+    $idCp = (int) $idCp;
+
+    $query = "SELECT cp.idCp, cp.numCp, cp.libelle 
+              FROM comptep cp 
+              WHERE cp.idCp = '$idCp' 
+              LIMIT 1";
+
+    $result = $connexion->query($query);
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_assoc(); // Retourne une seule ligne sous forme de tableau associatif
+    } else {
+        return null; // Ou false, selon ta logique
+    }
+}
+
+function sommeDot() {
+    global $connexion;
+
+    $anneeEnCours = $_SESSION['an'];
+
+    $sql = "SELECT COALESCE(SUM(d.volume),0) as totalDotations FROM dotations d WHERE d.an='$anneeEnCours'";
+    $result = mysqli_query($connexion, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['totalDotations'];
+    }
+
+    return null; // En cas d'échec ou d'utilisateur non trouvé
+}
+function sommeEngs() {
+    global $connexion;
+
+    $anneeEnCours = $_SESSION['an'];
+
+    $sql = "SELECT COALESCE(SUM(engs.montant),0) as totalEngs FROM engagements engs 
+            JOIN compte c ON c.idCompte=engs.idCompte
+            JOIN dotations d ON d.idCompte=c.idCompte
+            WHERE d.an='$anneeEnCours'";
+    $result = mysqli_query($connexion, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['totalEngs'];
+    }
+
+    return null; // En cas d'échec ou d'utilisateur non trouvé
+}
 ?>
