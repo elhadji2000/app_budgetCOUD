@@ -6,10 +6,12 @@ if (!isset($_SESSION['user'])) {
 }
 ?>
 <?php include '../../includes/fonctions.php';
+$date1 = $_GET['date1'];
+$date2 = $_GET['date2'];
 $numCompte = $_GET['numCompte'];
 $data = getCompteByNum($numCompte);
-$engs = getEngsByCompte($numCompte);
-$TDotations = sommeDotByCompte($numCompte);
+$engs = getEngsByCompteAndDate2($numCompte, $date1, $date2);
+$TDotations = 0;
 $TEngs = 0;
 ?>
 <?php include '../../includes/header.php';?>
@@ -20,7 +22,8 @@ $TEngs = 0;
 
     <!-- Barre de recherche -->
     <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h2>Realisation de <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></h2>
+        <h3>EXECUTION DU  : <?= $date1; ?> AU <?= $date2; ?></h3>
+        <strong>Compte  <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></strong>
     </div>
 
     <!-- Tableau -->
@@ -67,11 +70,10 @@ $TEngs = 0;
                         <td style='padding: 15px;'>
                             <?= $eng['nom']; ?>
                         </td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($eng['montant'], 0, ',', ','); ?>
-                            FCFA</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
                         <td>
-                            <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
-                        </td>
+                        <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                    </td>
                     </tr>
                     <?php 
                     $TEngs += $eng['montant'];
@@ -85,24 +87,14 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL DES REALISATIONS DU
-                            COMPTE</th>
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL DES REALISATIONS DU COMPTE</th>
                         <th colspan="2" style="background-color: #4655a4;text-align: center;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
-                    </tr>
-                    <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">
-                            SOLDE DISPONIBLE DU COMPTE
-                        </th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;">
-                            <?= number_format(($TDotations-$TEngs), 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>
             </table>
         </div>
     </div>
-
-
 
     <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
         <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>

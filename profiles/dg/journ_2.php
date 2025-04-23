@@ -5,17 +5,12 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
     // Redirige vers la page de connexion
     exit();
 }
-
 ?>
 <?php include '../../includes/fonctions.php';?>
-<?php
-$annee_connexion = $_SESSION['an']; // ex: 2023
-$min_date = $annee_connexion . "-01-01";
-$max_date = date("Y-m-d"); // aujourd'hui
-?>
 <?php include '../../includes/header.php';?>
 <?php 
-    $nums = getNumCompte();
+    $date = $_GET['dateEng'];
+    $nums = getCompteEngsByDate($date);
 ?>
 
 <div class='container'>
@@ -23,50 +18,38 @@ $max_date = date("Y-m-d"); // aujourd'hui
 </div>
 <main>
     <div class='container'>
-        <div class='text-center' style='margin-bottom:40px;color:rgba(70, 86, 164, 0.84);'>
-            <h3>MISE À JOUR APRES REMANIEMENT !</h3>
-            <strong style='color:rgba(78, 120, 93, 0.91);'><i>NB: Le montant peut etre positif ou negatif selon que la
-                    dotation ait augmentè ou diminuè.</i></strong>
+        <div class='text-center' style='margin-bottom:45px;color: #4655a4;'>
+            <h3>RENSEIGNEMENT DU COMPTE !</h3>
         </div>
 
         <!-- Formulaire centré avec design -->
-        <form action='traitement_dot.php' method='POST'>
+        <form action='journ_3.php' method='GET'>
             <div
-                style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
+                style='width: 60%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
 
-                <table style='width: 70%; margin: 0 auto; text-align: left;'>
+                <table style='width: 80%; margin: 0 auto; text-align: left;'>
                     <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
                     <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
                     <?php endif;?>
                     <tr>
+                        <input type="hidden" name="dateEng" value="<?= $date; ?>" />
                         <td style='padding: 10px 0;'><strong>Numéro du Compte :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <select name="rem_numc" style="width: 100%; padding: 7px;" required>
+                            <select name="numCompte" style="width: 100%; padding: 10px;" required>
                                 <option value="">Sélectionner un compte</option>
                                 <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["idCompte"]) ?>">
-                                    <?= htmlspecialchars($num["numCompte"]) ?></option>
+                                <option value="<?= htmlspecialchars($num["numCompte"]) ?>">
+                                    <?= htmlspecialchars($num["numCompte"]) ?>
+                                </option>
                                 <?php endforeach; ?>
                             </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Date de Remaniement :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='date' name='rem_date' style='width: 100%; padding: 5px;' required min="<?= $min_date ?>" max="<?= $max_date ?>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Montant Differentiel :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='number' name='rem_volume' step='1' style='width: 100%; padding: 5px;' required />
                         </td>
                     </tr>
                 </table>
             </div>
             <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
                 style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Enregistrer</strong></button>
+                <button type='submit' class='btn btn-success'><strong>Valider</strong></button>
                 <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
             </div>
         </form>
@@ -84,7 +67,7 @@ $max_date = date("Y-m-d"); // aujourd'hui
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 La dotation a été enregistrée avec succès !
+                🎉 L'Engagement a été enregistrée avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
@@ -103,6 +86,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
-
 <?php include '../../includes/footer.php';
 ?>

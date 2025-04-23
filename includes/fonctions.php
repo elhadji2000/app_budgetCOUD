@@ -286,14 +286,33 @@ function getEngsByCompte($numCompte) {
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, op.numFact, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn, f.nom, d.an  
-              FROM engagements AS eng
-              JOIN compte AS c ON c.idCompte = eng.idCompte 
-              JOIN comptep AS cp ON c.idCp = cp.idCp 
-              JOIN dotations AS d ON c.idCompte = d.idCompte 
-              JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-              LEFT JOIN operations AS op ON op.idEng=eng.idEng
-              WHERE d.an = '$anneeEnCours' AND c.numCompte = '$numCompte'";
+    $query = "
+        SELECT 
+            c.numCompte,
+            cp.numCp,
+            op.numFact,
+            cp.libelle AS libelleCp,
+            c.libelle AS libelleC,
+            eng.idEng,
+            eng.dateEng,
+            eng.service,
+            eng.libelle,
+            eng.bc,
+            eng.montant,
+            f.numFourn,
+            f.nom,
+            '$anneeEnCours' AS an
+        FROM engagements AS eng
+        JOIN compte AS c ON c.idCompte = eng.idCompte 
+        JOIN comptep AS cp ON c.idCp = cp.idCp 
+        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        WHERE c.numCompte = '$numCompte' 
+        AND EXISTS (
+            SELECT 1 FROM dotations d 
+            WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+        )
+    ";
 
     $result = $connexion->query($query);
 
@@ -303,6 +322,158 @@ function getEngsByCompte($numCompte) {
         return [];
     }
 }
+
+
+function getEngsByCompteAndDate($numCompte, $date) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            c.numCompte,
+            cp.numCp,
+            op.numFact,
+            cp.libelle AS libelleCp,
+            c.libelle AS libelleC,
+            eng.idEng,
+            eng.dateEng,
+            eng.service,
+            eng.libelle,
+            eng.bc,
+            eng.montant,
+            f.numFourn,
+            f.nom,
+            '$anneeEnCours' AS an
+        FROM engagements AS eng
+        JOIN compte AS c ON c.idCompte = eng.idCompte 
+        JOIN comptep AS cp ON c.idCp = cp.idCp 
+        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        WHERE c.numCompte = '$numCompte' 
+          AND eng.dateEng = '$date'
+          AND EXISTS (
+              SELECT 1 FROM dotations d 
+              WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+          )
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+function getEngsByCompteAndDate2($numCompte, $date1, $date2) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            c.numCompte,
+            cp.numCp,
+            op.numFact,
+            cp.libelle AS libelleCp,
+            c.libelle AS libelleC,
+            eng.idEng,
+            eng.dateEng,
+            eng.service,
+            eng.libelle,
+            eng.bc,
+            eng.montant,
+            f.numFourn,
+            f.nom,
+            '$anneeEnCours' AS an
+        FROM engagements AS eng
+        JOIN compte AS c ON c.idCompte = eng.idCompte 
+        JOIN comptep AS cp ON c.idCp = cp.idCp 
+        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        WHERE c.numCompte = '$numCompte' 
+          AND eng.dateEng BETWEEN '$date1' AND '$date2'
+          AND EXISTS (
+              SELECT 1 FROM dotations d 
+              WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+          )
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+
+function getCompteEngsByDate($date) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            c.numCompte,
+            cp.numCp,
+            op.numFact,
+            eng.dateEng,
+            '$anneeEnCours' AS an
+        FROM engagements AS eng
+        JOIN compte AS c ON c.idCompte = eng.idCompte 
+        JOIN comptep AS cp ON c.idCp = cp.idCp 
+        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        WHERE eng.dateEng = '$date'
+          AND EXISTS (
+              SELECT 1 FROM dotations d 
+              WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+          )
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+
+function getCompteEngsByDate2($date1, $date2) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            c.numCompte,
+            cp.numCp,
+            op.numFact,
+            eng.dateEng,
+            '$anneeEnCours' AS an
+        FROM engagements AS eng
+        JOIN compte AS c ON c.idCompte = eng.idCompte 
+        JOIN comptep AS cp ON c.idCp = cp.idCp 
+        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        WHERE eng.dateEng BETWEEN '$date1' AND '$date2'
+          AND EXISTS (
+              SELECT 1 FROM dotations d 
+              WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+          )
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
 
 function getEngById($idEng) {
     global $connexion;
@@ -332,31 +503,44 @@ Fonction pour recuperer les engagements a partir d'un numero de compte
  ********************************************************************************* */
 function getEngsByNumCompte($numCompte){
     global $connexion;
-    $query = "SELECT * FROM `engagements`
-            JOIN compte ON compte.idCompte = engagements.idCompte 
-            JOIN comptep ON compte.idCp=comptep.idCp 
-            JOIN dotations ON compte.idCompte= dotations.idCompte 
-            WHERE compte.numCompte='$numCompte';";
-    
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "SELECT engagements.*, compte.*, comptep.*
+              FROM engagements
+              JOIN compte ON compte.idCompte = engagements.idCompte 
+              JOIN comptep ON compte.idCp = comptep.idCp 
+              WHERE compte.numCompte = '$numCompte'
+                AND EXISTS (
+                    SELECT 1 FROM dotations 
+                    WHERE dotations.idCompte = compte.idCompte 
+                      AND dotations.an = '$anneeEnCours'
+                )";
+
     $result = $connexion->query($query);
-    if($result->num_rows > 0){
+    if ($result && $result->num_rows > 0) {
         return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    else {
+    } else {
         return [];
     }
 }
+
 function getEngsByNumCompteNonOperation($numCompte){
     global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
     $query = "
-        SELECT engagements.* 
+        SELECT engagements.*
         FROM engagements
         JOIN compte ON compte.idCompte = engagements.idCompte 
         JOIN comptep ON compte.idCp = comptep.idCp 
-        JOIN dotations ON compte.idCompte = dotations.idCompte 
         WHERE compte.numCompte = '$numCompte'
         AND engagements.idEng NOT IN (
             SELECT idEng FROM operations
+        )
+        AND EXISTS (
+            SELECT 1 FROM dotations 
+            WHERE dotations.idCompte = compte.idCompte 
+              AND dotations.an = '$anneeEnCours'
         );
     ";
     
@@ -367,6 +551,7 @@ function getEngsByNumCompteNonOperation($numCompte){
         return [];
     }
 }
+
 function isEngagementUsed($idEng){
     global $connexion;
     $query = "SELECT 1 FROM operations WHERE idEng = ?";
@@ -410,6 +595,8 @@ Fonction pour recuperer les engagements a partir d'un numero de compte
  ********************************************************************************* */
 function getOperationsByType($typeOp) {
     global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
     $query = "
         SELECT 
             o.idOp,
@@ -417,19 +604,22 @@ function getOperationsByType($typeOp) {
             o.numFact,
             e.montant,
             e.idEng,
-            d.an,
             e.dateEng,
             e.libelle,
             e.service,
             f.numFourn,
             c.numCompte
         FROM operations o
-        INNER JOIN engagements e ON o.idEng = e.idEng
-        INNER JOIN compte c ON e.idCompte = c.idCompte
-        INNER JOIN dotations d ON d.idCompte = c.idCompte
-        INNER JOIN fournisseur f ON e.idFourn = f.idFourn
+        JOIN engagements e ON o.idEng = e.idEng
+        JOIN compte c ON e.idCompte = c.idCompte
+        JOIN fournisseur f ON e.idFourn = f.idFourn
         WHERE o.typeOp = ?
-        ORDER BY o.idOp DESC
+        AND EXISTS (
+            SELECT 1 FROM dotations d
+            WHERE d.idCompte = c.idCompte 
+              AND d.an = '$anneeEnCours'
+        )
+        ORDER BY o.idOp DESC;
     ";
 
     $stmt = $connexion->prepare($query);
@@ -468,13 +658,14 @@ function enregistrerDotation($idCompte, $date, $volume, $type) {
 
     // Échappement des données
     $idCompte = mysqli_real_escape_string($connexion, $idCompte);
+    $idCompte = (int) $idCompte;
     $date = mysqli_real_escape_string($connexion, $date);
     $volume = (int) $volume;
     $type = mysqli_real_escape_string($connexion, $type);
 
     // Requête d'insertion
     $sql = "INSERT INTO dotations (idCompte, date, an, volume, type, idUser) 
-            VALUES ('$idCompte', '$date', '$an', $volume, '$type', $idUser)";
+            VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -531,7 +722,7 @@ function getDetailsCompte($numCompte) {
     // DOTATION REMANIEE
     $sqlRemaniee = "SELECT SUM(volume) AS totalRemaniee 
                     FROM dotations 
-                    WHERE idCompte = $idCompte AND type = 'remaniee'";
+                    WHERE idCompte = $idCompte AND type = 'remanier'";
     $resRemaniee = mysqli_query($connexion, $sqlRemaniee);
     $remaniee = ($resRemaniee && $row = mysqli_fetch_assoc($resRemaniee)) ? (int)$row['totalRemaniee'] : 0;
 
@@ -696,12 +887,31 @@ function getExecution_1(){
    // $anneeEnCours = date("Y"); // Récupère l'année en cours
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT cp.idCp, cp.numCp, cp.libelle, COALESCE(SUM(d.volume),0) as totalDotations, COALESCE(SUM(eng.montant),0) as totalEngs, COALESCE(SUM(eng.montant)*100/SUM(d.volume),0) as taux FROM comptep cp
-                JOIN compte c ON c.idCp=cp.idCp
-                JOIN dotations d ON d.idCompte=c.idCompte
-                LEFT JOIN engagements eng ON eng.idCompte=c.idCompte
-                WHERE d.an='$anneeEnCours'
-                GROUP BY cp.numCp";
+    $query = "SELECT 
+    cp.idCp, 
+    cp.numCp, 
+    cp.libelle,
+    COALESCE(d.totalDotations, 0) AS totalDotations,
+    COALESCE(e.totalEngs, 0) AS totalEngs,
+    CASE 
+        WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
+        ELSE ROUND(e.totalEngs * 100.0 / d.totalDotations, 2)
+    END AS taux
+FROM comptep cp
+JOIN (
+    SELECT c.idCp, SUM(d.volume) AS totalDotations
+    FROM compte c
+    JOIN dotations d ON d.idCompte = c.idCompte
+    WHERE d.an = '$anneeEnCours'
+    GROUP BY c.idCp
+) d ON d.idCp = cp.idCp
+LEFT JOIN (
+    SELECT c.idCp, SUM(eng.montant) AS totalEngs
+    FROM compte c
+    JOIN engagements eng ON eng.idCompte = c.idCompte
+    GROUP BY c.idCp
+) e ON e.idCp = cp.idCp
+";
     
     $result = $connexion->query($query);
     if($result->num_rows > 0){
@@ -713,25 +923,47 @@ function getExecution_1(){
 }
 function getExecution_2($idCp){
     global $connexion;
-   // $anneeEnCours = date("Y"); // Récupère l'année en cours
     $anneeEnCours = $_SESSION['an'];
     $idCp = (int) $idCp;
 
-    $query = "SELECT cp.idCp, cp.numCp, cp.libelle,c.numCompte,c.libelle as libelleC, COALESCE(SUM(d.volume),0) as totalDotations, COALESCE(SUM(eng.montant),0) as totalEngs, COALESCE(SUM(eng.montant)*100/SUM(d.volume),0) as taux FROM comptep cp
-                JOIN compte c ON c.idCp=cp.idCp
-                JOIN dotations d ON d.idCompte=c.idCompte
-                LEFT JOIN engagements eng ON eng.idCompte=c.idCompte
-                WHERE d.an='$anneeEnCours' and cp.idCp='$idCp'
-                GROUP BY c.numCompte";
-    
+    $query = "
+        SELECT 
+            cp.idCp, 
+            cp.numCp, 
+            cp.libelle,
+            c.numCompte,
+            c.libelle AS libelleC,
+            COALESCE(d.totalDotations, 0) AS totalDotations,
+            COALESCE(e.totalEngs, 0) AS totalEngs,
+            CASE 
+                WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
+                ELSE ROUND(e.totalEngs * 100.0 / d.totalDotations, 2)
+            END AS taux
+        FROM comptep cp
+        JOIN compte c ON c.idCp = cp.idCp
+        JOIN (
+            SELECT d.idCompte, SUM(d.volume) AS totalDotations
+            FROM dotations d
+            WHERE d.an = '$anneeEnCours'
+            GROUP BY d.idCompte
+        ) d ON d.idCompte = c.idCompte
+        LEFT JOIN (
+            SELECT eng.idCompte, SUM(eng.montant) AS totalEngs
+            FROM engagements eng
+            GROUP BY eng.idCompte
+        ) e ON e.idCompte = c.idCompte
+        WHERE cp.idCp = '$idCp'
+        GROUP BY c.numCompte
+    ";
+
     $result = $connexion->query($query);
-    if($result->num_rows > 0){
+    if ($result->num_rows > 0) {
         return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    else {
+    } else {
         return [];
     }
 }
+
 function getComptePById($idCp) {
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
@@ -765,6 +997,25 @@ function sommeDot() {
 
     return null; // En cas d'échec ou d'utilisateur non trouvé
 }
+
+function sommeDotByCompte($numCompte) {
+    global $connexion;
+
+    $anneeEnCours = $_SESSION['an'];
+
+    $sql = "SELECT COALESCE(SUM(d.volume),0) as totalDotations, c.numCompte 
+            FROM dotations d 
+            JOIN compte c ON d.idCompte=c.idCompte
+            WHERE d.an='$anneeEnCours' AND c.numCompte='$numCompte'";
+    $result = mysqli_query($connexion, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['totalDotations'];
+    }
+
+    return null; // En cas d'échec ou d'utilisateur non trouvé
+}
 function sommeEngs() {
     global $connexion;
 
@@ -772,8 +1023,12 @@ function sommeEngs() {
 
     $sql = "SELECT COALESCE(SUM(engs.montant),0) as totalEngs FROM engagements engs 
             JOIN compte c ON c.idCompte=engs.idCompte
-            JOIN dotations d ON d.idCompte=c.idCompte
-            WHERE d.an='$anneeEnCours'";
+            AND EXISTS (
+            SELECT 1 FROM dotations d
+            WHERE d.idCompte = c.idCompte 
+              AND d.an = '$anneeEnCours'
+        )
+            ";
     $result = mysqli_query($connexion, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {

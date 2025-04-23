@@ -49,7 +49,7 @@ $taux = ($sommeEngs*100)/$sommeDotations;
                         <td style='text-align: right;padding: 15px;'>
                             <a href="actuel_2.php?idCp=<?php echo $exec['idCp']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> FCFA</a>
                         </td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['taux'], 2); ?>%</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['taux']), 2); ?>%</td>
                         <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> FCFA</td>
                     </tr>
                     <?php endforeach;?>

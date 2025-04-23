@@ -19,12 +19,12 @@ if (isset($_POST['ini_numc'], $_POST['ini_date'], $_POST['ini_volume'])) {
 }
 
 if (isset($_POST['rem_numc'], $_POST['rem_date'], $_POST['rem_volume'])) {
-    $numCompte = $_POST['rem_numc'];
+    $idCompte = $_POST['rem_numc'];
     $date = $_POST['rem_date'];
     $volume = $_POST['rem_volume'];
     $type="remanier";
 
-    $resultat = enregistrerDotation($numCompte, $date, $volume, $type);
+    $resultat = enregistrerDotation($idCompte, $date, $volume, $type);
 
     if ($resultat === true) {
         header("Location: add_rem_dot.php?success=1");

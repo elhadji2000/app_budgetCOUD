@@ -6,10 +6,11 @@ if (!isset($_SESSION['user'])) {
 }
 ?>
 <?php include '../../includes/fonctions.php';
+$date = $_GET['dateEng'];
 $numCompte = $_GET['numCompte'];
 $data = getCompteByNum($numCompte);
-$engs = getEngsByCompte($numCompte);
-$TDotations = sommeDotByCompte($numCompte);
+$engs = getEngsByCompteAndDate($numCompte, $date);
+$TDotations = 0;
 $TEngs = 0;
 ?>
 <?php include '../../includes/header.php';?>
@@ -20,7 +21,8 @@ $TEngs = 0;
 
     <!-- Barre de recherche -->
     <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h2>Realisation de <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></h2>
+        <h3>EXECUTION JOURNALIERE : <?= $date; ?></h3>
+        <strong>Compte <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></strong>
     </div>
 
     <!-- Tableau -->
@@ -85,24 +87,14 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL DES REALISATIONS DU
-                            COMPTE</th>
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL JOURNALIERE</th>
                         <th colspan="2" style="background-color: #4655a4;text-align: center;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
-                    </tr>
-                    <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">
-                            SOLDE DISPONIBLE DU COMPTE
-                        </th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;">
-                            <?= number_format(($TDotations-$TEngs), 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>
             </table>
         </div>
     </div>
-
-
 
     <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
         <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>

@@ -27,12 +27,12 @@ $anneeActuelle = date("Y");
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dotations/add_rem_dot.php">
+                        <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/borner_1.php">
                             <strong>Borner</strong>
                         </a>
                     </li>
 
-                    <li><a class="dropdown-item" href="http://localhost/BUDGET/profiles/dotations/liste_dotations.php">
+                    <li><a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/journ_1.php">
                             <strong>Journaliere</strong>
                         </a>
                     </li>
