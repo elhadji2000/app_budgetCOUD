@@ -8,7 +8,12 @@ if (!isset($_SESSION['user'])) {
 <?php include '../../includes/fonctions.php';
 $sommeDotations = sommeDot();
 $sommeEngs = sommeEngs();
-$taux = ($sommeEngs*100)/$sommeDotations;
+if ($sommeDotations != 0) {
+    $taux = ($sommeEngs * 100) / $sommeDotations;
+} else {
+    $taux = 0; // Ou un autre comportement selon ton besoin
+}
+
 ?>
 <?php include '../../includes/header.php';?>
 <main>
@@ -55,7 +60,7 @@ $taux = ($sommeEngs*100)/$sommeDotations;
                     <?php endforeach;?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="5" class="text-danger">Aucune recette trouvée</td>
+                        <td colspan="6" class="text-danger">Aucune resultat trouvée</td>
                     </tr>
                     <?php endif; ?>
 
@@ -64,7 +69,7 @@ $taux = ($sommeEngs*100)/$sommeDotations;
         </div>
         <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
             style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-            <button type='submit' class='btn btn-success'><strong>Imprimer</strong></button>
+            <a href="pdf/actuel_1_pdf.php" target="_blank" class='btn btn-success'><strong>Imprimer en PDF</strong></a>
             <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
         </div>
     </div>

@@ -5,7 +5,9 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';?>
+<?php include '../../includes/fonctions.php';
+$an = $_SESSION['an'];
+?>
 <?php include '../../includes/header.php';?>
 <main>
     <div class='container'>
@@ -48,7 +50,7 @@ if (!isset($_SESSION['user'])) {
                     <td><?= $n; ?></td>
                     <td><?= $eng['numCompte']; ?></td>
                     <td>
-                        <?= 'BE'.$eng['an'] . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?>
+                        <?= 'BE'.$an . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?>
                     </td>
                     <td><?= $eng['dateEng']; ?></td>
                     <td><?= $eng['service']; ?></td>

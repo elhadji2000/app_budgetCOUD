@@ -13,7 +13,7 @@ $anneeActuelle = date("Y");
     <tr style="background-color: #4655a4; color: white;font-size: 13px; font-weight: 400;">
 
         <!-- LIEN CONSULTER LEXECUTION -->
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
@@ -42,7 +42,7 @@ $anneeActuelle = date("Y");
         <?php endif; ?>
 
         <!-- LIEN DE LA DOATIONS -->
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
@@ -88,14 +88,14 @@ $anneeActuelle = date("Y");
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <a href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs.php" class="text-white"
                 style="color: white; text-decoration: none;"><strong>Fournisseurs</strong></a>
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
@@ -128,7 +128,7 @@ if ($anneeSession == $anneeActuelle): ?>
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
@@ -158,7 +158,7 @@ if ($anneeSession == $anneeActuelle): ?>
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
@@ -189,14 +189,14 @@ if ($anneeSession == $anneeActuelle): ?>
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <a href="http://localhost/BUDGET/profiles/dba/liste_compte.php" class="text-white"
                 style="color: white; text-decoration: none;"><strong>Compte</strong></a>
         </td>
         <?php endif; ?>
 
-        <?php if ($_SESSION['priv'] == 'sga' || $_SESSION['priv'] == 'admin') : ?>
+        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
         <td>
             <a href="http://localhost/BUDGET/profiles/dba/liste_users.php" class="text-white"
                 style="color: white; text-decoration: none;"><strong>Utilisateurs</strong></a>

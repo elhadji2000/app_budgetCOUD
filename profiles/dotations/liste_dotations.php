@@ -65,14 +65,14 @@ if (!isset($_SESSION['user'])) {
                 <?php endforeach;?>
                 <?php else : ?>
                 <tr>
-                    <td colspan="5" class="text-danger">Aucune recette trouvée</td>
+                    <td colspan="7" class="text-danger">Aucune résultat trouvée</td>
                 </tr>
                 <?php endif; ?>
 
             </tbody>
             <tbody id="noResultRow" style="display: none;">
                 <tr>
-                    <td colspan="5" class="text-danger">Aucun résultat trouvé</td>
+                    <td colspan="7" class="text-danger">Aucun résultat trouvé</td>
                 </tr>
             </tbody>
         </table>

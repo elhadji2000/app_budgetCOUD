@@ -18,7 +18,7 @@ if (!isset($_SESSION['user'])) {
         <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
             style="max-width: 250px;" onkeyup="filterTable()">
         <h3 class="mb-0 text-center">LES COMPTES ENREGISTRÉS</h3>
-        <a href="#" class="btn btn-success"><strong>nouveau</strong></a>
+        <strong></strong>
     </div>
 
     <!-- Tableau -->

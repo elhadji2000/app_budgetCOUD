@@ -23,20 +23,20 @@
                 <tr>
                     <td style="padding: 10px 0;"><strong>Utilisateur</strong></td>
                     <td style="padding: 10px 0;">
-                        <input type="text" name="utilisateur" style="width: 100%; padding: 5px;" required />
+                        <input type="text" name="utilisateur" placeholder="Matricule Agent..." style="width: 100%; padding: 7px;" required />
                     </td>
                 </tr>
                 <tr>
                     <td style="padding: 10px 0;"><strong>Mot de passe</strong></td>
                     <td style="padding: 10px 0;">
-                        <input type="password" name="motdepasse" style="width: 100%; padding: 5px;" required />
+                        <input type="password" name="motdepasse" placeholder="**** password ****" style="width: 100%; padding: 7px;" required />
                     </td>
                 </tr>
                 <tr>
                     <td style="padding: 10px 0;"><strong>Année Budgétaire</strong></td>
                     <td style="padding: 10px 0;">
-                        <select name="annee_budgetaire" style="width: 100%; padding: 5px;" required>
-                            <option value="">Sélectionnez une année</option>
+                        <select name="annee_budgetaire" style="width: 100%; padding: 8px;" required>
+                            <option value="">--Sélectionnez année--</option>
                             <?php
                                 $annee_actuelle = date("Y");
                                 for ($i = $annee_actuelle; $i >= $annee_actuelle - 10; $i--) {

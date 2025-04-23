@@ -105,13 +105,16 @@ $an = $_SESSION['an'];
             if (rowContainsFilter) found = true;
         }
 
-        <
-        div class = "container text-center"
-        style = "font-size: 15px; font-weight: 400;margin-bottom:20px;" >
-            <
-            a href = "javascript:history.back()"
-        class = "btn btn-info text-center" > < strong > retour < /strong></a >
-            <
-            /div> <
-            /main>
-        <?php include '../../includes/footer.php';?>
+        // Afficher ou cacher la ligne "Aucun résultat trouvé"
+        noResultRow.style.display = found ? "none" : "";
+    }
+    </script>
+
+
+
+
+    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
+        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
+    </div>
+</main>
+<?php include '../../includes/footer.php';?>

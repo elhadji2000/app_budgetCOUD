@@ -30,19 +30,19 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     <tr>
                         <td style='padding: 10px 0;'><strong>NOM COMPLET :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='text' name='nom' style='width: 100%; padding: 10px;' required />
+                            <input type='text' name='nom' placeholder="Prenom NOM" style='width: 100%; padding: 10px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 10px 0;'><strong>LOGIN :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='text' name='log' style='width: 100%; padding: 10px;' required />
+                            <input type='text' name='log' placeholder="Matricule de L'utilisateur..." style='width: 100%; padding: 10px;' required />
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 10px 0;'><strong>E-MAIL :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='text' name='mail' style='width: 100%; padding: 10px;' required />
+                            <input type='text' name='mail' placeholder="Ex: exemple@coud.com" style='width: 100%; padding: 10px;' required />
                         </td>
                     </tr>
                     <tr>
@@ -51,8 +51,9 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                         <select name="priv" style="width: 100%; padding: 13px;" required>
                                 <option value="">--Sélectionnez--</option>
                                 <option value="admin">ADMIN</option>
-                                <option value="sga">SGA</option>
+                                <option value="sag">SAG</option>
                                 <option value="mbis">MBIS</option>
+                                <option value="op">OP</option>
                             </select>
                         </td>
                     </tr>
@@ -79,7 +80,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 Le fournisseur a été enregistrée avec succès !
+                🎉 L'utilisateur a été enregistrée avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>

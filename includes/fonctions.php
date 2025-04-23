@@ -25,18 +25,6 @@ function login($username, $password)
 /********************************************************************************** 
 Fonction pour recuperer tous les ordres de recettes
  ********************************************************************************* */
-function getAllRecettes()
-{
-    global $connexion;
-    $query = "SELECT * FROM `bud_or`"; // Assurez-vous que la table `bud_recettes` existe
-    $result = $connexion->query($query);
-
-    if ($result->num_rows > 0) {
-        return $result->fetch_all(MYSQLI_ASSOC); // Retourne toutes les recettes sous forme de tableau associatif
-    } else {
-        return []; // Retourne un tableau vide si aucune recette n'est trouvée
-    }
-}
 
 /********************************************************************************** 
 Fonction pour recuperer tous les Fournisseurs
@@ -122,7 +110,7 @@ function getAllCompte()
 function getComptesDotations()
 {
     global $connexion;
-    $anneeEnCours = date("Y"); // Récupère l'année en cours
+    $anneeEnCours = $_SESSION['an']; // Récupère l'année en cours
 
     // Requête SQL pour récupérer les comptes déjà dotés et dont l'année de dotation est égale à l'année en cours
     $query = "
@@ -148,7 +136,7 @@ Fonction pour recuperer tous les dotations
 function getAllDotations()
 {
     global $connexion;
-
+    $anneeEnCours = $_SESSION['an'];
     $query = "
         SELECT 
             d.idDot,
@@ -166,6 +154,7 @@ function getAllDotations()
         FROM dotations d
         INNER JOIN users u ON d.idUser = u.idUser
         INNER JOIN compte c ON d.idCompte = c.idCompte
+        WHERE d.an = '$anneeEnCours'
         ORDER BY d.dateSys DESC
     ";
 
@@ -265,13 +254,16 @@ function getEngs(){
    // $anneeEnCours = date("Y"); // Récupère l'année en cours
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn, d.an  
+    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn 
             FROM engagements as eng
             JOIN compte as c ON c.idCompte = eng.idCompte 
             JOIN comptep as cp ON c.idCp=cp.idCp 
-            JOIN dotations as d ON c.idCompte= d.idCompte 
             JOIN fournisseur as f ON f.idFourn= eng.idFourn 
-            WHERE d.an='$anneeEnCours';";
+            WHERE EXISTS (
+            SELECT 1 FROM dotations d 
+            WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+        )
+            ";
     
     $result = $connexion->query($query);
     if($result->num_rows > 0){
@@ -1038,4 +1030,44 @@ function sommeEngs() {
 
     return null; // En cas d'échec ou d'utilisateur non trouvé
 }
+
+function ajouterUtilisateur($nom, $login, $email, $privilege) {
+    global $connexion;
+
+    // Échapper les entrées (à remplacer par des requêtes préparées pour plus de sécurité)
+    $nom = $connexion->real_escape_string($nom);
+    $login = $connexion->real_escape_string($login);
+    $email = $connexion->real_escape_string($email);
+    $privilege = $connexion->real_escape_string($privilege);
+    $password = SHA1("coud2025");
+    $type_mdp = "default";
+
+    // Vérifie si le login existe déjà
+    $checkQuery = "SELECT idUser FROM users WHERE log = '$login'";
+    $checkResult = $connexion->query($checkQuery);
+
+    if ($checkResult && $checkResult->num_rows > 0) {
+        return [
+            'success' => false,
+            'message' => "Ce login existe déjà."
+        ];
+    }
+
+    // Insérer l'utilisateur
+    $insertQuery = "INSERT INTO users (nom, log, email, priv, mdp, type_mdp) 
+                    VALUES ('$nom', '$login', '$email', '$privilege', '$password', '$type_mdp')";
+
+    if ($connexion->query($insertQuery)) {
+        return [
+            'success' => true,
+            'message' => "Utilisateur ajouté avec succès."
+        ];
+    } else {
+        return [
+            'success' => false,
+            'message' => "Erreur lors de l'ajout de l'utilisateur."
+        ];
+    }
+}
+
 ?>
