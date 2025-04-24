@@ -8,10 +8,10 @@ if (!isset($_SESSION['user'])) {
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 include '../../../includes/fonctions.php';
-$sommeDotations = sommeDot();
-$sommeEngs = sommeEngs();
-$taux = ($sommeDotations != 0) ? ($sommeEngs * 100) / $sommeDotations : 0;
-
+$idCp = $_GET['idCp'];
+$comptep = getComptePById($idCp);
+$TDotations = 0;
+$TEngs = 0;
 // Capture HTML
 ob_start();
 ?>
@@ -22,16 +22,16 @@ ob_start();
     </div>
     <br>
     <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h2>REALISATIONS: <?= number_format($sommeDotations, 0, ',', ','); ?> FCFA /
-            <?= number_format($sommeEngs, 0, ',', ','); ?> FCFA soit <?= number_format($taux, 2); ?>%</h2>
+        <h2>Etat du compte principal <?= $comptep['numCp']; ?> : <?= $comptep['libelle']; ?></h2>
     </div>
 
+    <!-- Tableau -->
     <div class='container-fluid'>
         <div style='width: 100%; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
             <table style="width: 100%; font-size: 15px;">
                 <thead style="color: white !important;">
                     <tr style="color: white !important;text-align:center;">
-                        <th style="background-color: #4655a4; color: white;text-align:center;">C.P</th>
+                        <th style="background-color: #4655a4; color: white;text-align:center;">C_P</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Libelle</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Dotations</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Realisation</th>
@@ -39,29 +39,51 @@ ob_start();
                         <th style="background-color: #4655a4; color: white;text-align:center;">Disponible</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableBody">
                     <?php
-                    $execs1 = getExecution_1();
-                    if (!empty($execs1)) :
-                        foreach ($execs1 as $exec) : ?>
+                $execs1 = getExecution_2($idCp);
+                $n=1;
+                if (!empty($execs1)) :
+                    foreach ($execs1 as $exec) : ?>
                     <tr>
-                        <td><?= $exec['numCp']; ?></td>
-                        <td style='text-align:left;padding: 15px;max-width: 250px;'><?= $exec['libelle']; ?></td>
+                        <td style='text-align:center;padding: 15px;'><?= $exec['numCompte']; ?></td>
+                        <td style="text-align:left; padding: 15px; max-width: 200px;">
+                            <?= $exec['libelleC']; ?>
+                        </td>
+
                         <td style='text-align:center;padding: 15px;'>
-                            <?= number_format($exec['totalDotations'], 0, ',', ','); ?> F</td>
+                            <?= number_format($exec['totalDotations'], 0, ',', ','); ?> F
+                        </td>
                         <td style='text-align:center;padding: 15px;'>
-                            <?= number_format($exec['totalEngs'], 0, ',', ','); ?> F</td>
-                        <td style='text-align:center;padding: 15px;'><?= number_format(($exec['taux']), 2); ?>%</td>
+                            <a href="actuel_3.php?numCompte=<?php echo $exec['numCompte']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> F</a>
+                        </td>
+                        <td style='text-align:center;padding: 15px;'><?= number_format($exec['taux'], 2); ?>%</td>
                         <td style='text-align:center;padding: 15px;'>
-                            <?= number_format(($exec['totalDotations'] - $exec['totalEngs']), 0, ',', ','); ?> F</td>
+                            <?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> F</td>
                     </tr>
-                    <?php endforeach;
-                    else : ?>
+                    <?php 
+                    $TDotations += $exec['totalDotations'];
+                    $TEngs += $exec['totalEngs'];
+                    endforeach;?>
+                    <?php else : ?>
                     <tr>
-                        <td colspan="6" class="text-danger">Aucun résultat trouvé</td>
+                        <td colspan="5" class="text-danger">Aucune recette trouvée</td>
                     </tr>
                     <?php endif; ?>
+
                 </tbody>
+                <tfooter>
+                    <tr>
+                        <th colspan="2" style="background-color: #4655a4;text-align:center;color: white;">Total principal</th>
+                        <th style="background-color: #4655a4;text-align:center;color: white;">
+                            <?= number_format($TDotations, 0, ',', ','); ?> F</th>
+                        <th style="background-color: #4655a4;text-align:center;color: white;">
+                            <?= number_format($TEngs, 0, ',', ','); ?> F</th>
+                        <th style="background-color: #4655a4;text-align:center;color: white;">-</th>
+                        <th style="background-color: #4655a4;text-align:center;color: white;">
+                            <?=number_format(($TDotations - $TEngs) , 0, ',', ','); ?> F</th>
+                    </tr>
+                </tfooter>
             </table>
         </div>
     </div>

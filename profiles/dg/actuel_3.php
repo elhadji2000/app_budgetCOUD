@@ -85,16 +85,16 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL DES REALISATIONS DU
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL DES REALISATIONS DU
                             COMPTE</th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;">
+                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
                     </tr>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">
                             SOLDE DISPONIBLE DU COMPTE
                         </th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;">
+                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format(($TDotations-$TEngs), 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>

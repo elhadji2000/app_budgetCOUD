@@ -1,42 +1,40 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../index.php"); // Redirige vers la page de connexion
+    header("Location: ../../../index.php");
     exit();
 }
-?>
-<?php include '../../includes/fonctions.php';
+
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+include '../../../includes/fonctions.php';
 $numEng = $_GET['id'];
 $engagement = getEngById($numEng);
 $details = getDetailsCompte($engagement['numCompte']);
-?>
-<?php
+
 // Sécurité : Initialisation si valeurs manquantes
 $details['dotationInitiale'] = $details['dotationInitiale'] ?? 0;
 $details['dotationRemaniee'] = $details['dotationRemaniee'] ?? 0;
 $totalEngagement = $details['totalEngagement'] ?? 0;
 $ecart = $details['ecart'] ?? 0;
-$tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
+$tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee']);
+// Capture HTML
+ob_start();
 ?>
-<?php include '../../includes/header.php';?>
+
 <main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
+    <div class="text-center">
+        <img src="/BUDGET/assets/images/logo.jpg" width="1020" height="100" alt="Logo">
     </div>
-
-    <div class='container' style="margin-bottom: 20px;">
-        <?php
-            $date = date('d/m/Y'); // ou une autre date d'engagement récupérée en BDD
-        ?>
-        <div
-            style='width: 100%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
-
+    <!-- Tableau -->
+    <div class='container-fluid'>
+        <div style='width: 100%; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4; padding: 20px;'>
             <table
                 style="width: 100%; border-collapse: separate; border-spacing: 0 10px; font-family: Arial, sans-serif;">
                 <!-- Ligne 1 : Logo, Titre, Date -->
                 <tr>
                     <td style="text-align: center; width: 30%; border: 1px solid black; padding: 8px;">
-                        <img src="/BUDGET/assets/images/logo-du-coud.jpg" width="70%" height="100" alt="Logo" />
+                        <img src="/BUDGET/assets/images/logo-du-coud.jpg" width="20%" height="100" alt="Logo" />
                     </td>
 
                     <td style="text-align: center; width: 40%; border: 1px solid black; padding: 8px;">
@@ -61,7 +59,8 @@ $tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
                         <p>Type : <i><?= $engagement['service']; ?></i></p>
                         <p>Nature : <?= $engagement['libelleCp']; ?></i></p>
                         <p>Objet : <i><?= $engagement['libelle']; ?></i></p>
-                        <p>Montant : <i style="float: right;"><?= number_format($engagement['montant'], 0, ',', ','); ?>
+                        <p>Montant : <i
+                                style="text-align: right;"><?= number_format($engagement['montant'], 0, ',', ','); ?>
                                 FCFA</i></p>
                     </td>
                     <td style="border: 1px solid black; padding: 10px; vertical-align: top;">
@@ -88,16 +87,17 @@ $tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
                     </td>
                     <td style="border: 1px solid black; padding: 10px; vertical-align: top;">
                         <p><b>SITUATION DES ENGAGEMENTS</b></p>
-                        <p>Crédits ouverts : <i style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?>
-                                FCFA</i></p>
+                        <p>Crédits ouverts :
+                            <i style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i>
+                        </p>
                         <p>Modification de crédits :</p>
                         <p>Engagements antérieurs :</p>
                         <p>Annulation d"engagement :</p>
-                        <p>Disponible avant le bon : <i
-                                style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?>
-                                FCFA</i></p>
-                        <p>Nouveau disponible : <i style="float: right;"><?= number_format($ecart, 0, ',', ','); ?>
-                                FCFA</i>
+                        <p>Disponible avant le bon :
+                            <i style="float: right;"><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</i>
+                        </p>
+                        <p>Nouveau disponible :
+                            <i style="float: right;"><?= number_format($ecart, 0, ',', ','); ?> FCFA</i>
                         </p>
                     </td>
                     <td
@@ -107,14 +107,34 @@ $tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
                 </tr>
             </table>
         </div>
-
-        <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-            style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-            <a  href="../dg/pdf/bonEng_pdf.php?id=<?php echo $numEng; ?>" target="_blank" class='btn btn-success'><strong>Imprimer en PDF</strong></a>
-            <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
-        </div>
-
     </div>
 
+    <div class="text-center" style="font-size: 13px; font-weight: 400;">
+        <p><strong>Généré automatiquement par le système de gestion budgétaire</strong></p>
+    </div>
 </main>
-<?php include '../../includes/footer.php';?>
+
+<?php
+$html = ob_get_clean();
+
+// Lecture du CSS Bootstrap local
+$bootstrapCSS = file_get_contents(__DIR__ . '/../../../assets/bootstrap/dist/css/bootstrap.min.css');
+
+$mpdf = new \Mpdf\Mpdf([
+    'orientation' => 'L' // 'L' pour Landscape (paysage), 'P' pour Portrait
+]);
+$mpdf->WriteHTML('<style>' . $bootstrapCSS . '</style>', \Mpdf\HTMLParserMode::HEADER_CSS);
+$mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
+$mpdf->WriteHTML('<style>
+    table, th, td {
+        border: 1px solid white;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+</style>', \Mpdf\HTMLParserMode::HEADER_CSS);
+
+
+$mpdf->Output('etat-actuel.pdf', 'I');

@@ -73,13 +73,13 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="2" style="background-color: #4655a4;texte-align:center;">Total principal</th>
-                        <th style="background-color: #4655a4;text-align: right;">
+                        <th colspan="2" style="background-color: #4655a4;texte-align:center;color: white;">Total principal</th>
+                        <th style="background-color: #4655a4;text-align: right;color: white;">
                             <?= number_format($TDotations, 0, ',', ','); ?> FCFA</th>
-                        <th style="background-color: #4655a4;text-align: right;">
+                        <th style="background-color: #4655a4;text-align: right;color: white;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
-                        <th style="background-color: #4655a4;texte-align:center;">-</th>
-                        <th style="background-color: #4655a4;texte-align:center;text-align: right;">
+                        <th style="background-color: #4655a4;texte-align:center;color: white;">-</th>
+                        <th style="background-color: #4655a4;texte-align:center;text-align: right;color: white;">
                             <?=number_format(($TDotations - $TEngs) , 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>
@@ -87,7 +87,7 @@ $TEngs = 0;
         </div>
         <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
             style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-            <button type='submit' class='btn btn-success'><strong>Imprimer</strong></button>
+            <a  href="pdf/actuel_2_pdf.php?idCp=<?php echo $exec['idCp']; ?>" target="_blank" class='btn btn-success'><strong>Imprimer en PDF</strong></a>
             <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
         </div>
     </div>
