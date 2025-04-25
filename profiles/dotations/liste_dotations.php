@@ -29,7 +29,7 @@ if (!isset($_SESSION['user'])) {
                     <th style="background-color: #4655a4;">N°</th>
                     <th style="background-color: #4655a4;">Num_Compte</th>
                     <th style="background-color: #4655a4;">Date de dotation</th>
-                    <th style="background-color: #4655a4;">Volume</th>
+                    <th style="background-color: #4655a4;">Volume (fcfa)</th>
                     <th style="background-color: #4655a4;">Type</th>
                     <th style="background-color: #4655a4;">User</th>
                     <th style="background-color: #4655a4;">Action(s)</th>
@@ -45,7 +45,7 @@ if (!isset($_SESSION['user'])) {
                     <td><?= $n++; ?></td>
                     <td><?= $dotation['numCompte']; ?></td>
                     <td><?= $dotation['date']; ?></td>
-                    <td><?= number_format($dotation['volume'], 0, ',', ','); ?> FCFA</td>
+                    <td><?= number_format($dotation['volume'], 0, ',', ','); ?> fcfa</td>
                     <td>
                         <span class="badge <?= ($dotation['type'] == 'initiale') ? 'bg-info' : 'bg-warning'; ?>">
                             <?= ucfirst($dotation['type']); ?>
@@ -76,6 +76,7 @@ if (!isset($_SESSION['user'])) {
                 </tr>
             </tbody>
         </table>
+        <div id="pagination" class="text-center mt-3"></div>
     </div>
 
     <!-- Script pour la recherche et l'affichage du message -->
@@ -109,6 +110,52 @@ if (!isset($_SESSION['user'])) {
     }
     </script>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const rowsPerPage = 15; // Nombre de lignes par page
+        const table = document.querySelector("tbody#tableBody");
+        const rows = table.querySelectorAll("tr");
+        const pagination = document.getElementById("pagination");
+
+        let currentPage = 1;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function displayRows(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+        }
+
+        function setupPagination() {
+            pagination.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement("button");
+                btn.innerText = i;
+                btn.classList.add("btn", "btn-sm", "btn-outline-primary", "mx-1");
+
+                if (i === currentPage) {
+                    btn.classList.add("active");
+                }
+
+                btn.addEventListener("click", () => {
+                    currentPage = i;
+                    displayRows(currentPage);
+                    setupPagination(); // Re-render pour mettre à jour le bouton actif
+                });
+
+                pagination.appendChild(btn);
+            }
+        }
+
+        // Init display
+        displayRows(currentPage);
+        setupPagination();
+    });
+    </script>
 
 
 

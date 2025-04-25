@@ -63,6 +63,7 @@ if (!isset($_SESSION['user'])) {
                 </tr>
             </tbody>
         </table>
+        <div id="pagination" class="text-center mt-3"></div>
     </div>
 
     <!-- Script pour la recherche et l'affichage du message -->
@@ -95,6 +96,54 @@ if (!isset($_SESSION['user'])) {
         noResultRow.style.display = found ? "none" : "";
     }
     </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 15; // Nombre de lignes par page
+        const table = document.querySelector("tbody#tableBody");
+        const rows = table.querySelectorAll("tr");
+        const pagination = document.getElementById("pagination");
+
+        let currentPage = 1;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function displayRows(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+        }
+
+        function setupPagination() {
+            pagination.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement("button");
+                btn.innerText = i;
+                btn.classList.add("btn", "btn-sm", "btn-outline-primary", "mx-1");
+
+                if (i === currentPage) {
+                    btn.classList.add("active");
+                }
+
+                btn.addEventListener("click", () => {
+                    currentPage = i;
+                    displayRows(currentPage);
+                    setupPagination(); // Re-render pour mettre à jour le bouton actif
+                });
+
+                pagination.appendChild(btn);
+            }
+        }
+
+        // Init display
+        displayRows(currentPage);
+        setupPagination();
+    });
+</script>
+
 
 
 

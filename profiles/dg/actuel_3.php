@@ -27,12 +27,12 @@ $TEngs = 0;
     <div class='container-fluid' style="margin-bottom: 20px;">
         <div
             style='width: 100%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
-            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:18px;">
+            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:15px;">
                 <thead style="color: white !important;">
                     <tr>
                         <th style="background-color: #4655a4;">Numero</th>
                         <th style="background-color: #4655a4;">Compte</th>
-                        <th style="background-color: #4655a4;">Date_Realisation</th>
+                        <th style="background-color: #4655a4;">Date</th>
                         <th style="background-color: #4655a4;">Ref</th>
                         <th style="background-color: #4655a4;">Objet</th>
                         <th style="background-color: #4655a4;">Service</th>

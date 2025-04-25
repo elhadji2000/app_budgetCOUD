@@ -23,7 +23,12 @@ $anneeActuelle = date("Y");
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li>
                         <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/actuel_1.php">
-                            <strong>actuel</strong>
+                            <strong>Globale</strong>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/global_1.php">
+                            <strong>Globale O.P</strong>
                         </a>
                     </li>
                     <li>

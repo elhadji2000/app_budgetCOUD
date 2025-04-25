@@ -27,17 +27,17 @@ $an = $_SESSION['an'];
     <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>N°</th>
-                    <th>Compte</th>
-                    <th>Num_Engagement</th>
-                    <th>Num O.R</th>
-                    <th>Date_Engagement</th>
-                    <th>Objet</th>
-                    <th>Service</th>
-                    <th>Fournisseur</th>
-                    <th>Date O.R</th>
-                    <th>Num_Fact</th>
-                    <th>Montant</th>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">Compte</th>
+                    <th style="background-color: #4655a4;">Num_Engagement</th>
+                    <th style="background-color: #4655a4;">Num O.R</th>
+                    <th style="background-color: #4655a4;">Date_Engagement</th>
+                    <th style="background-color: #4655a4;">Objet</th>
+                    <th style="background-color: #4655a4;">Service</th>
+                    <th style="background-color: #4655a4;">Fournisseur</th>
+                    <th style="background-color: #4655a4;">Date O.R</th>
+                    <th style="background-color: #4655a4;">Num_Fact</th>
+                    <th style="background-color: #4655a4;">Montant</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

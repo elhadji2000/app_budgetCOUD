@@ -28,8 +28,8 @@ $TEngs = 0;
     <!-- Tableau -->
     <div class='container-fluid' style="margin-bottom: 20px;">
         <div
-            style='width: 100%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
-            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:18px;">
+            style='width: 100%; margin: 0 auto; border-top: 3px solid #4655a4; border-bottom: 3px solid #4655a4; padding: 20px;'>
+            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:15px;">
                 <thead style="color: white !important;">
                     <tr>
                         <th style="background-color: #4655a4;">Numero</th>
@@ -87,8 +87,8 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;">TOTAL JOURNALIERE</th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;">
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL JOURNALIERE</th>
+                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>

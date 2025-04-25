@@ -4,10 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
     <link href="http://localhost/BUDGET/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://localhost/BUDGET/assets/css.css" rel="stylesheet">
     <!-- Lien pour inclure Google Fonts -->
-    <title>budgetcoud</title>
+    <title>CAMPUSCOUD: Gestion Budget</title>
+    <link rel="shortcut icon" href="log.gif" type="../image/x-icon">
+    <link rel="icon" href="log.gif" type="../assets/image/x-icon">
     <style>
     html,
     body {
@@ -68,6 +72,26 @@
         /* Réduit la hauteur du bouton */
     }
     </style>
+
+    <script>
+    // ⏳ Déconnexion après 1 minute d'inactivité
+    let inactivityTimer;
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            window.location.href = 'http://localhost/BUDGET/auth/logout.php'; // Redirige vers la déconnexion
+        }, 180000); // 60000 ms = 1 minute
+    }
+
+    // Réinitialise le timer à chaque activité utilisateur
+   // ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+      //  document.addEventListener(event, resetInactivityTimer);
+    //});
+
+    // Lancer le timer dès le chargement
+    //resetInactivityTimer();
+    </script>
 
 </head>
 

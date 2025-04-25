@@ -16,7 +16,7 @@ if ($sommeDotations != 0) {
 
 ?>
 <?php
-$execs1 = getExecution_1();
+$execs1 = getExecutionOp_1();
 $showRemanier = false;
 
 // Première boucle pour vérifier s'il existe au moins une dotation remaniée
@@ -53,8 +53,10 @@ foreach ($execs1 as $exec) {
                             <th style="background-color: #4655a4;">Dotation_Remaniee</th>
                         <?php endif; ?>
                         <th style="background-color: #4655a4;">Realisation</th>
-                        <th style="background-color: #4655a4;">Taux_Realisation</th>
+                        <th style="background-color: #4655a4;">Taux</th>
                         <th style="background-color: #4655a4;">Disponible</th>
+                        <th style="background-color: #4655a4;">O.P</th>
+                        <th style="background-color: #4655a4;">Diff Eng/Op</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -71,10 +73,12 @@ foreach ($execs1 as $exec) {
                         <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalDotations'], 0, ',', ','); ?> fcfa</td>
                         <?php endif; ?>
                         <td style='text-align: right;padding: 15px;'>
-                            <a href="actuel_2.php?idCp=<?php echo $exec['idCp']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> fcfa</a>
+                            <a href="actuel_2.php?idCp=<?php echo $exec['idCp']; ?>&op=1"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> fcfa</a>
                         </td>
                         <td style='text-align: right;padding: 15px;'><?= number_format(($exec['taux']), 2); ?>%</td>
                         <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> fcfa</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalOp'], 0, ',', ','); ?> fcfa</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalEngs']-$exec['totalOp']), 0, ',', ','); ?> fcfa</td>
                     </tr>
                     <?php endforeach;?>
                     <?php else : ?>

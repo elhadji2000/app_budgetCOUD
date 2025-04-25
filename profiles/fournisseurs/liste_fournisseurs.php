@@ -27,13 +27,13 @@ if (!isset($_SESSION['user'])) {
         <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>N°</th>
-                    <th>NumF</th>
-                    <th>Nom</th>
-                    <th>Adresse</th>
-                    <th>Contact</th>
-                    <th>Nature</th>
-                    <th>Action(s)</th>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">NumF</th>
+                    <th style="background-color: #4655a4;">Nom</th>
+                    <th style="background-color: #4655a4;">Adresse</th>
+                    <th style="background-color: #4655a4;">Contact</th>
+                    <th style="background-color: #4655a4;">Nature</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

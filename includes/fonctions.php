@@ -117,8 +117,10 @@ function getComptesDotations()
         SELECT c.numCompte, c.code, c.libelle, cp.numCp, cp.nature
         FROM compte AS c
         JOIN compteP AS cp ON c.idCp = cp.idCp
-        JOIN dotations AS d ON c.idCompte = d.idCompte
-        WHERE YEAR(d.date) = '$anneeEnCours'  -- Filtrer sur l'année de la dotation
+        WHERE EXISTS (
+            SELECT 1 FROM dotations d 
+            WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+            )
         ORDER BY cp.numCp ASC";
     
     $result = $connexion->query($query);
@@ -644,8 +646,10 @@ function enregistrerDotation($idCompte, $date, $volume, $type) {
     $an = (int) $_SESSION['an'];
 
     // Validation : montant non négatif
-    if ($volume < 0) {
-        return "Le volume ne peut pas être négatif.";
+    if ($type=="initiale") {
+        if ($volume < 0) {
+            return "Le volume ne peut pas être négatif.";
+        }
     }
 
     // Échappement des données
@@ -884,6 +888,8 @@ function getExecution_1(){
     cp.numCp, 
     cp.libelle,
     COALESCE(d.totalDotations, 0) AS totalDotations,
+    COALESCE(d.totalDotInitial, 0) AS totalDotInitial,
+    COALESCE(d.totalDotRemanier, 0) AS totalDotRemanier,
     COALESCE(e.totalEngs, 0) AS totalEngs,
     CASE 
         WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
@@ -891,18 +897,81 @@ function getExecution_1(){
     END AS taux
 FROM comptep cp
 JOIN (
-    SELECT c.idCp, SUM(d.volume) AS totalDotations
+    SELECT 
+        c.idCp, 
+        SUM(d.volume) AS totalDotations,
+        SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
+        SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
     FROM compte c
     JOIN dotations d ON d.idCompte = c.idCompte
     WHERE d.an = '$anneeEnCours'
     GROUP BY c.idCp
 ) d ON d.idCp = cp.idCp
 LEFT JOIN (
-    SELECT c.idCp, SUM(eng.montant) AS totalEngs
+    SELECT 
+        c.idCp, 
+        SUM(eng.montant) AS totalEngs
     FROM compte c
     JOIN engagements eng ON eng.idCompte = c.idCompte
     GROUP BY c.idCp
 ) e ON e.idCp = cp.idCp
+";
+    
+    $result = $connexion->query($query);
+    if($result->num_rows > 0){
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    else {
+        return [];
+    }
+}
+function getExecutionOp_1(){
+    global $connexion;
+   // $anneeEnCours = date("Y"); // Récupère l'année en cours
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "SELECT 
+    cp.idCp, 
+    cp.numCp, 
+    cp.libelle,
+    COALESCE(d.totalDotations, 0) AS totalDotations,
+    COALESCE(d.totalDotInitial, 0) AS totalDotInitial,
+    COALESCE(d.totalDotRemanier, 0) AS totalDotRemanier,
+    COALESCE(e.totalEngs, 0) AS totalEngs,
+    COALESCE(f.totalOp, 0) AS totalOp,
+    CASE 
+        WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
+        ELSE ROUND(e.totalEngs * 100.0 / d.totalDotations, 2)
+    END AS taux
+FROM comptep cp
+JOIN (
+    SELECT 
+        c.idCp, 
+        SUM(d.volume) AS totalDotations,
+        SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
+        SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
+    FROM compte c
+    JOIN dotations d ON d.idCompte = c.idCompte
+    WHERE d.an = '$anneeEnCours'
+    GROUP BY c.idCp
+) d ON d.idCp = cp.idCp
+LEFT JOIN (
+    SELECT 
+        c.idCp, 
+        SUM(eng.montant) AS totalEngs
+    FROM compte c
+    JOIN engagements eng ON eng.idCompte = c.idCompte
+    GROUP BY c.idCp
+) e ON e.idCp = cp.idCp
+LEFT JOIN (
+    SELECT 
+        c.idCp,
+        SUM(eng.montant) AS totalOp
+    FROM operations op
+    JOIN engagements eng ON eng.idEng = op.idEng
+    JOIN compte c ON c.idCompte = eng.idCompte
+    GROUP BY c.idCp
+) f ON f.idCp = cp.idCp
 ";
     
     $result = $connexion->query($query);
@@ -919,34 +988,52 @@ function getExecution_2($idCp){
     $idCp = (int) $idCp;
 
     $query = "
+    SELECT 
+        cp.idCp, 
+        cp.numCp, 
+        cp.libelle,
+        c.numCompte,
+        c.libelle AS libelleC,
+        COALESCE(d.totalDotations, 0) AS totalDotations,
+        COALESCE(d.totalDotInitial, 0) AS totalDotInitial,
+        COALESCE(d.totalDotRemanier, 0) AS totalDotRemanier,
+        COALESCE(e.totalEngs, 0) AS totalEngs,
+        COALESCE(f.totalOp, 0) AS totalOp,
+        CASE 
+            WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
+            ELSE ROUND(e.totalEngs * 100.0 / d.totalDotations, 2)
+        END AS taux
+    FROM comptep cp
+    JOIN compte c ON c.idCp = cp.idCp
+    JOIN (
         SELECT 
-            cp.idCp, 
-            cp.numCp, 
-            cp.libelle,
-            c.numCompte,
-            c.libelle AS libelleC,
-            COALESCE(d.totalDotations, 0) AS totalDotations,
-            COALESCE(e.totalEngs, 0) AS totalEngs,
-            CASE 
-                WHEN COALESCE(d.totalDotations, 0) = 0 THEN 0
-                ELSE ROUND(e.totalEngs * 100.0 / d.totalDotations, 2)
-            END AS taux
-        FROM comptep cp
-        JOIN compte c ON c.idCp = cp.idCp
-        JOIN (
-            SELECT d.idCompte, SUM(d.volume) AS totalDotations
-            FROM dotations d
-            WHERE d.an = '$anneeEnCours'
-            GROUP BY d.idCompte
-        ) d ON d.idCompte = c.idCompte
-        LEFT JOIN (
-            SELECT eng.idCompte, SUM(eng.montant) AS totalEngs
-            FROM engagements eng
-            GROUP BY eng.idCompte
-        ) e ON e.idCompte = c.idCompte
-        WHERE cp.idCp = '$idCp'
-        GROUP BY c.numCompte
-    ";
+            d.idCompte, 
+            SUM(d.volume) AS totalDotations,
+            SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
+            SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
+        FROM dotations d
+        WHERE d.an = '$anneeEnCours'
+        GROUP BY d.idCompte
+    ) d ON d.idCompte = c.idCompte
+    LEFT JOIN (
+        SELECT 
+            eng.idCompte, 
+            SUM(eng.montant) AS totalEngs
+        FROM engagements eng
+        GROUP BY eng.idCompte
+    ) e ON e.idCompte = c.idCompte
+    LEFT JOIN (
+    SELECT 
+        c.idCp,
+        SUM(eng.montant) AS totalOp
+    FROM operations op
+    JOIN engagements eng ON eng.idEng = op.idEng
+    JOIN compte c ON c.idCompte = eng.idCompte
+    GROUP BY c.idCp
+) f ON f.idCp = cp.idCp
+    WHERE cp.idCp = '$idCp'
+    GROUP BY c.numCompte
+";
 
     $result = $connexion->query($query);
     if ($result->num_rows > 0) {

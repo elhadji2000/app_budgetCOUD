@@ -28,16 +28,16 @@ $an = $_SESSION['an'];
         <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>N°</th>
-                    <th>NumCompte</th>
-                    <th>NumEngs</th>
-                    <th>date</th>
-                    <th>service</th>
-                    <th>libelle</th>
-                    <th>bc</th>
-                    <th>Montant</th>
-                    <th>Fourniseur</th>
-                    <th>Action(s)</th>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">NumCompte</th>
+                    <th style="background-color: #4655a4;">NumEngs</th>
+                    <th style="background-color: #4655a4;">date</th>
+                    <th style="background-color: #4655a4;">service</th>
+                    <th style="background-color: #4655a4;">libelle</th>
+                    <th style="background-color: #4655a4;">bc</th>
+                    <th style="background-color: #4655a4;">Montant</th>
+                    <th style="background-color: #4655a4;">Fourniseur</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

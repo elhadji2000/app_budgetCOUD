@@ -18,7 +18,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
 <main>
     <div class='container'>
         <div class='text-center' style='margin-bottom:45px;color: #4655a4;'>
-            <h3>RENSEIGNEMENT DE LA DOTATION INITIALE !!</h3>
+            <h3>RENSEIGNER LE COMPTE !</h3>
         </div>
 
         <!-- Formulaire centré avec design -->
