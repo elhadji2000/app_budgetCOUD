@@ -9,9 +9,24 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 include '../../../includes/fonctions.php';
 $idCp = $_GET['idCp'];
+$op = isset($_GET['op']) ? $_GET['op'] : 0;
 $comptep = getComptePById($idCp);
 $TDotations = 0;
 $TEngs = 0;
+$TOp = 0;
+$TDotationInitiale = 0;
+$TDotationRemanier = 0;
+
+$execs1 = getExecution_2($idCp);
+$showRemanier = false;
+
+// Première boucle pour vérifier s'il existe au moins une dotation remaniée
+foreach ($execs1 as $exec) {
+    if ($exec['totalDotRemanier'] != 0) {
+        $showRemanier = true;
+        break;
+    }
+}
 // Capture HTML
 ob_start();
 ?>
@@ -28,42 +43,54 @@ ob_start();
     <!-- Tableau -->
     <div class='container-fluid'>
         <div style='width: 100%; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
-            <table style="width: 100%; font-size: 15px;">
+            <table style="width: 100%; font-size: 12px;">
                 <thead style="color: white !important;">
                     <tr style="color: white !important;text-align:center;">
                         <th style="background-color: #4655a4; color: white;text-align:center;">C_P</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Libelle</th>
-                        <th style="background-color: #4655a4; color: white;text-align:center;">Dotations</th>
+                        <th style="background-color: #4655a4; color: white;text-align:center;">Dot_Initiale</th>
+                        <?php if ($showRemanier): ?>
+                        <th style="background-color: #4655a4; color: white;text-align:center;">Variation</th>
+                        <th style="background-color: #4655a4; color: white;text-align:center;">Dot_Remaniee</th>
+                        <?php endif; ?>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Realisation</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Taux</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Disponible</th>
+                        <?php if ($op == 1): ?>
+                            <th style="background-color: #4655a4; color: white;text-align:center;">O.P</th>
+                            <th style="background-color: #4655a4; color: white;text-align:center;">Diff Eng/Op</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <?php
-                $execs1 = getExecution_2($idCp);
                 $n=1;
                 if (!empty($execs1)) :
                     foreach ($execs1 as $exec) : ?>
                     <tr>
-                        <td style='text-align:center;padding: 15px;'><?= $exec['numCompte']; ?></td>
-                        <td style="text-align:left; padding: 15px; max-width: 200px;">
-                            <?= $exec['libelleC']; ?>
-                        </td>
+                        <td><?= $exec['numCompte']; ?></td>
+                        <td style="text-align: center; padding: 15px; max-width: 350px;"><?= $exec['libelleC']; ?></td>
+                        <td style='text-align: center;padding: 15px;'><?= number_format($exec['totalDotInitial'], 0, ',', ','); ?> f</td>
+                        <?php if ($showRemanier): ?>
+                        <td style='text-align: center;padding: 15px;'><?= number_format($exec['totalDotRemanier'], 0, ',', ','); ?> f</td>
+                        <td style='text-align: center;padding: 15px;'><?= number_format($exec['totalDotations'], 0, ',', ','); ?> f</td>
+                        <?php endif; ?>
+                        <td style='text-align: center;padding: 15px;'> <a href="actuel_3.php?numCompte=<?php echo $exec['numCompte']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?>
+                                f</a></td>
+                        <td style='text-align: center;padding: 15px;'><?= number_format($exec['taux'], 2); ?>%</td>
+                        <td style='text-align: center;padding: 15px;'><?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> f</td>
+                        <?php if ($op == 1): ?>
+                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalOp'], 0, ',', ','); ?> f</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalEngs'] - $exec['totalOp']), 0, ',', ','); ?> f</td>
+                        <?php endif; ?>
 
-                        <td style='text-align:center;padding: 15px;'>
-                            <?= number_format($exec['totalDotations'], 0, ',', ','); ?> F
-                        </td>
-                        <td style='text-align:center;padding: 15px;'>
-                            <a href="actuel_3.php?numCompte=<?php echo $exec['numCompte']; ?>"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> F</a>
-                        </td>
-                        <td style='text-align:center;padding: 15px;'><?= number_format($exec['taux'], 2); ?>%</td>
-                        <td style='text-align:center;padding: 15px;'>
-                            <?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> F</td>
                     </tr>
                     <?php 
                     $TDotations += $exec['totalDotations'];
                     $TEngs += $exec['totalEngs'];
+                    $TOp += $exec['totalOp'];
+                    $TDotationInitiale += $exec['totalDotInitial'];
+                    $TDotationRemanier += $exec['totalDotRemanier'];
                     endforeach;?>
                     <?php else : ?>
                     <tr>
@@ -74,14 +101,20 @@ ob_start();
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="2" style="background-color: #4655a4;text-align:center;color: white;">Total principal</th>
-                        <th style="background-color: #4655a4;text-align:center;color: white;">
-                            <?= number_format($TDotations, 0, ',', ','); ?> F</th>
-                        <th style="background-color: #4655a4;text-align:center;color: white;">
-                            <?= number_format($TEngs, 0, ',', ','); ?> F</th>
-                        <th style="background-color: #4655a4;text-align:center;color: white;">-</th>
-                        <th style="background-color: #4655a4;text-align:center;color: white;">
-                            <?=number_format(($TDotations - $TEngs) , 0, ',', ','); ?> F</th>
+                        <th colspan="2" style="background-color: #4655a4;text-align:center;color: white;">Total
+                            principal</th>
+                        <th style="background-color: #4655a4;text-align: center;color: white;"><?= number_format($TDotationInitiale, 0, ',', ','); ?> f</th>
+                        <?php if ($showRemanier): ?>
+                        <th style="background-color: #4655a4;text-align: center;color: white;"><?= number_format($TDotationRemanier, 0, ',', ','); ?> f</th>
+                        <th style="background-color: #4655a4;text-align: center;color: white;"><?= number_format($TDotations, 0, ',', ','); ?> f</th>
+                        <?php endif; ?>
+                        <th style="background-color: #4655a4;text-align: center;color: white;"><?= number_format($TEngs, 0, ',', ','); ?> f</th>
+                        <th style="background-color: #4655a4;text-align: center;color: white;">-</th>
+                        <th style="background-color: #4655a4;text-align: center;color: white;"><?=number_format(($TDotations - $TEngs) , 0, ',', ','); ?> f</th>
+                        <?php if ($op == 1): ?>
+                            <th style="background-color: #4655a4;text-align: center;color: white;"><?= number_format($TOp, 0, ',', ','); ?> f</th>
+                            <th style="background-color: #4655a4;text-align: center;color: white;"><?=number_format(($TEngs - $TOp) , 0, ',', ','); ?> f</th>
+                        <?php endif; ?>
                     </tr>
                 </tfooter>
             </table>
@@ -116,4 +149,4 @@ $mpdf->WriteHTML('<style>
 </style>', \Mpdf\HTMLParserMode::HEADER_CSS);
 
 
-$mpdf->Output('etat-actuel.pdf', 'I');
+$mpdf->Output('etat-actuel_2.pdf', 'I');

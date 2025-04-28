@@ -424,6 +424,9 @@ function getCompteEngsByDate($date) {
               SELECT 1 FROM dotations d 
               WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
           )
+        GROUP BY 
+            c.numCompte, 
+            cp.numCp
     ";
 
     $result = $connexion->query($query);
@@ -441,22 +444,26 @@ function getCompteEngsByDate2($date1, $date2) {
     $anneeEnCours = $_SESSION['an'];
 
     $query = "
-        SELECT 
-            c.numCompte,
-            cp.numCp,
-            op.numFact,
-            eng.dateEng,
-            '$anneeEnCours' AS an
+       SELECT 
+        c.numCompte,
+        cp.numCp,
+        MIN(op.numFact) AS numFact, -- on prend le premier numFact (ou n'importe lequel)
+        MIN(eng.dateEng) AS dateEng, -- date minimale d'engagement (ou n'importe laquelle selon ton besoin)
+        '$anneeEnCours' AS an
         FROM engagements AS eng
-        JOIN compte AS c ON c.idCompte = eng.idCompte 
-        JOIN comptep AS cp ON c.idCp = cp.idCp 
-        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+            JOIN compte AS c ON c.idCompte = eng.idCompte 
+            JOIN comptep AS cp ON c.idCp = cp.idCp 
+            JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+            LEFT JOIN operations AS op ON op.idEng = eng.idEng
         WHERE eng.dateEng BETWEEN '$date1' AND '$date2'
-          AND EXISTS (
-              SELECT 1 FROM dotations d 
-              WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
-          )
+            AND EXISTS (
+                    SELECT 1 FROM dotations d 
+                        WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+                    )
+        GROUP BY 
+        c.numCompte, 
+        cp.numCp
+
     ";
 
     $result = $connexion->query($query);
@@ -623,7 +630,9 @@ function getOperationsByType($typeOp) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-
+/********************************************************************************** 
+    #########    FONCTION POUR DOTATION ... ##############3
+ ********************************************************************************* */
 function enregistrerDotation($idCompte, $date, $volume, $type) {
     // Démarre la session si ce n'est pas déjà fait
     if (session_status() === PHP_SESSION_NONE) {
@@ -668,6 +677,24 @@ function enregistrerDotation($idCompte, $date, $volume, $type) {
         return true;
     } else {
         return "Erreur lors de l'enregistrement : " . mysqli_error($connexion);
+    }
+}
+function supprDotation($suppr){
+    // Connexion MySQLi
+    global $connexion;
+
+    if (!$connexion) {
+        return "Connexion échouée : " . mysqli_connect_error();
+    }
+    $suppr = (int) $suppr;
+    // Requête d'insertion
+    $sql = " DELETE FROM dotations WHERE idDot='$suppr';";
+
+    // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de la suppression : " . mysqli_error($connexion);
     }
 }
 

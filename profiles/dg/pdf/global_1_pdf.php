@@ -10,9 +10,13 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 include '../../../includes/fonctions.php';
 $sommeDotations = sommeDot();
 $sommeEngs = sommeEngs();
-$taux = ($sommeDotations != 0) ? ($sommeEngs * 100) / $sommeDotations : 0;
+if ($sommeDotations != 0) {
+    $taux = ($sommeEngs * 100) / $sommeDotations;
+} else {
+    $taux = 0; // Ou un autre comportement selon ton besoin
+}
 
-$execs1 = getExecution_1();
+$execs1 = getExecutionOp_1();
 $showRemanier = false;
 
 // Première boucle pour vérifier s'il existe au moins une dotation remaniée
@@ -22,7 +26,6 @@ foreach ($execs1 as $exec) {
         break;
     }
 }
-
 // Capture HTML
 ob_start();
 ?>
@@ -33,8 +36,7 @@ ob_start();
     </div>
     <br>
     <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h2>REALISATIONS: <?= number_format($sommeEngs, 0, ',', ','); ?> FCFA /
-            <?= number_format($sommeDotations, 0, ',', ','); ?> FCFA soit <?= number_format($taux, 2); ?>%</h2>
+    <h3>REALISATIONS: <?= number_format($sommeEngs, 0, ',', ','); ?>FCFA / <?= number_format($sommeDotations, 0, ',', ','); ?>FCFA soit <?= number_format($taux, 2); ?>%</h3>
     </div>
 
     <div class='container-fluid'>
@@ -52,6 +54,8 @@ ob_start();
                         <th style="background-color: #4655a4; color: white;text-align:center;">Realisation</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Taux</th>
                         <th style="background-color: #4655a4; color: white;text-align:center;">Disponible</th>
+                        <th style="background-color: #4655a4;color: white;text-align:center;">O.P</th>
+                        <th style="background-color: #4655a4;color: white;text-align:center;">Diff Eng/Op</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,11 +73,13 @@ ob_start();
                         <td style='text-align:center;padding: 15px;'> <?= number_format($exec['totalEngs'], 0, ',', ','); ?> f</td>
                         <td style='text-align:center;padding: 15px;'><?= number_format(($exec['taux']), 2); ?>%</td>
                         <td style='text-align:center;padding: 15px;'><?= number_format(($exec['totalDotations'] - $exec['totalEngs']), 0, ',', ','); ?> f</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalOp'], 0, ',', ','); ?> f</td>
+                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalEngs']-$exec['totalOp']), 0, ',', ','); ?> f</td>
                     </tr>
                     <?php endforeach;
                     else : ?>
                     <tr>
-                        <td colspan="6" class="text-danger">Aucun résultat trouvé</td>
+                        <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
@@ -109,4 +115,4 @@ $mpdf->WriteHTML('<style>
 </style>', \Mpdf\HTMLParserMode::HEADER_CSS);
 
 
-$mpdf->Output('etat-actuel.pdf', 'I');
+$mpdf->Output('etat_global-actuel.pdf', 'I');

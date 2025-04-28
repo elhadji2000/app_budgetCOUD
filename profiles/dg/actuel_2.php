@@ -121,7 +121,7 @@ foreach ($execs1 as $exec) {
         </div>
         <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
             style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-            <a href="pdf/actuel_2_pdf.php?idCp=<?php echo $exec['idCp']; ?>" target="_blank"
+            <a href="pdf/actuel_2_pdf.php?idCp=<?php echo $exec['idCp']; ?>&op=1" target="_blank"
                 class='btn btn-success'><strong>Imprimer en PDF</strong></a>
             <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
         </div>

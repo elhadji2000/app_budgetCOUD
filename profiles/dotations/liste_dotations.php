@@ -45,7 +45,7 @@ if (!isset($_SESSION['user'])) {
                     <td><?= $n++; ?></td>
                     <td><?= $dotation['numCompte']; ?></td>
                     <td><?= $dotation['date']; ?></td>
-                    <td><?= number_format($dotation['volume'], 0, ',', ','); ?> fcfa</td>
+                    <td style="text-align:center;"><?= number_format($dotation['volume'], 0, ',', ','); ?> fcfa</td>
                     <td>
                         <span class="badge <?= ($dotation['type'] == 'initiale') ? 'bg-info' : 'bg-warning'; ?>">
                             <?= ucfirst($dotation['type']); ?>
@@ -54,8 +54,8 @@ if (!isset($_SESSION['user'])) {
                     <td><?= $dotation['log']; ?></td>
                     <td>
                         <?php if (!isDotationUsed($dotation['idDot'])): ?>
-                        <a href="supprimer_engagement.php?id=<?= $dotation['idDot'] ?>"
-                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Dotation ?')">Supprimer</a>
+                        <a href="traitement_dot.php?suppr=<?= $dotation['idDot'] ?>"
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette Dotation ?')">Supprimer</a>
                         <?php else: ?>
                         <span style="color: grey; cursor: not-allowed;"
                             title="Dotation utilisé, suppression désactivée">Supprimer</span>
@@ -163,4 +163,36 @@ if (!isset($_SESSION['user'])) {
         <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
     </div>
 </main>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-info">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 Dotation supprimer avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
+
 <?php include '../../includes/footer.php';?>

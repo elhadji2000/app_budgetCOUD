@@ -33,4 +33,16 @@ if (isset($_POST['rem_numc'], $_POST['rem_date'], $_POST['rem_volume'])) {
     }
 }
 
+if (isset($_GET['suppr'])) {
+    $suppr = $_GET['suppr'];
+
+    $resultat = supprDotation($suppr);
+
+    if ($resultat === true) {
+        header("Location: liste_dotations.php?success=1");
+    } else {
+        header("Location: liste_dotations.php?error=" . urlencode($resultat));
+    }
+}
+
 ?>
