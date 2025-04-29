@@ -50,7 +50,7 @@ $an = $_SESSION['an'];
                 <tr>
                     <td><?= $n++ ?></td>
                     <td><?= $op['numCompte'] ?></td>
-                    <td>BE<?= $an ?>-<?= str_pad($op['idEng'], 4, '0', STR_PAD_LEFT) ?></td>
+                    <td><?= formatNumEng($op['idEng']); ?></td>
                     <td><?= $op['idOp'] ?></td>
                     <td><?= $op['dateEng'] ?></td>
                     <td><?= $op['libelle'] ?></td>

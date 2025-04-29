@@ -50,7 +50,7 @@ $TEngs = 0;
                 if (!empty($engs)) :
                     foreach ($engs as $eng) : ?>
                     <tr>
-                        <td><?= 'BE'.$eng['an'] . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?></td>
+                        <td><?= formatNumEng($eng['idEng']); ?></td>
                         <td style="padding: 15px;">
                             <?= $eng['numCompte']; ?>
                         </td>

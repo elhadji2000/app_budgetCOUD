@@ -41,7 +41,7 @@ ob_start();
                         <p><strong style="font-size: 18px;">BON ENGAGEMENT</strong></p>
                         <p> <strong style="font-size: 16px;">
                                 N°
-                                <?= 'BE' . $engagement['an'] . '-' . str_pad($engagement['idEng'], 3, '0', STR_PAD_LEFT); ?>
+                                <?= formatNumEng($engagement['idEng']); ?>
                             </strong>
                         </p>
                     </td>

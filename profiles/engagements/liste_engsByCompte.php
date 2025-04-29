@@ -54,7 +54,7 @@ $engs = getEngsByCompte($numCompte);
                 <tr>
                     <td><?= $n; ?></td>
                     <td>
-                        <?= 'BE'.$eng['an'] . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?>
+                        <?= formatNumEng($eng['idEng']); ?>
                     </td>
                     <td><?= $eng['dateEng']; ?></td>
                     <td><?= $eng['service']; ?></td>

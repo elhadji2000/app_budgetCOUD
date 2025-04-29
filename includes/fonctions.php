@@ -264,7 +264,33 @@ function getEngs(){
             WHERE EXISTS (
             SELECT 1 FROM dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
-        )
+            )
+            ORDER BY eng.idEng DESC
+            ";
+    
+    $result = $connexion->query($query);
+    if($result->num_rows > 0){
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    else {
+        return [];
+    }
+}
+function getEngagementsTemp(){
+    global $connexion;
+   // $anneeEnCours = date("Y"); // Récupère l'année en cours
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, f.numFourn 
+            FROM engagements_temp as eng
+            JOIN compte as c ON c.idCompte = eng.idCompte 
+            JOIN comptep as cp ON c.idCp=cp.idCp 
+            JOIN fournisseur as f ON f.idFourn= eng.idFourn 
+            WHERE EXISTS (
+            SELECT 1 FROM dotations d 
+            WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
+            )
+            ORDER BY eng.idEng DESC
             ";
     
     $result = $connexion->query($query);
@@ -629,6 +655,41 @@ function getOperationsByType($typeOp) {
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+function getOperationsTemp($typeOp) {
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            o.idOp,
+            o.dateOp,
+            o.numFact,
+            e.montant,
+            e.idEng,
+            e.dateEng,
+            e.libelle,
+            e.service,
+            f.numFourn,
+            c.numCompte
+        FROM operations_temp o
+        JOIN engagements e ON o.idEng = e.idEng
+        JOIN compte c ON e.idCompte = c.idCompte
+        JOIN fournisseur f ON e.idFourn = f.idFourn
+        WHERE o.typeOp = ?
+        AND EXISTS (
+            SELECT 1 FROM dotations d
+            WHERE d.idCompte = c.idCompte 
+              AND d.an = '$anneeEnCours'
+        )
+        ORDER BY o.idOp DESC;
+    ";
+
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("s", $typeOp);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 
 /********************************************************************************** 
     #########    FONCTION POUR DOTATION ... ##############3
@@ -689,6 +750,79 @@ function supprDotation($suppr){
     $suppr = (int) $suppr;
     // Requête d'insertion
     $sql = " DELETE FROM dotations WHERE idDot='$suppr';";
+
+    // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de la suppression : " . mysqli_error($connexion);
+    }
+}
+
+function supprEngagementTemp($suppr){
+    // Connexion MySQLi
+    global $connexion;
+
+    if (!$connexion) {
+        return "Connexion échouée : " . mysqli_connect_error();
+    }
+    $suppr = (int) $suppr;
+    // Requête d'insertion
+    $sql = " DELETE FROM engagements_temp WHERE idEng='$suppr';";
+
+    // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de la suppression : " . mysqli_error($connexion);
+    }
+}
+function supprEngagement($suppr){
+    // Connexion MySQLi
+    global $connexion;
+
+    if (!$connexion) {
+        return "Connexion échouée : " . mysqli_connect_error();
+    }
+    $suppr = (int) $suppr;
+    // Requête d'insertion
+    $sql = " DELETE FROM engagements WHERE idEng='$suppr';";
+
+    // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de la suppression : " . mysqli_error($connexion);
+    }
+}
+function supprOpTemp($suppr){
+    // Connexion MySQLi
+    global $connexion;
+
+    if (!$connexion) {
+        return "Connexion échouée : " . mysqli_connect_error();
+    }
+    $suppr = (int) $suppr;
+    // Requête d'insertion
+    $sql = " DELETE FROM operations_temp WHERE idOp='$suppr';";
+
+    // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de la suppression : " . mysqli_error($connexion);
+    }
+}
+function supprOp($suppr){
+    // Connexion MySQLi
+    global $connexion;
+
+    if (!$connexion) {
+        return "Connexion échouée : " . mysqli_connect_error();
+    }
+    $suppr = (int) $suppr;
+    // Requête d'insertion
+    $sql = " DELETE FROM operations WHERE idOp='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -814,7 +948,7 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature) {
     }
 }
 
-function ajouterEngagement($dateEng, $service, $montant, $libelle, $bc, $idCompte, $idFourn) {
+function ajouterEngagement_temp($dateEng, $service, $montant, $libelle, $bc, $idCompte, $idFourn) {
     global $connexion;
     session_start(); // si ce n’est pas déjà démarré
 
@@ -843,7 +977,7 @@ function ajouterEngagement($dateEng, $service, $montant, $libelle, $bc, $idCompt
     $montant = (float) $montant;
 
     // Requête d'insertion
-    $sql = "INSERT INTO engagements (dateEng, service, montant, libelle, bc, idCompte, idFourn) 
+    $sql = "INSERT INTO engagements_temp (dateEng, service, montant, libelle, bc, idCompte, idFourn) 
             VALUES ('$dateEng', '$service', $montant, '$libelle', '$bc', $idCompte, $idFourn)";
 
     if (mysqli_query($connexion, $sql)) {
@@ -853,7 +987,7 @@ function ajouterEngagement($dateEng, $service, $montant, $libelle, $bc, $idCompt
     }
 }
 
-function ajouterOp($dateOp, $idEng, $numFact, $typeOp) {
+function ajouterOp_temp($dateOp, $idEng, $numFact, $typeOp) {
     global $connexion;
 
     // Sécurisation des données
@@ -864,7 +998,7 @@ function ajouterOp($dateOp, $idEng, $numFact, $typeOp) {
 
     // Requête d'insertion
     $query = "
-        INSERT INTO operations (dateOp, idEng, numFact, typeOp)
+        INSERT INTO operations_temp (dateOp, idEng, numFact, typeOp)
         VALUES ('$dateOp', $idEng, '$numFact', '$typeOp')
     ";
 
@@ -1183,5 +1317,24 @@ function ajouterUtilisateur($nom, $login, $email, $privilege) {
         ];
     }
 }
+
+function formatNumEng($idEng) {
+    // Vérifie que la session est démarrée
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Vérifie que l'année est bien dans la session
+    if (!isset($_SESSION['an'])) {
+        return 'Erreur: année non définie.';
+    }
+
+    $an = $_SESSION['an'];
+    $deuxDerniersChiffres = substr($an, -2);
+    $idFormate = str_pad($idEng, 3, '0', STR_PAD_LEFT);
+
+    return 'BE' . $deuxDerniersChiffres . '-' . $idFormate;
+}
+
 
 ?>

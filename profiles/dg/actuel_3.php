@@ -47,7 +47,7 @@ $TEngs = 0;
                 if (!empty($engs)) :
                     foreach ($engs as $eng) : ?>
                     <tr>
-                        <td><?= 'BE'.$eng['an'] . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?></td>
+                        <td><?= formatNumEng($eng['idEng']); ?></td>
                         <td style="padding: 15px;">
                             <?= $eng['numCompte']; ?>
                         </td>
@@ -56,8 +56,13 @@ $TEngs = 0;
                             <?= $eng['dateEng']; ?>
                         </td>
                         <td style='padding: 15px;'>
+                            <?php if (!empty($eng['numFact'])): ?>
                             facture<br> N°<?= $eng['numFact']; ?>
+                            <?php else: ?>
+                            —
+                            <?php endif; ?>
                         </td>
+
                         <td style='padding: 15px;max-width: 250px;'>
                             <?= $eng['libelleC']; ?>
                         </td>
@@ -85,7 +90,8 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL DES REALISATIONS DU
+                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL DES
+                            REALISATIONS DU
                             COMPTE</th>
                         <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>

@@ -44,7 +44,7 @@ $max_date = date("Y-m-d"); // aujourd'hui
                                 <option value="">Sélectionner un compte</option>
                                 <?php foreach ($nums as $num) : ?>
                                 <option value="<?= htmlspecialchars($num["idEng"]) ?>">
-                                    <?= htmlspecialchars($num["idEng"]) ?>
+                                    <?= htmlspecialchars(formatNumEng($num['idEng'])) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>

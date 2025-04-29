@@ -37,21 +37,25 @@ $an = $_SESSION['an'];
                     <th style="background-color: #4655a4;">bc</th>
                     <th style="background-color: #4655a4;">Montant</th>
                     <th style="background-color: #4655a4;">Fourniseur</th>
+                    <th style="background-color: #4655a4;">Valider</th>
                     <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 <?php
-                $engs = getEngs();
-                $n = 1;
-                if (!empty($engs)) :
-                    foreach ($engs as $eng) : ?>
-                <tr>
-                    <td><?= $n; ?></td>
+    $n = 1;
+    $engsTemp = getEngagementsTemp();
+    $engs = getEngs();
+
+    if (!empty($engsTemp) || !empty($engs)):
+
+        // D'abord les engagements TEMP
+        foreach ($engsTemp as $eng): ?>
+                <tr style="background-color: #fff8e1;">
+                    <!-- Jaune clair pour temp -->
+                    <td><?= $n++; ?></td>
                     <td><?= $eng['numCompte']; ?></td>
-                    <td>
-                        <?= 'BE'.$an . '-' . str_pad($eng['idEng'], 3, '0', STR_PAD_LEFT); ?>
-                    </td>
+                    <td><?= formatNumEng($eng['idEng']); ?> <small class="text-warning">(temp)</small></td>
                     <td><?= $eng['dateEng']; ?></td>
                     <td><?= $eng['service']; ?></td>
                     <td><?= $eng['libelle']; ?></td>
@@ -59,8 +63,42 @@ $an = $_SESSION['an'];
                     <td><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
                     <td><?= $eng['numFourn']; ?></td>
                     <td>
+                        <?php if ($_SESSION['priv'] === 'sag'): ?>
+                        <a href="traitement_eng.php?valider_id=<?= $eng['idEng']; ?>"
+                            onclick="return confirm('Êtes-vous sûr de vouloir valider cet engagement ?')"
+                            class="badge bg-success">Valider</a>
+                        <?php else: ?>
+                        <span class="badge bg-success" style="opacity: 0.5; cursor: not-allowed;"
+                            title="Accès réservé à l'administrateur">
+                            valider
+                        </span>
+                        <?php endif; ?>
+                    </td>
+
+                    <td>
+                        <a href="traitement_eng.php?supprTemp=<?= $eng['idEng']; ?>"
+                            onclick="return confirm('Supprimer cet engagement temporaire ?')">Supprimer</a>
+                    </td>
+                </tr>
+                <?php endforeach;
+
+        // Ensuite les engagements validés
+        foreach ($engs as $eng): ?>
+                <tr>
+                    <td><?= $n++; ?></td>
+                    <td><?= $eng['numCompte']; ?></td>
+                    <td><?= formatNumEng($eng['idEng']); ?></td>
+                    <td><?= $eng['dateEng']; ?></td>
+                    <td><?= $eng['service']; ?></td>
+                    <td><?= $eng['libelle']; ?></td>
+                    <td><?= $eng['bc']; ?></td>
+                    <td><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
+                    <td><?= $eng['numFourn']; ?></td>
+                    <td><span style="cursor: not-allowed;" title="Engagement valider"
+                            class="badge bg-secondary">Validé</span></td>
+                    <td>
                         <?php if (!isEngagementUsed($eng['idEng'])): ?>
-                        <a href="supprimer_engagement.php?id=<?= $eng['idEng'] ?>"
+                        <a href="traitement_eng.php?suppr=<?= $eng['idEng'] ?>"
                             onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet engagement ?')">Supprimer</a>
                         <?php else: ?>
                         <span style="color: grey; cursor: not-allowed;"
@@ -68,22 +106,15 @@ $an = $_SESSION['an'];
                         <?php endif; ?>
                     </td>
                 </tr>
-                <?php
-                    $n++;
-                    endforeach;
-                ?>
-                <?php else : ?>
+                <?php endforeach; ?>
+
+                <?php else: ?>
                 <tr>
-                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
+                    <td colspan="11" class="text-danger">Aucun engagement trouvé.</td>
                 </tr>
                 <?php endif; ?>
+            </tbody>
 
-            </tbody>
-            <tbody id="noResultRow" style="display: none;">
-                <tr>
-                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
-                </tr>
-            </tbody>
         </table>
     </div>
 
@@ -125,4 +156,66 @@ $an = $_SESSION['an'];
         <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
     </div>
 </main>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-info">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 Engagement supprimer avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 2): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 Engagement valider avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 2): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
 <?php include '../../includes/footer.php';?>
