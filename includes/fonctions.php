@@ -175,7 +175,7 @@ Fonction pour recuperer tous les Utilisateurs
 function getAllUsers()
 {
     global $connexion;
-    $query = "SELECT * FROM `users`"; 
+    $query = "SELECT * FROM `users` ORDER BY date_sys DESC"; 
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {

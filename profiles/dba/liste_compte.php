@@ -26,13 +26,13 @@ if (!isset($_SESSION['user'])) {
         <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>N°</th>
-                    <th>NumCompte</th>
-                    <th>Libelle</th>
-                    <th>NumCp</th>
-                    <th>Code</th>
-                    <th>Nature</th>
-                    <th>Action(s)</th>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">NumCompte</th>
+                    <th style="background-color: #4655a4;">Libelle</th>
+                    <th style="background-color: #4655a4;">NumCp</th>
+                    <th style="background-color: #4655a4;">Code</th>
+                    <th style="background-color: #4655a4;">Nature</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">

@@ -6,6 +6,29 @@ if (!isset($_SESSION['user'])) {
 }
 ?>
 <?php include '../../includes/fonctions.php';?>
+<?php
+// Traitement de l’activation/désactivation
+if (isset($_GET['toggle_id'])) {
+    $id = intval($_GET['toggle_id']);
+    $connexion = connexionBD();
+    // Récupérer le statut actuel
+    $sql = "SELECT statut FROM users WHERE idUser = $id";
+    $result = mysqli_query($connexion, $sql);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+        $newStatut = ($row['statut'] == 1) ? 0 : 1;
+
+        // Mettre à jour
+        $updateSql = "UPDATE users SET statut = $newStatut WHERE idUser = $id";
+        mysqli_query($connexion, $updateSql);
+
+        // Rediriger pour éviter le double traitement au rafraîchissement
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+?>
+
 <?php include '../../includes/header.php';?>
 <main>
     <div class='container'>
@@ -26,13 +49,13 @@ if (!isset($_SESSION['user'])) {
         <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Log</th>
-                    <th>Rôle</th>
-                    <th>Email</th>
-                    <th>Type_mdp</th>
-                    <th>Action(s)</th>
+                    <th style="background-color: #4655a4;">N°</th>
+                    <th style="background-color: #4655a4;">Nom</th>
+                    <th style="background-color: #4655a4;">Log</th>
+                    <th style="background-color: #4655a4;">Rôle</th>
+                    <th style="background-color: #4655a4;">Email</th>
+                    <th style="background-color: #4655a4;">Type_mdp</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -52,7 +75,13 @@ if (!isset($_SESSION['user'])) {
                             <?= ucfirst($user['type_mdp']); ?>
                         </span>
                     </td>
-                    <td><a href="#">dèsactiver</a></td>
+                    <td>
+                        <a href="?toggle_id=<?= $user['idUser']; ?>"
+                            class="badge <?= ($user['statut']) ? 'bg-danger' : 'bg-success'; ?>">
+                            <?= ($user['statut']) ? 'Désactiver' : 'Activer'; ?>
+                        </a>
+                    </td>
+
                 </tr>
                 <?php $n++; endforeach;?>
                 <?php else : ?>

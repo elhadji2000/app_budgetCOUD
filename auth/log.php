@@ -24,6 +24,13 @@ if (!empty($_POST['utilisateur']) && !empty($_POST['motdepasse']) && !empty($_PO
         $_SESSION['idUser'] = $row['idUser'];
         $_SESSION['type_mdp'] = $row['type_mdp'];
 
+       
+        if (!$row['statut']) {
+            $error = "Compte désactivé. Veuillez contacter le service concerné pour plus d'informations.";
+            header("Location: ../index.php?error=" . urlencode($error));
+            exit();
+        } 
+        
         if($_SESSION['type_mdp'] == "default"){
             // Redirection vers la page modifier mot de passe
             header("Location: ../shared/updated_mdp.php");
