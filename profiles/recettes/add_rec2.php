@@ -23,7 +23,7 @@ $max_date = date("Y-m-d"); // aujourd'hui
 </div>
 <main>
     <div class='container'>
-    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
+        <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
             <h3>ENREGISTREMENT DES ORDRES DE RECETTES</h3>
             <strong style='color:rgba(78, 120, 93, 0.91);'><i><?= htmlspecialchars($compte["numCompte"]) ?> :
                     <?= htmlspecialchars($compte["libelle"]) ?></i></strong>
@@ -41,10 +41,10 @@ $max_date = date("Y-m-d"); // aujourd'hui
                         <td style='padding: 10px 0;'><strong>Numéro de l'Engagement :</strong></td>
                         <td style='padding: 10px 0;'>
                             <select name="idEng" style="width: 100%; padding: 7px;" required>
-                                <option value="">Sélectionner un compte</option>
+                                <option value="">Sélectionner un Mandat</option>
                                 <?php foreach ($nums as $num) : ?>
                                 <option value="<?= htmlspecialchars($num["idEng"]) ?>">
-                                    <?= htmlspecialchars($num["idEng"]) ?>
+                                    <?= htmlspecialchars(formatNumEng($num['idEng'])) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
@@ -53,7 +53,8 @@ $max_date = date("Y-m-d"); // aujourd'hui
                     <tr>
                         <td style='padding: 10px 0;'><strong>Date O.R :</strong></td>
                         <td style='padding: 10px 0;'>
-                            <input type='date' name='dateOr' style='width: 100%; padding: 5px;' required min="<?= $min_date ?>" max="<?= $max_date ?>" />
+                            <input type='date' name='dateOr' style='width: 100%; padding: 5px;' required
+                                min="<?= $min_date ?>" max="<?= $max_date ?>" />
                         </td>
                     </tr>
                     <tr>

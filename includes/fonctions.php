@@ -507,12 +507,13 @@ function getEngById($idEng) {
     $anneeEnCours = $_SESSION['an'];
 
     $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.service, eng.libelle, eng.bc, eng.montant, 
-                     f.numFourn, f.nom, d.an
+                     f.numFourn, f.nom, d.an, op.numFact, op.dateOp, op.idOp
               FROM engagements AS eng
               JOIN compte AS c ON c.idCompte = eng.idCompte 
               JOIN comptep AS cp ON c.idCp = cp.idCp 
               JOIN dotations AS d ON c.idCompte = d.idCompte 
               JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
+              LEFT JOIN operations AS op ON eng.idEng=op.idEng
               WHERE d.an = '$anneeEnCours' AND eng.idEng = '$idEng'";
 
     $result = $connexion->query($query);
@@ -1334,6 +1335,32 @@ function formatNumEng($idEng) {
     $idFormate = str_pad($idEng, 3, '0', STR_PAD_LEFT);
 
     return 'BE' . $deuxDerniersChiffres . '-' . $idFormate;
+}
+
+function formatNumOP($idOp) {
+    // Vérifie que la session est démarrée
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Vérifie que l'année est bien dans la session
+    if (!isset($_SESSION['an'])) {
+        return 'Erreur: année non définie.';
+    }
+
+    $an = $_SESSION['an'];
+    $deuxDerniersChiffres = substr($an, -2);
+    $idFormate = str_pad($idOp, 3, '0', STR_PAD_LEFT);
+
+    return 'MD' . $deuxDerniersChiffres . '-' . $idFormate;
+}
+
+
+function nombreEnLettres($nombre)
+{
+    $fmt = new \NumberFormatter('fr_FR', \NumberFormatter::SPELLOUT);
+    $lettres = $fmt->format($nombre);
+    return ucfirst($lettres);
 }
 
 

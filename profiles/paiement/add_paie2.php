@@ -41,7 +41,7 @@ $max_date = date("Y-m-d"); // aujourd'hui
                         <td style='padding: 10px 0;'><strong>Numéro de l'Engagement :</strong></td>
                         <td style='padding: 10px 0;'>
                             <select name="idEng" style="width: 100%; padding: 7px;" required>
-                                <option value="">Sélectionner un compte</option>
+                                <option value="">Sélectionner un Mandat</option>
                                 <?php foreach ($nums as $num) : ?>
                                 <option value="<?= htmlspecialchars($num["idEng"]) ?>">
                                     <?= htmlspecialchars(formatNumEng($num['idEng'])) ?>

@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 ?>
 <?php include '../../includes/fonctions.php';
 $numCompte = $_GET['numCompte'];
+$op = isset($_GET['op']) ? $_GET['op'] : 0;
 $data = getCompteByNum($numCompte);
 $engs = getEngsByCompte($numCompte);
 $TDotations = sommeDotByCompte($numCompte);
@@ -39,6 +40,9 @@ $TEngs = 0;
                         <th style="background-color: #4655a4;">FR/Bènèf</th>
                         <th style="background-color: #4655a4;">Montant</th>
                         <th style="background-color: #4655a4;">Bon_Eng</th>
+                        <?php if ($op == 1): ?>
+                        <th style="background-color: #4655a4;">Mandat</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -77,6 +81,16 @@ $TEngs = 0;
                         <td>
                             <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
                         </td>
+                        <?php if ($op == 1): ?>
+                        <td>
+                            <?php if (!empty($eng['numFact'])): ?>
+                            <a href="../engagements/mandat_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                            <?php else: ?>
+                            <span title="Pas d'opération" style="color: grey; cursor: not-allowed;">vue_pdf</span>
+                            <?php endif; ?>
+                        </td>
+
+                        <?php endif; ?>
                     </tr>
                     <?php 
                     $TEngs += $eng['montant'];
@@ -93,14 +107,14 @@ $TEngs = 0;
                         <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL DES
                             REALISATIONS DU
                             COMPTE</th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
+                        <th colspan="3" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
                     </tr>
                     <tr>
                         <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">
                             SOLDE DISPONIBLE DU COMPTE
                         </th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
+                        <th colspan="3" style="background-color: #4655a4;text-align: center;color: white;">
                             <?= number_format(($TDotations-$TEngs), 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>

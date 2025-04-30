@@ -24,7 +24,7 @@ $an = $_SESSION['an'];
     </div>
 
     <div class='container-fluid' style="margin-bottom: 20px;">
-    <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
+        <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
             <thead style="color: white !important;">
                 <tr class="table-primary">
                     <th style="background-color: #4655a4;">N°</th>
@@ -38,48 +38,190 @@ $an = $_SESSION['an'];
                     <th style="background-color: #4655a4;">Date O.R</th>
                     <th style="background-color: #4655a4;">Num_Fact</th>
                     <th style="background-color: #4655a4;">Montant</th>
+                    <th style="background-color: #4655a4;">Validation</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 <?php
-                    $n=1;
-                    $ops = getOperationsByType($typeOp);
-                    if (!empty($ops)):
-                        foreach ($ops as $op):
-                    ?>
-                <tr>
-                    <td><?= $n++ ?></td>
-                    <td><?= $op['numCompte'] ?></td>
+    $n = 1;
+    $opsTemp = getOperationsTemp($typeOp); // À définir dans ton modèle
+    $ops = getOperationsByType($typeOp); // Liste validée
+
+    if (!empty($opsTemp) || !empty($ops)):
+
+        // 1. Afficher les opérations TEMPORAIRES
+        foreach ($opsTemp as $op): ?>
+                <tr style="background-color: #fff8e1;">
+                    <td><?= $n++; ?></td>
+                    <td><?= $op['numCompte']; ?></td>
                     <td><?= formatNumEng($op['idEng']); ?></td>
-                    <td><?= $op['idOp'] ?></td>
-                    <td><?= $op['dateEng'] ?></td>
-                    <td><?= $op['libelle'] ?></td>
-                    <td><?= $op['service'] ?></td>
-                    <td><?= $op['numFourn'] ?></td>
-                    <td><?= $op['dateOp'] ?></td>
-                    <td><?= $op['numFact'] ?></td>
-                    <td><?= number_format($op['montant'], 0, ',', ',') ?> FCFA</td>
+                    <td><?= formatNumOP($op['idOp']); ?><small class="text-warning">(temp)</small></td>
+                    <td><?= $op['dateEng']; ?></td>
+                    <td><?= $op['libelle']; ?></td>
+                    <td><?= $op['service']; ?></td>
+                    <td><?= $op['numFourn']; ?></td>
+                    <td><?= $op['dateOp']; ?></td>
+                    <td><?= $op['numFact']; ?></td>
+                    <td><?= number_format($op['montant'], 0, ',', ','); ?> FCFA</td>
+                    <td>
+                        <?php if ($_SESSION['priv'] === 'admin'): ?>
+                        <a href="../paiement/traitement_paie.php?valider_id=<?= $op['idOp']; ?>"
+                            onclick="return confirm('Valider cette opération ?')" class="badge bg-success">Valider</a>
+                        <?php else: ?>
+                        <span class="badge bg-success" style="opacity: 0.5; cursor: not-allowed;"
+                            title="Accès restreint">
+                            Valider
+                        </span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="../paiement/traitement_paie.php?supprTempOr=<?= $op['idOp']; ?>"
+                            onclick="return confirm('Supprimer cette opération temporaire ?')" class="badge bg-danger">
+                            Supprimer
+                        </a>
+                    </td>
                 </tr>
-                <?php
-                    endforeach;
-                    else:
-                    ?>
+                <?php endforeach; ?>
+
+                <!-- 2. Afficher les opérations VALIDÉES -->
+                <?php foreach ($ops as $op): ?>
                 <tr>
-                    <td colspan="11" style="color: red;">Aucun résultat trouvé</td>
+                    <td><?= $n++; ?></td>
+                    <td><?= $op['numCompte']; ?></td>
+                    <td><?= formatNumEng($op['idEng']); ?></td>
+                    <td><?= formatNumOP($op['idOp']); ?></td>
+                    <td><?= $op['dateEng']; ?></td>
+                    <td><?= $op['libelle']; ?></td>
+                    <td><?= $op['service']; ?></td>
+                    <td><?= $op['numFourn']; ?></td>
+                    <td><?= $op['dateOp']; ?></td>
+                    <td><?= $op['numFact']; ?></td>
+                    <td><?= number_format($op['montant'], 0, ',', ','); ?> FCFA</td>
+                    <td>
+                        <span class="badge bg-secondary" style="cursor: not-allowed;" title="Déjà validée">
+                            Validée
+                        </span>
+                    </td>
+                    <td>
+                        <?php if ($_SESSION['priv'] === 'admin'): ?>
+                        <a href="../paiement/traitement_paie.php?supprOr=<?= $op['idOp']; ?>"
+                            onclick="return confirm('Supprimer cette opération ?')" class="badge bg-danger">
+                            Supprimer
+                        </a>
+                        <?php else: ?>
+                        <span class="text-muted" style="cursor: not-allowed;" title="Opération utilisée">
+                            Supprimer
+                        </span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+
+                <?php else: ?>
+                <tr>
+                    <td colspan="13" class="text-danger">Aucune opération trouvée.</td>
                 </tr>
                 <?php endif; ?>
-
-            </tbody>
-            <tbody id="noResultRow" style="display: none;">
-                <tr>
-                    <td colspan="11" class="text-danger">Aucun résultat trouvé</td>
-                </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Script pour la recherche et l'affichage du message -->
+    <script>
+    function filterTable() {
+        let input = document.getElementById("searchInput");
+        let filter = input.value.toLowerCase();
+        let tableBody = document.getElementById("tableBody");
+        let rows = tableBody.getElementsByTagName("tr");
+        let noResultRow = document.getElementById("noResultRow");
+
+        let found = false;
+
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName("td");
+            let rowContainsFilter = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j].textContent.toLowerCase().includes(filter)) {
+                    rowContainsFilter = true;
+                    break;
+                }
+            }
+
+            rows[i].style.display = rowContainsFilter ? "" : "none";
+            if (rowContainsFilter) found = true;
+        }
+
+        // Afficher ou cacher la ligne "Aucun résultat trouvé"
+        noResultRow.style.display = found ? "none" : "";
+    }
+    </script>
 
     <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
         <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
     </div>
 </main>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-info">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 O.P supprimer avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 2): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                🎉 O.P valider avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_GET['success']) && $_GET['success'] == 2): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
 <?php include '../../includes/footer.php';?>

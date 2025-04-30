@@ -40,7 +40,7 @@ $an = $_SESSION['an'];
                     <th style="background-color: #4655a4;">Num_Fact</th>
                     <th style="background-color: #4655a4;">Montant</th>
                     <th style="background-color: #4655a4;">Validation</th>
-                    <th style="background-color: #4655a4;">Action</th>
+                    <th style="background-color: #4655a4;">Action(s)</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -56,8 +56,8 @@ $an = $_SESSION['an'];
                 <tr style="background-color: #fff8e1;">
                     <td><?= $n++; ?></td>
                     <td><?= $op['numCompte']; ?></td>
-                    <td><?= formatNumEng($op['idEng']); ?> <small class="text-warning">(temp)</small></td>
-                    <td><?= $op['idOp']; ?></td>
+                    <td><?= formatNumEng($op['idEng']); ?></td>
+                    <td><?= formatNumOP($op['idOp']); ?><small class="text-warning">(temp)</small></td>
                     <td><?= $op['dateEng']; ?></td>
                     <td><?= $op['libelle']; ?></td>
                     <td><?= $op['service']; ?></td>
@@ -91,7 +91,7 @@ $an = $_SESSION['an'];
                     <td><?= $n++; ?></td>
                     <td><?= $op['numCompte']; ?></td>
                     <td><?= formatNumEng($op['idEng']); ?></td>
-                    <td><?= $op['idOp']; ?></td>
+                    <td><?= formatNumOP($op['idOp']); ?></td>
                     <td><?= $op['dateEng']; ?></td>
                     <td><?= $op['libelle']; ?></td>
                     <td><?= $op['service']; ?></td>

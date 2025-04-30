@@ -63,7 +63,7 @@ $an = $_SESSION['an'];
                     <td><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
                     <td><?= $eng['numFourn']; ?></td>
                     <td>
-                        <?php if ($_SESSION['priv'] === 'sag'): ?>
+                        <?php if ($_SESSION['priv'] === 'admin'): ?>
                         <a href="traitement_eng.php?valider_id=<?= $eng['idEng']; ?>"
                             onclick="return confirm('Êtes-vous sûr de vouloir valider cet engagement ?')"
                             class="badge bg-success">Valider</a>
