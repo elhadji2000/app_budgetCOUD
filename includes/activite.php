@@ -1,24 +1,31 @@
-<script>
-    // 🔁 Rechargement automatique de la page toutes les 10 secondes
-    setTimeout(() => {
-        location.reload();
-    }, 10000); // 10000 ms = 10 secondes
 
-    // ⏳ Déconnexion après 1 minute d'inactivité
-    let inactivityTimer;
+<script type="text/javascript">
+	var theTime;
 
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            window.location.href = 'http://localhost/BUDGET/auth/logout.php'; // Redirige vers la déconnexion
-        }, 60000); // 60000 ms = 1 minute
-    }
+	// la fonction ne commence marcher qu'apres le premier clic
 
-    // Réinitialise le timer à chaque activité utilisateur
-    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(event => {
-        document.addEventListener(event, resetInactivityTimer);
-    });
+	currentTime = new Date();
+	theTime = currentTime.getTime();
+	/////////////////////////////////////////////////
 
-    // Lancer le timer dès le chargement
-    resetInactivityTimer();
+	document.onmousemove = stockTime;
+	document.onkeydown = stockTime; //  pour prendre en compte les actions du clavier
+
+	function stockTime() {
+		currentTime = new Date();
+		theTime = currentTime.getTime();
+	}
+
+	function verifTime() {
+		currentTime = new Date();
+		var timeNow = currentTime.getTime();
+		if (timeNow - theTime > 400000) {           //300000==>5mn
+
+			  alert('Votre session a expiré. Veuillez vous reconnecter!');
+			 //   top.location.href="index"			   
+			  top.location.href="http://localhost/BUDGET/auth/logout.php"			 
+
+		}
+	}
+	window.setInterval("verifTime()", 200000);
 </script>

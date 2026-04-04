@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 22 avr. 2025 à 14:09
+-- Généré le : jeu. 12 juin 2025 à 00:42
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -236,7 +236,7 @@ INSERT INTO `comptep` (`idCp`, `numCp`, `libelle`, `dateSys`, `nature`) VALUES
 (17, '71', 'Subvention d\'Exploitation', '2025-04-16 08:39:53', 'produit'),
 (18, '75', 'Autres Produits', '2025-04-16 08:39:53', 'produit'),
 (19, '82', 'Produits de Cessions', '2025-04-16 08:39:53', 'produit'),
-(20, '865', 'Reprise Subvention d\'Investissement', '2025-04-16 08:39:53', 'produit');
+(20, '865', 'Reprise Subvention d\Investissement', '2025-04-16 08:39:53', 'produit');
 
 -- --------------------------------------------------------
 
@@ -260,11 +260,12 @@ CREATE TABLE `dotations` (
 --
 
 INSERT INTO `dotations` (`idDot`, `date`, `volume`, `dateSys`, `type`, `an`, `idUser`, `idCompte`) VALUES
-(1, '2025-04-16', 3000000.00, '2025-04-16 09:38:08', 'initiale', '2025', 1, 2),
 (2, '2025-04-22', 150000000.00, '2025-04-22 10:53:50', 'initiale', '2025', 1, 3),
 (3, '2025-04-22', 100000000.00, '2025-04-22 10:54:16', 'initiale', '2025', 1, 4),
 (4, '2025-04-22', 50000000.00, '2025-04-22 10:54:36', 'initiale', '2025', 1, 6),
-(5, '2025-04-22', 14000000.00, '2025-04-22 10:55:03', 'initiale', '2025', 1, 7);
+(9, '2025-04-23', 20000000.00, '2025-04-23 13:04:31', 'remanier', '2025', 1, 2),
+(10, '2025-04-25', -13000000.00, '2025-04-25 13:23:49', 'remanier', '2025', 1, 3),
+(11, '2025-04-30', 9500000.00, '2025-04-30 08:21:47', 'initiale', '2025', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -289,7 +290,35 @@ CREATE TABLE `engagements` (
 --
 
 INSERT INTO `engagements` (`idEng`, `dateEng`, `service`, `libelle`, `bc`, `montant`, `dateSys`, `idFourn`, `idCompte`) VALUES
-(1, '2025-04-16', 'RESTO', 'engagement 1', 'F10', 300000.00, '2025-04-16 11:40:18', 1, 2);
+(1, '2025-04-16', 'RESTO', 'engagement 1', 'F10', 300000.00, '2025-04-16 11:40:18', 1, 2),
+(2, '2025-04-25', 'personel', 'carburant', 'ttcc', 1000000.00, '2025-04-25 15:59:38', 2, 2),
+(4, '2025-04-29', 'dst', 'pavillon B les toilettes', 'PavBtt', 2500000.00, '2025-04-29 13:35:41', 1, 3),
+(5, '2025-04-30', 'Personnel', 'pour la dst coud', 'equipement', 600000.00, '2025-04-30 08:24:00', 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `engagements_temp`
+--
+
+CREATE TABLE `engagements_temp` (
+  `idEng` int(11) NOT NULL,
+  `dateEng` date DEFAULT NULL,
+  `service` varchar(100) DEFAULT NULL,
+  `libelle` varchar(255) DEFAULT NULL,
+  `bc` varchar(100) DEFAULT NULL,
+  `montant` decimal(13,2) DEFAULT NULL,
+  `dateSys` datetime DEFAULT current_timestamp(),
+  `idFourn` int(11) DEFAULT NULL,
+  `idCompte` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `engagements_temp`
+--
+
+INSERT INTO `engagements_temp` (`idEng`, `dateEng`, `service`, `libelle`, `bc`, `montant`, `dateSys`, `idFourn`, `idCompte`) VALUES
+(4, '2025-04-29', 'dst', 'les lampes pavillons', 'lampHH', 400000.00, '2025-04-29 13:41:40', 1, 6);
 
 -- --------------------------------------------------------
 
@@ -312,7 +341,8 @@ CREATE TABLE `fournisseur` (
 --
 
 INSERT INTO `fournisseur` (`idFourn`, `numFourn`, `adresse`, `nom`, `nature`, `dateSys`, `contact`) VALUES
-(1, 'EMD', 'malicounda', 'diop', 'repreneur', '2025-04-16 11:27:02', '784413400');
+(1, 'EMD', 'malicounda', 'diop', 'repreneur', '2025-04-16 11:27:02', '784413400'),
+(2, 'EL', 'dakar', 'ELTON', 'bénéficiaire', '2025-04-24 11:35:11', '764019147');
 
 -- --------------------------------------------------------
 
@@ -334,7 +364,52 @@ CREATE TABLE `operations` (
 --
 
 INSERT INTO `operations` (`idOp`, `typeOp`, `dateOp`, `numFact`, `dateSys`, `idEng`) VALUES
-(1, 'paiement', '2025-04-16', '004552', '2025-04-16 12:22:30', 1);
+(2, 'paiement', '2025-04-29', '001239', '2025-04-29 13:52:25', 4),
+(5, 'recette', '2025-04-30', '56BBCC', '2025-04-30 14:05:59', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `operations_suppr`
+--
+
+CREATE TABLE `operations_suppr` (
+  `idOp` int(11) NOT NULL,
+  `typeOp` varchar(50) NOT NULL,
+  `dateOp` date DEFAULT NULL,
+  `numFact` varchar(100) DEFAULT NULL,
+  `dateSys` datetime DEFAULT current_timestamp(),
+  `idEng` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `operations_suppr`
+--
+
+INSERT INTO `operations_suppr` (`idOp`, `typeOp`, `dateOp`, `numFact`, `dateSys`, `idEng`) VALUES
+(3, 'recette', '2025-04-30', '56BBCC', '2025-04-30 13:59:30', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `operations_temp`
+--
+
+CREATE TABLE `operations_temp` (
+  `idOp` int(11) NOT NULL,
+  `typeOp` varchar(50) NOT NULL,
+  `dateOp` date DEFAULT NULL,
+  `numFact` varchar(100) DEFAULT NULL,
+  `dateSys` datetime DEFAULT current_timestamp(),
+  `idEng` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `operations_temp`
+--
+
+INSERT INTO `operations_temp` (`idOp`, `typeOp`, `dateOp`, `numFact`, `dateSys`, `idEng`) VALUES
+(3, 'paiement', '2025-04-30', '99AA25', '2025-04-30 08:15:54', 1);
 
 -- --------------------------------------------------------
 
@@ -350,15 +425,18 @@ CREATE TABLE `users` (
   `email` varchar(100) DEFAULT NULL,
   `priv` varchar(100) DEFAULT NULL,
   `type_mdp` varchar(50) DEFAULT NULL,
-  `date_sys` date NOT NULL DEFAULT current_timestamp()
+  `statut` tinyint(1) NOT NULL DEFAULT 1,
+  `date_sys` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`idUser`, `nom`, `log`, `mdp`, `email`, `priv`, `type_mdp`, `date_sys`) VALUES
-(1, 'Madiop DIOP', '936076/M', 'f6a7651443d5867f394fe61ab082aac01c3c25fd', 'diopelhadjimadiop@gmail.com', 'admin', 'updated', '2025-04-16');
+INSERT INTO `users` (`idUser`, `nom`, `log`, `mdp`, `email`, `priv`, `type_mdp`, `statut`, `date_sys`) VALUES
+(1, 'Madiop DIOP', '936076/M', 'f6a7651443d5867f394fe61ab082aac01c3c25fd', 'diopelhadjimadiop@gmail.com', 'admin', 'updated', 1, '2025-04-16'),
+(2, 'Modou Waly FAYE', '902000/A', 'f6a7651443d5867f394fe61ab082aac01c3c25fd', 'fayefaye@gmail.com', 'sag', 'updated', 1, '2025-04-23'),
+(3, 'Ibrahima DIOP', '936009/C', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 'khalil@hotmail.com', 'op', 'default', 0, '2025-04-29');
 
 --
 -- Index pour les tables déchargées
@@ -395,6 +473,14 @@ ALTER TABLE `engagements`
   ADD KEY `idCompte` (`idCompte`);
 
 --
+-- Index pour la table `engagements_temp`
+--
+ALTER TABLE `engagements_temp`
+  ADD PRIMARY KEY (`idEng`),
+  ADD KEY `idFourn` (`idFourn`),
+  ADD KEY `idCompte` (`idCompte`);
+
+--
 -- Index pour la table `fournisseur`
 --
 ALTER TABLE `fournisseur`
@@ -404,6 +490,20 @@ ALTER TABLE `fournisseur`
 -- Index pour la table `operations`
 --
 ALTER TABLE `operations`
+  ADD PRIMARY KEY (`idOp`),
+  ADD KEY `idEng` (`idEng`);
+
+--
+-- Index pour la table `operations_suppr`
+--
+ALTER TABLE `operations_suppr`
+  ADD PRIMARY KEY (`idOp`),
+  ADD KEY `idEng` (`idEng`);
+
+--
+-- Index pour la table `operations_temp`
+--
+ALTER TABLE `operations_temp`
   ADD PRIMARY KEY (`idOp`),
   ADD KEY `idEng` (`idEng`);
 
@@ -435,31 +535,49 @@ ALTER TABLE `comptep`
 -- AUTO_INCREMENT pour la table `dotations`
 --
 ALTER TABLE `dotations`
-  MODIFY `idDot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idDot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT pour la table `engagements`
 --
 ALTER TABLE `engagements`
-  MODIFY `idEng` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idEng` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `engagements_temp`
+--
+ALTER TABLE `engagements_temp`
+  MODIFY `idEng` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `fournisseur`
 --
 ALTER TABLE `fournisseur`
-  MODIFY `idFourn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idFourn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `operations`
 --
 ALTER TABLE `operations`
-  MODIFY `idOp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idOp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `operations_suppr`
+--
+ALTER TABLE `operations_suppr`
+  MODIFY `idOp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `operations_temp`
+--
+ALTER TABLE `operations_temp`
+  MODIFY `idOp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `idUser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idUser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Contraintes pour les tables déchargées
@@ -486,10 +604,29 @@ ALTER TABLE `engagements`
   ADD CONSTRAINT `engagements_ibfk_2` FOREIGN KEY (`idCompte`) REFERENCES `compte` (`idCompte`);
 
 --
+-- Contraintes pour la table `engagements_temp`
+--
+ALTER TABLE `engagements_temp`
+  ADD CONSTRAINT `engagements_temp_ibfk_1` FOREIGN KEY (`idFourn`) REFERENCES `fournisseur` (`idFourn`),
+  ADD CONSTRAINT `engagements_temp_ibfk_2` FOREIGN KEY (`idCompte`) REFERENCES `compte` (`idCompte`);
+
+--
 -- Contraintes pour la table `operations`
 --
 ALTER TABLE `operations`
   ADD CONSTRAINT `operations_ibfk_1` FOREIGN KEY (`idEng`) REFERENCES `engagements` (`idEng`);
+
+--
+-- Contraintes pour la table `operations_suppr`
+--
+ALTER TABLE `operations_suppr`
+  ADD CONSTRAINT `operations_suppr_ibfk_1` FOREIGN KEY (`idEng`) REFERENCES `engagements` (`idEng`);
+
+--
+-- Contraintes pour la table `operations_temp`
+--
+ALTER TABLE `operations_temp`
+  ADD CONSTRAINT `operations_temp_ibfk_1` FOREIGN KEY (`idEng`) REFERENCES `engagements` (`idEng`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

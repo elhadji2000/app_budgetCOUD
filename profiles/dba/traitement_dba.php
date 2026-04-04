@@ -3,12 +3,12 @@
 session_start(); // Démarrer la session
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!empty($_POST['nom']) && !empty($_POST['log']) && !empty($_POST['mail']) && !empty($_POST['priv'])) {
+    if (!empty($_POST['nom']) && !empty($_POST['log']) && !empty($_POST['mail']) && !empty($_POST['priv']) && !empty($_POST['telephone']) && !empty($_POST['sexe'])) {
 
 
-        $resultat = ajouterUtilisateur($_POST['nom'], $_POST['log'], $_POST['mail'], $_POST['priv']);
+        $resultat = ajouterUtilisateur($_POST['nom'], $_POST['log'], $_POST['mail'], $_POST['priv'], $_POST['telephone'], $_POST['sexe']);
         
-        if ($resultat['success']) {
+        if ($resultat['success']) { 
             $messageSuccess = $resultat['message'];
             header("Location: add_user.php?success=1");
             exit();

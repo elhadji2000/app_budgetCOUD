@@ -14,118 +14,152 @@ $TDotations = sommeDotByCompte($numCompte);
 $TEngs = 0;
 ?>
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
-    </div>
 
-    <!-- Barre de recherche -->
-    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h2>Realisation de <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></h2>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<main class="container-fluid mt-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 text-primary fw-bold">
+            <i class="bi bi-folder2-open"></i> Realisation de <?= $data['numCompte']; ?> : <?= $data['libelle']; ?>
+        </h5>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
     </div>
 
     <!-- Tableau -->
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <div
-            style='width: 100%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
-            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:15px;">
-                <thead style="color: white !important;">
-                    <tr>
-                        <th style="background-color: #4655a4;">Numero</th>
-                        <th style="background-color: #4655a4;">Compte</th>
-                        <th style="background-color: #4655a4;">Date</th>
-                        <th style="background-color: #4655a4;">Ref</th>
-                        <th style="background-color: #4655a4;">Objet</th>
-                        <th style="background-color: #4655a4;">Service</th>
-                        <th style="background-color: #4655a4;">FR/Bènèf</th>
-                        <th style="background-color: #4655a4;">Montant</th>
-                        <th style="background-color: #4655a4;">Bon_Eng</th>
-                        <?php if ($op == 1): ?>
-                        <th style="background-color: #4655a4;">Mandat</th>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <?php
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table id="tableComptes" class="table table-striped table-hover align-middle">
+                    <thead class="text-white custom-header">
+                        <tr>
+                            <th>#</th>
+                            <th>Numero</th>
+                            <th>Compte</th>
+                            <th>Date</th>
+                            <th>REF</th>
+                            <th>Type_eng</th>
+                            <th>Bènèficiaire</th>
+                            <th>Montant</th>
+                            <th>Bon_Eng</th>
+                            <?php if ($op == 1): ?>
+                            <th>Mandat</th>
+                            <?php endif; ?>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <?php
                 $n=1;
                 if (!empty($engs)) :
                     foreach ($engs as $eng) : ?>
-                    <tr>
-                        <td><?= formatNumEng($eng['idEng']); ?></td>
-                        <td style="padding: 15px;">
-                            <?= $eng['numCompte']; ?>
-                        </td>
+                        <tr>
+                            <td><?= $n++; ?></td>
+                            <td><?= formatNumEng($eng['idEng']); ?></td>
+                            <td style="padding: 15px;">
+                                <?= $eng['numCompte']; ?>
+                            </td>
 
-                        <td style='padding: 15px;'>
-                            <?= $eng['dateEng']; ?>
-                        </td>
-                        <td style='padding: 15px;'>
-                            <?php if (!empty($eng['numFact'])): ?>
-                            facture<br> N°<?= $eng['numFact']; ?>
-                            <?php else: ?>
-                            —
+                            <td>
+                                <?= date('d/m/Y', strtotime($eng['dateEng'])) ; ?>
+                            </td>
+                            <td>
+                                <?php if (!empty($eng['numFact'])): ?>
+                                <?= strtoupper($eng['numFact']); ?>
+                                <?php else: ?>
+                                —
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?= $eng['type_eng']; ?>
+                            </td>
+                            <td>
+                                <?= $eng['nom']; ?>
+                            </td>
+                            <td class="text-start fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
+                            <td class="text-center">
+                                <a class="btn btn-sm btn-warning" target="_blank" href="../engagements/be_vue_pdf.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                            </td>
+                            <?php if ($op == 1): ?>
+                            <td class="text-center">
+                                <?php if (!empty($eng['numFact'])): ?>
+                                <a class="btn btn-sm btn-primary" target="_blank"  href="../engagements/mandat_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                                <?php else: ?>
+                                <span title="Pas d'opération" style="color: grey; cursor: not-allowed;">vue_pdf</span>
+                                <?php endif; ?>
+                            </td>
+
                             <?php endif; ?>
-                        </td>
-
-                        <td style='padding: 15px;max-width: 250px;'>
-                            <?= $eng['libelleC']; ?>
-                        </td>
-                        <td style='padding: 15px;'>
-                            <?= $eng['service']; ?>
-                        </td>
-                        <td style='padding: 15px;'>
-                            <?= $eng['nom']; ?>
-                        </td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($eng['montant'], 0, ',', ','); ?>
-                            FCFA</td>
-                        <td>
-                            <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
-                        </td>
-                        <?php if ($op == 1): ?>
-                        <td>
-                            <?php if (!empty($eng['numFact'])): ?>
-                            <a href="../engagements/mandat_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
-                            <?php else: ?>
-                            <span title="Pas d'opération" style="color: grey; cursor: not-allowed;">vue_pdf</span>
-                            <?php endif; ?>
-                        </td>
-
+                        </tr>
+                        <?php 
+                        $TEngs += $eng['montant'];
+                        endforeach;?>
                         <?php endif; ?>
-                    </tr>
-                    <?php 
-                    $TEngs += $eng['montant'];
-                    endforeach;?>
-                    <?php else : ?>
-                    <tr>
-                        <td colspan="9" class="text-danger">Aucune recette trouvée</td>
-                    </tr>
-                    <?php endif; ?>
 
-                </tbody>
-                <tfooter>
-                    <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL DES
-                            REALISATIONS DU
-                            COMPTE</th>
-                        <th colspan="3" style="background-color: #4655a4;text-align: center;color: white;">
-                            <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
-                    </tr>
-                    <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">
-                            SOLDE DISPONIBLE DU COMPTE
-                        </th>
-                        <th colspan="3" style="background-color: #4655a4;text-align: center;color: white;">
-                            <?= number_format(($TDotations-$TEngs), 0, ',', ','); ?> FCFA</th>
-                    </tr>
-                </tfooter>
-            </table>
+                    </tbody>
+                    <tfooter>
+                        <tr>
+                            <th colspan="7" class="text-center" style="text-align: left;">TOTAL DES REALISATIONS DU COMPTE</th>
+                            <th colspan="3" class="text-center" style="text-align: left;">
+                                <?= number_format($TEngs, 0, ',', ' '); ?> F</th>
+                        </tr>
+                        <tr>
+                            <th colspan="7" class="text-center" style="text-align: left;">
+                                SOLDE DISPONIBLE DU COMPTE
+                            </th>
+                            <th colspan="3" class="text-center" style="text-align: left;">
+                                <?= number_format(($TDotations-$TEngs), 0, ',', ' '); ?> F</th>
+                        </tr>
+                    </tfooter>
+                </table>
+            </div>
         </div>
-    </div>
-
-
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
-    </div>
 </main>
 <?php include '../../includes/footer.php';?>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tableComptes').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        responsive: true,
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
+        }
+    });
+});
+</script>
+
+<style>
+.custom-header {
+    background-color: #4655a4;
+    color: #fff;
+}
+
+#tableComptes th,
+#tableComptes td {
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+.text-end {
+    text-align: right !important;
+}
+.text-center {
+    text-align: center !important;
+}
+</style>

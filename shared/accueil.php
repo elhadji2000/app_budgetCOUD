@@ -8,9 +8,6 @@ if (!isset($_SESSION['user'])) {
 
 <?php include '../includes/header.php';?>
 <main>
-    <div class='container'>
-        <?php include 'menu.php';?>
-    </div>
 
     <div class="text-center container" style="margin-bottom: 50px; margin-top: 70px;">
         <a href="http://localhost/BUDGET/shared/accueil.php">
@@ -30,7 +27,7 @@ if (!isset($_SESSION['user'])) {
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 votre mot de passe a été modifiè avec succès !
+                votre mot de passe a été modifiè avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>

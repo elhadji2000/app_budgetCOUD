@@ -138,7 +138,7 @@ if ($anneeSession == $anneeActuelle): ?>
             <div class="dropdown">
                 <a style="color: white; text-decoration: none;font-size: 13px;" class="dropdown-toggle text-white"
                     href="#" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    <strong>Ordre de Paiment(O.P)</strong>
+                    <strong>Mandat de Paiement</strong>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <?php if ($anneeSession == $anneeActuelle): ?>

@@ -1,50 +1,56 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../index.php"); // Redirige vers la page de connexion
+    header("Location: ../../index.php");
     exit();
 }
-?>
-<?php include '../../includes/fonctions.php';
+
 $typeOp = "paiement";
 $an = $_SESSION['an'];
 ?>
+<?php include '../../includes/fonctions.php';?>
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container-fluid mt-3">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 text-primary fw-bold">
+            <i class="bi bi-folder2-open"></i> ORDRE(S) DES PAIEMENT(S)
+        </h5>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
     </div>
 
-    <div class="d-flex container justify-content-between align-items-center py-2 px-3"
-        style="color: #4655a4; font-size: 13px; font-weight: 400;">
+    <!-- Tableau -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
 
-        <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
-            style="max-width: 250px;" onkeyup="filterTable()">
-        <h3 class="mb-0 text-center"> ORDRE(S) DES PAIEMENTS</h3>
-        <a href="add_paie1.php" class="btn btn-success"><strong>ajouter</strong></a>
-    </div>
-
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <table class="table table-bordered table-hover text-center" style="margin-top: 10px;">
-            <thead style="color: white !important;">
-                <tr class="table-primary">
-                    <th style="background-color: #4655a4;">N°</th>
-                    <th style="background-color: #4655a4;">Compte</th>
-                    <th style="background-color: #4655a4;">Num_Engagement</th>
-                    <th style="background-color: #4655a4;">Num O.P</th>
-                    <th style="background-color: #4655a4;">Date_Engagement</th>
-                    <th style="background-color: #4655a4;">Objet</th>
-                    <th style="background-color: #4655a4;">Service</th>
-                    <th style="background-color: #4655a4;">Fournisseur</th>
-                    <th style="background-color: #4655a4;">Date O.P</th>
-                    <th style="background-color: #4655a4;">Num_Fact</th>
-                    <th style="background-color: #4655a4;">Montant</th>
-                    <th style="background-color: #4655a4;">Validation</th>
-                    <th style="background-color: #4655a4;">Action(s)</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <?php
+            <table id="tableComptes" class="table table-striped table-hover align-middle">
+                <thead class="text-white" style="background-color: #4655a4;">
+                    <tr>
+                        <th>N°</th>
+                        <th>Compte</th>
+                        <th>N° Bon</th>
+                        <th>Date_Eng</th>
+                        <th>Montant_Eng</th>
+                        <th>Num O.P</th>
+                        <th>Date O.P</th>
+                        <th>Pieces_justificatifs</th>
+                        <th>Montant_O.P</th>
+                        <th>Validation</th>
+                        <th>Action(s)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <?php
     $n = 1;
     $opsTemp = getOperationsTemp($typeOp); // À définir dans ton modèle
     $ops = getOperationsByType($typeOp); // Liste validée
@@ -53,119 +59,80 @@ $an = $_SESSION['an'];
 
         // 1. Afficher les opérations TEMPORAIRES
         foreach ($opsTemp as $op): ?>
-                <tr style="background-color: #fff8e1;">
-                    <td><?= $n++; ?></td>
-                    <td><?= $op['numCompte']; ?></td>
-                    <td><?= formatNumEng($op['idEng']); ?></td>
-                    <td><?= formatNumOP($op['idOp']); ?><small class="text-warning">(temp)</small></td>
-                    <td><?= $op['dateEng']; ?></td>
-                    <td><?= $op['libelle']; ?></td>
-                    <td><?= $op['service']; ?></td>
-                    <td><?= $op['numFourn']; ?></td>
-                    <td><?= $op['dateOp']; ?></td>
-                    <td><?= $op['numFact']; ?></td>
-                    <td><?= number_format($op['montant'], 0, ',', ','); ?> FCFA</td>
-                    <td>
-                        <?php if ($_SESSION['priv'] === 'admin'): ?>
-                        <a href="traitement_paie.php?valider_id=<?= $op['idOp']; ?>"
-                            onclick="return confirm('Valider cette opération ?')" class="badge bg-success">Valider</a>
-                        <?php else: ?>
-                        <span class="badge bg-success" style="opacity: 0.5; cursor: not-allowed;"
-                            title="Accès restreint">
-                            Valider
-                        </span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <a href="traitement_paie.php?supprTempOp=<?= $op['idOp']; ?>"
-                            onclick="return confirm('Supprimer cette opération temporaire ?')" class="badge bg-danger">
-                            Supprimer
-                        </a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                    <tr style="background-color: #fff8e1;">
+                        <td><?= $n++; ?></td>
+                        <td><?= $op['numCompte']; ?></td>
+                        <td><?= formatNumEng($op['idEng']); ?></td>
+                        <td><?= date('j/m/Y', strtotime($op['dateEng'])); ?></td>
+                        <td class="fw-bold somme"><?= number_format($op['montant'], 0, ',', ' '); ?> F</td>
+                        <td><?= formatNumOP($op['idOp']); ?><small class="text-warning">(temp)</small></td>
+                        <td><?= date('j/m/Y', strtotime($op['dateOp'])); ?></td>
+                        <td><?= strtoupper($op['numFact']); ?></td>
+                        <td class="fw-bold somme"><?= number_format($op['montant_op'], 0, ',', ' '); ?> F</td>
+                        <td>
+                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <a href="traitement_paie.php?valider_id=<?= $op['idOp']; ?>"
+                                onclick="return confirm('Valider cette opération ?')"
+                                class="btn btn-sm  btn-success">Valider</a>
+                            <?php else: ?>
+                            <span class="btn btn-sm btn-secondary" style="opacity: 0.5; cursor: not-allowed;"
+                                title="Accès réservé à l'administrateur">
+                                valider
+                            </span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <a href="traitement_paie.php?supprTempOp=<?= $op['idOp']; ?>"
+                                onclick="return confirm('Annuler cette opération temporaire ?')"
+                                class="btn btn-sm  btn-dabger">
+                                Annuler
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
 
-                <!-- 2. Afficher les opérations VALIDÉES -->
-                <?php foreach ($ops as $op): ?>
-                <tr>
-                    <td><?= $n++; ?></td>
-                    <td><?= $op['numCompte']; ?></td>
-                    <td><?= formatNumEng($op['idEng']); ?></td>
-                    <td><?= formatNumOP($op['idOp']); ?></td>
-                    <td><?= $op['dateEng']; ?></td>
-                    <td><?= $op['libelle']; ?></td>
-                    <td><?= $op['service']; ?></td>
-                    <td><?= $op['numFourn']; ?></td>
-                    <td><?= $op['dateOp']; ?></td>
-                    <td><?= $op['numFact']; ?></td>
-                    <td><?= number_format($op['montant'], 0, ',', ','); ?> FCFA</td>
-                    <td>
-                        <span class="badge bg-secondary" style="cursor: not-allowed;" title="Déjà validée">
-                            Validée
-                        </span>
-                    </td>
-                    <td>
-                        <?php if ($_SESSION['priv'] === 'admin'): ?>
-                        <a href="traitement_paie.php?supprOp=<?= $op['idOp']; ?>"
-                            onclick="return confirm('Supprimer cette opération ?')" class="badge bg-danger">
-                            Supprimer
-                        </a>
-                        <?php else: ?>
-                        <span class="text-muted" style="cursor: not-allowed;" title="Opération utilisée">
-                            Supprimer
-                        </span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                    <!-- 2. Afficher les opérations VALIDÉES -->
+                    <?php foreach ($ops as $op): ?>
+                    <tr>
+                        <td><?= $n++; ?></td>
+                        <td><?= $op['numCompte']; ?></td>
+                        <td><?= formatNumEng($op['idEng']); ?></td>
+                        <td><?= date('j/m/Y', strtotime($op['dateEng'])); ?></td>
+                        <td class="fw-bold somme"><?= number_format($op['montant'], 0, ',', ' '); ?> F</td>
+                        <td><?= formatNumOP($op['idOp']); ?></td>
+                        <td><?= date('j/m/Y', strtotime($op['dateOp'])); ?></td>
+                        <td><?= strtoupper($op['numFact']); ?></td>
+                        <td class="fw-bold somme"><?= number_format($op['montant_op'], 0, ',', ' '); ?> F</td>
+                        <td>
+                            <span class="btn btn-sm btn-secondary" style="cursor: not-allowed;" title="Déjà validée">
+                                Valider
+                            </span>
+                        </td>
+                        <td>
+                            <a target="_blank" href="mp_vue_pdf.php?id=<?= $op['idOp']; ?>"
+                                class="btn btn-sm btn-warning">
+                                MP_PDF
+                            </a> |
+                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <a href="traitement_paie.php?supprOp=<?= $op['idOp']; ?>"
+                                onclick="return confirm('Annuler cette opération ?')" class="btn btn-sm btn-danger">
+                                Annuler
+                            </a>
+                            <?php else: ?>
+                            <span class="btn btn-sm btn-secondary" style="cursor: not-allowed;"
+                                title="Opération utilisée">
+                                Annuler
+                            </span>
+                            <?php endif; ?>
 
-                <?php else: ?>
-                <tr>
-                    <td colspan="13" class="text-danger">Aucune opération trouvée.</td>
-                </tr>
-                <?php endif; ?>
-            </tbody>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
 
-        </table>
-    </div>
-
-    <!-- Script pour la recherche et l'affichage du message -->
-    <script>
-    function filterTable() {
-        let input = document.getElementById("searchInput");
-        let filter = input.value.toLowerCase();
-        let tableBody = document.getElementById("tableBody");
-        let rows = tableBody.getElementsByTagName("tr");
-        let noResultRow = document.getElementById("noResultRow");
-
-        let found = false;
-
-        for (let i = 0; i < rows.length; i++) {
-            let cells = rows[i].getElementsByTagName("td");
-            let rowContainsFilter = false;
-
-            for (let j = 0; j < cells.length; j++) {
-                if (cells[j].textContent.toLowerCase().includes(filter)) {
-                    rowContainsFilter = true;
-                    break;
-                }
-            }
-
-            rows[i].style.display = rowContainsFilter ? "" : "none";
-            if (rowContainsFilter) found = true;
-        }
-
-        // Afficher ou cacher la ligne "Aucun résultat trouvé"
-        noResultRow.style.display = found ? "none" : "";
-    }
-    </script>
-
-
-
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
-    </div>
+            </table>
+        </div>
 </main>
 
 <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
@@ -179,7 +146,7 @@ $an = $_SESSION['an'];
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 O.P supprimer avec succès !
+                O.P supprimer avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Fermer</button>
@@ -210,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 O.P valider avec succès !
+                O.P valider avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
@@ -230,3 +197,40 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <?php endif; ?>
 <?php include '../../includes/footer.php';?>
+
+<!-- jQuery + DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tableComptes').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ comptes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
+        }
+    });
+});
+</script>
+
+<!-- Alignement à gauche -->
+<style>
+#tableComptes th,
+#tableComptes td {
+    text-align: left !important;
+    vertical-align: middle;
+    font-size: 12px;
+}
+
+#tableComptes .somme {
+    text-align: right !important;
+}
+</style>

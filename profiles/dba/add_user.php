@@ -8,63 +8,90 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
 ?>
 <?php include '../../includes/fonctions.php';?>
 <?php include '../../includes/header.php';?>
-
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
 <main>
     <div class='container'>
+
         <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-            <h3>ENREGISTRER UN UTILISATEUR !!</h3>
+            <h3>AJOUTER UN UTILISATEUR</h3>
         </div>
 
-        <!-- Formulaire centré avec design -->
+        <!-- Formulaire -->
         <form action='traitement_dba.php' method='POST'>
-            <div
-                style='width: 70%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
 
-                <table style='width: 80%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>NOM COMPLET :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='nom' placeholder="Prenom NOM" style='width: 100%; padding: 10px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>LOGIN :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='log' placeholder="Matricule de L'utilisateur..." style='width: 100%; padding: 10px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>E-MAIL :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='mail' placeholder="Ex: exemple@coud.com" style='width: 100%; padding: 10px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>PRIVILEGE :</strong></td>
-                        <td style='padding: 10px 0;'>
-                        <select name="priv" style="width: 100%; padding: 13px;" required>
-                                <option value="">--Sélectionnez--</option>
-                                <option value="admin">ADMIN</option>
-                                <option value="sag">SAG</option>
-                                <option value="mbis">MBIS</option>
-                                <option value="op">OP</option>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
+            <div class="mx-auto px-3 py-4"
+                style="max-width: 700px; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4;">
 
+                <?php if (!empty($_GET['error'])): ?>
+                <div class="text-center mb-3">
+                    <i style='color:red;'><?= htmlspecialchars($_GET['error']); ?></i>
+                </div>
+                <?php endif; ?>
+
+                <div class="row">
+
+                    <!-- Nom -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>NOM COMPLET :</strong></label>
+                        <input type='text' name='nom' placeholder="Prenom NOM" style="border: 1px solid black;" class="form-control" required>
+                    </div>
+
+                    <!-- Login -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>LOGIN :</strong></label>
+                        <input type='text' name='log' placeholder="Matricule de l'utilisateur..." style="border: 1px solid black;" class="form-control"
+                            required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>E-MAIL :</strong></label>
+                        <input type='email' name='mail' placeholder="Ex: exemple@coud.com" style="border: 1px solid black;" class="form-control"
+                            required>
+                    </div>
+
+                    <!-- Telephone -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>TELEPHONE :</strong></label>
+                        <input type='text' name='telephone' placeholder="+221..." style="border: 1px solid black;" class="form-control"
+                            required>
+                    </div>
+
+                    <!-- Privilège -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>SEXE :</strong></label>
+                        <select name="sexe" class="form-control" style="border: 1px solid black;" required>
+                            <option value="">--Sélectionnez--</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                        </select>
+                    </div>
+
+                    <!-- Privilège -->
+                    <div class="col-md-6 mb-3">
+                        <label><strong>PRIVILEGE :</strong></label>
+                        <select name="priv" class="form-control" style="border: 1px solid black;" required>
+                            <option value="">--Sélectionnez--</option>
+                            <option value="admin">ADMIN</option>
+                            <option value="sag">SAG</option>
+                            <option value="mbis">MBIS</option>
+                            <option value="op">OP</option>
+                        </select>
+                    </div>
+
+                </div>
             </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Enregistrer</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
+
+            <!-- Boutons -->
+            <div class="d-flex justify-content-between align-items-center mt-3 mx-auto" style="max-width: 700px;">
+                <button type="submit" class="btn btn-success">
+                    <strong>Enregistrer</strong>
+                </button>
+
+                <a href="javascript:history.back()" class="btn btn-danger">
+                    <strong>Annuler</strong>
+                </a>
             </div>
+
         </form>
     </div>
 </main>
@@ -80,7 +107,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                     aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                🎉 L'utilisateur a été enregistrée avec succès !
+                 L'utilisateur a été enregistrée avec succès !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>

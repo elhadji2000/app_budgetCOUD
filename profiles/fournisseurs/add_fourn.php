@@ -1,104 +1,146 @@
 <?php
 session_start();
-if ( !isset( $_SESSION[ 'user' ] ) ) {
-    header( 'Location: ../../index.php' );
-    // Redirige vers la page de connexion
+
+if (!isset($_SESSION['user'])) {
+    header('Location: ../../index.php');
     exit();
 }
-?>
-<?php include '../../includes/fonctions.php';?>
-<?php include '../../includes/header.php';?>
 
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
+include '../../includes/fonctions.php';
+include '../../includes/header.php';
+?>
+
 <main>
     <div class='container'>
-        <div class='text-center' style='margin-bottom:45px;color:#4655a4;'>
-            <h3>ENREGISTRER UN FOURNISSEUR !!</h3>
+
+        <!-- Titre -->
+        <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
+            <h3>NOUVEAU FOURNISSEUR</h3>
+            <p class="text-danger fst-italic mb-0">
+                Veuillez remplir correctement toutes les informations
+            </p>
         </div>
 
-        <!-- Formulaire centré avec design -->
-        <form action='traitement_fourn.php' method='POST'>
-            <div
-                style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
+        <!-- Formulaire -->
+        <form action="traitement_fourn.php" method="POST" class="needs-validation" novalidate>
 
-                <table style='width: 70%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Code Fournisseur :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='numFourn' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style='padding: 10px 0;'><strong>Nom :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='nom' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style='padding: 10px 0;'><strong>adresse :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='adresse' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style='padding: 10px 0;'><strong>Contact :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='contact' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style='padding: 10px 0;'><strong>Nature :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type='text' name='nature' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                </table>
+            <div class="mx-auto px-3 py-4"
+                style="max-width: 700px; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4;">
 
+                <!-- Erreur -->
+                <?php if (!empty($_GET['error'])): ?>
+                    <div class="text-center mb-3">
+                        <i style="color:red;">
+                            <?= htmlspecialchars($_GET['error']); ?>
+                        </i>
+                    </div>
+                <?php endif; ?>
+
+                <div class="row">
+
+                    <!-- Num fournisseur -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            NUM F <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="numfourn" class="form-control" required>
+                        <div class="invalid-feedback">Veuillez entrer le numéro fournisseur.</div>
+                    </div>
+
+                    <!-- Nom -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            NOM <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="nom" class="form-control" required>
+                        <div class="invalid-feedback">Veuillez entrer le nom.</div>
+                    </div>
+
+                    <!-- Adresse -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            ADRESSE <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="adresse" class="form-control" required>
+                        <div class="invalid-feedback">Veuillez entrer l'adresse.</div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            CONTACT <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="contact" class="form-control" required>
+                        <div class="invalid-feedback">Veuillez entrer le contact.</div>
+                    </div>
+
+                    <!-- Nature -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            NATURE <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="nature" class="form-control" required>
+                        <div class="invalid-feedback">Veuillez préciser la nature.</div>
+                    </div>
+
+                </div>
             </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Enregistrer</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
+
+            <!-- Boutons -->
+            <div class="container mt-3" style="max-width:700px;">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                    <button type="submit" class="btn btn-success w-100 w-md-auto">
+                        <strong>Enregistrer</strong>
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-danger w-100 w-md-auto">
+                        <strong>Annuler</strong>
+                    </a>
+                </div>
             </div>
+
         </form>
     </div>
 </main>
 
+<!-- Modal succès -->
 <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+<div class="modal fade" id="successModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-success">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="successModalLabel">Succès</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Fermer"></button>
+                <h5 class="modal-title">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                🎉 Le fournisseur a été enregistrée avec succès !
+            <div class="modal-body text-center">
+                Le fournisseur a été enregistré avec succès !
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+                <button class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
 </div>
-<?php endif; ?>
 
-<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
 <script>
-// Une fois le DOM chargé, on lance la modal
 document.addEventListener('DOMContentLoaded', function() {
-    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-    successModal.show();
+    new bootstrap.Modal(document.getElementById('successModal')).show();
 });
+
+// Validation Bootstrap
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', e => {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+})();
 </script>
 <?php endif; ?>
 
-<?php include '../../includes/footer.php';
-?>
+<?php include '../../includes/footer.php'; ?>

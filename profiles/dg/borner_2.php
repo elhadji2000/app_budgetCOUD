@@ -1,62 +1,107 @@
 <?php
 session_start();
-if ( !isset( $_SESSION[ 'user' ] ) ) {
-    header( 'Location: ../../index.php' );
-    // Redirige vers la page de connexion
+if (!isset($_SESSION['user'])) {
+    header('Location: ../../index.php');
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';?>
-<?php include '../../includes/header.php';?>
+
 <?php 
-    $date1 = $_GET['date1'];
-    $date2 = $_GET['date2'];
-    $nums = getCompteEngsByDate2($date1, $date2); 
+include '../../includes/fonctions.php';
+
+$date1 = $_GET['date1'] ?? '';
+$date2 = $_GET['date2'] ?? '';
+
+$nums = getCompteEngsByDate2($date1, $date2);
 ?>
 
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
-<main>
-    <div class='container'>
-        <div class='text-center' style='margin-bottom:45px;color: #4655a4;'>
-            <h3>RENSEIGNEMENT DU COMPTE !</h3>
+<?php include '../../includes/header.php';?>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center">
+
+            <h5 class="fw-bold text-primary mb-2">
+                <i class="bi bi-journal-text"></i> SÉLECTION DU COMPTE
+            </h5>
+
+            <small class="text-muted">
+                Période sélectionnée :
+                <strong><?= htmlspecialchars($date1) ?></strong> →
+                <strong><?= htmlspecialchars($date2) ?></strong>
+            </small>
+
+        </div>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form action="borner_3.php" method="GET">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <!-- Message erreur -->
+                <?php if (!empty($_GET['error'])) : ?>
+                    <div class="alert alert-danger text-center">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <?= htmlspecialchars($_GET['error']) ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Champs cachés -->
+                <input type="hidden" name="date1" value="<?= htmlspecialchars($date1) ?>">
+                <input type="hidden" name="date2" value="<?= htmlspecialchars($date2) ?>">
+
+                <div class="row justify-content-center">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-folder"></i> Numéro du compte
+                        </label>
+
+                        <select name="numCompte" class="form-select" required>
+                            <option value="">-- Sélectionner un compte --</option>
+
+                            <?php if (!empty($nums)) : ?>
+                                <?php foreach ($nums as $num) : ?>
+                                    <option value="<?= htmlspecialchars($num['numCompte']) ?>">
+                                        <?= htmlspecialchars($num['numCompte']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <option disabled>Aucun compte disponible</option>
+                            <?php endif; ?>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="card-footer d-flex justify-content-between">
+
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-check-circle"></i> Valider
+                </button>
+
+                <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+
+            </div>
         </div>
 
-        <!-- Formulaire centré avec design -->
-        <form action='borner_3.php' method='GET'>
-            <div
-                style='width: 60%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
+    </form>
 
-                <table style='width: 80%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <input type="hidden" name="date1" value="<?= $date1; ?>" />
-                        <input type="hidden" name="date2" value="<?= $date2; ?>" />
-                        <td style='padding: 10px 0;'><strong>Numéro du Compte :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <select name="numCompte" style="width: 100%; padding: 10px;" required>
-                                <option value="">Sélectionner un compte</option>
-                                <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["numCompte"]) ?>">
-                                    <?= htmlspecialchars($num["numCompte"]) ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Valider</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
-            </div>
-        </form>
-    </div>
 </main>
 
-<?php include '../../includes/footer.php';
-?>
+<?php include '../../includes/footer.php';?>

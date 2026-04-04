@@ -11,42 +11,54 @@ $data = getCompteByNum($numCompte);
 $engs = getEngsByCompte($numCompte);
 ?>
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
-    </div>
-    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h4>
-            <i style='color:rgba(78, 120, 93, 0.91);'><?= $data['numCompte']; ?>:<?= $data['libelle']; ?></i>
-        </h4>
-    </div>
-    <!-- Barre de recherche -->
-    <div class="d-flex container justify-content-between align-items-center py-2 px-3"
-        style="color: #4655a4; font-size: 13px; font-weight: 400;">
-        <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
-            style="max-width: 250px;" onkeyup="filterTable()">
-        <h3 class="mb-0 text-center">LES ENGAGEMENTS</h3>
-        <strong></strong>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container-fluid mt-3">
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-graph-up-arrow"></i> LES ENGAGEMENTS 
+                </h5>
+                <small class="text-muted"><strong>Compte <?= $data['numCompte']; ?> :
+                        <?= $data['libelle']; ?></strong></small>
+            </div>
+
+            <div class="text-end">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+
+        </div>
     </div>
 
     <!-- Tableau -->
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
-            <thead style="color: white !important;">
-                <tr class="table-primary">
-                    <th style="background-color: #4655a4;">N°</th>
-                    <th style="background-color: #4655a4;">NumEngs</th>
-                    <th style="background-color: #4655a4;">date</th>
-                    <th style="background-color: #4655a4;">service</th>
-                    <th style="background-color: #4655a4;">libelle</th>
-                    <th style="background-color: #4655a4;">bc</th>
-                    <th style="background-color: #4655a4;">Montant</th>
-                    <th style="background-color: #4655a4;">Fourniseur</th>
-                    <th style="background-color: #4655a4;">details</th>
-                    <th style="background-color: #4655a4;">suppr</th>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <table id="tableComptes" class="table table-striped table-hover align-middle">
+                <thead class="text-white" style="background-color: #4655a4;">
+                    <tr>
+                    <th>N°</th>
+                    <th>NumEngs</th>
+                    <th>date</th>
+                    <th>Type_eng</th>
+                    <th>Objet</th>
+                    <th>Montant</th>
+                    <th>Bénéficiaire</th>
+                    <th>details</th>
+                    <th>Annuler</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
+            <tbody>
                 <?php
                 $n = 1;
                 if (!empty($engs)) :
@@ -56,22 +68,21 @@ $engs = getEngsByCompte($numCompte);
                     <td>
                         <?= formatNumEng($eng['idEng']); ?>
                     </td>
-                    <td><?= $eng['dateEng']; ?></td>
-                    <td><?= $eng['service']; ?></td>
-                    <td><?= $eng['libelle']; ?></td>
-                    <td><?= $eng['bc']; ?></td>
-                    <td><?= number_format($eng['montant'], 0, ',', ','); ?> FCFA</td>
+                    <td><?= date('d/m/Y', strtotime($eng['dateEng'])); ?></td>
+                    <td><?= $eng['type_eng']; ?></td>
+                    <td><?= $eng['objet']; ?></td>
+                    <td class="fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
                     <td><?= $eng['numFourn']; ?></td>
                     <td>
-                        <a href="eng_details.php?id=<?= $eng['idEng'] ?>">details</a>
+                        <a class="btn btn-sm btn-warning" href="be_vue_pdf.php?id=<?= $eng['idEng'] ?>">Vue_PDF</a>
                     </td>
                     <td>
                         <?php if (!isEngagementUsed($eng['idEng'])): ?>
-                        <a href="supprimer_engagement.php?id=<?= $eng['idEng'] ?>"
-                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet engagement ?')">Supprimer</a>
+                        <a class="btn btn-sm btn-danger" href="supprimer_engagement.php?id=<?= $eng['idEng'] ?>"
+                            onclick="return confirm('Êtes-vous sûr de vouloir Annuler cet engagement ?')">Annuler</a>
                         <?php else: ?>
-                        <span style="color: grey; cursor: not-allowed;"
-                            title="Engagement utilisé, suppression désactivée">Supprimer</span>
+                        <span class="btn btn-sm btn-secondary" style="color: black; cursor: not-allowed;"
+                            title="Engagement utilisé, Annulation désactivée">Annuler</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -79,57 +90,44 @@ $engs = getEngsByCompte($numCompte);
                     $n++;
                     endforeach;
                 ?>
-                <?php else : ?>
-                <tr>
-                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
-                </tr>
                 <?php endif; ?>
 
             </tbody>
-            <tbody id="noResultRow" style="display: none;">
-                <tr>
-                    <td colspan="10" class="text-danger">Aucun résultat trouvé</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Script pour la recherche et l'affichage du message -->
-    <script>
-    function filterTable() {
-        let input = document.getElementById("searchInput");
-        let filter = input.value.toLowerCase();
-        let tableBody = document.getElementById("tableBody");
-        let rows = tableBody.getElementsByTagName("tr");
-        let noResultRow = document.getElementById("noResultRow");
-
-        let found = false;
-
-        for (let i = 0; i < rows.length; i++) {
-            let cells = rows[i].getElementsByTagName("td");
-            let rowContainsFilter = false;
-
-            for (let j = 0; j < cells.length; j++) {
-                if (cells[j].textContent.toLowerCase().includes(filter)) {
-                    rowContainsFilter = true;
-                    break;
-                }
-            }
-
-            rows[i].style.display = rowContainsFilter ? "" : "none";
-            if (rowContainsFilter) found = true;
-        }
-
-        // Afficher ou cacher la ligne "Aucun résultat trouvé"
-        noResultRow.style.display = found ? "none" : "";
-    }
-    </script>
-
-
-
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
+         </table>
+        </div>
     </div>
 </main>
 <?php include '../../includes/footer.php';?>
+
+<!-- jQuery + DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tableComptes').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ comptes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
+        }
+    });
+});
+</script>
+
+<!-- Alignement à gauche -->
+<style>
+#tableComptes th,
+#tableComptes td {
+    text-align: left !important;
+    vertical-align: middle;
+    font-size:12px !important;
+}
+</style>

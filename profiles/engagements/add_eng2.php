@@ -1,197 +1,277 @@
 <?php
 session_start();
-if ( !isset( $_SESSION[ 'user' ] ) ) {
-    header( 'Location: ../../index.php' );
-    // Redirige vers la page de connexion
+if (!isset($_SESSION['user'])) {
+    header('Location: ../../index.php');
     exit();
 }
 
-?>
-<?php include '../../includes/fonctions.php';
+include '../../includes/fonctions.php';
+
 $numCompte = $_GET['numc'];
 $idCompte = getIdCompteByNum($numCompte);
 $data = getCompteByNum($numCompte);
 $details = getDetailsCompte($numCompte);
 $fourns = getAllFourniseurs();
-?>
-<?php
-// Sécurité : Initialisation si valeurs manquantes
-$details['dotationInitiale'] = $details['dotationInitiale'] ?? 0;
-$details['dotationRemaniee'] = $details['dotationRemaniee'] ?? 0;
-$details['totalEngagement'] = $details['totalEngagement'] ?? 0;
-$details['ecart'] = $details['ecart'] ?? 0;
-$tresoreri = ($details['dotationInitiale'] + $details['dotationRemaniee'])
-?>
-<?php
-$annee_connexion = $_SESSION['an']; // ex: 2023
+
+$dotationInitiale = $details['dotationInitiale'] ?? 0;
+$dotationRemaniee = $details['dotationRemaniee'] ?? 0;
+$dotationTotale = $dotationInitiale + $dotationRemaniee;
+
+$engagement = $details['totalEngagement'] ?? 0;
+$mandat = $details['totalDepense'] ?? ($details['O.P'] ?? 0);
+
+// Crédit disponible (avant paiement)
+$credit = $dotationTotale - $engagement;
+
+// Solde réel (après paiement)
+$solde = $dotationTotale - $mandat;
+
+// Couleurs dynamiques
+$colorCredit = ($credit > 0) ? 'text-success' : (($credit < 0) ? 'text-danger' : 'text-dark');
+$colorSolde = ($solde > 0) ? 'text-success' : (($solde < 0) ? 'text-danger' : 'text-dark');
+
+$annee_connexion = $_SESSION['an'];
 $min_date = $annee_connexion . "-01-01";
-$max_date = date("Y-m-d"); // aujourd'hui
+$max_date = date("Y-m-d");
+
+include '../../includes/header.php';
 ?>
-<?php include '../../includes/header.php';?>
 
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
-<main>
-    <!-- ##########  ESPACE POUR DETAILS DES ENGEMENT DU COMPTE DONNER ################ -->
-    <div class='container' style='margin-bottom:40px;'>
-        <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-            <strong style='color:rgba(78, 120, 93, 0.91);'><i><?= $data['numCompte']; ?>:
-                    <?= $data['libelle']; ?></i></strong>
-            <h4>SITUATION ACTUEL DU COMPTE !!</h4>
-        </div>
+<style>
+.card-admin {
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
 
-        <!-- Formulaire centré avec design -->
-        <div
-            style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 10px;'>
-            <table style='width: 100%; margin: 0 auto;'>
-                <tr>
-                    <td class="text-left" style='padding: 5px; text-align: left;'><strong>DOTATION INITIALE</strong>
-                    </td>
-                    <td style='padding: 5px; text-align: right;'>
-                        <strong><?= number_format($details['dotationInitiale'], 0, ',', ','); ?> FCFA</strong>
-                    </td>
-                </tr>
+.title-admin {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
 
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>DOTATION REMANIEE</strong></td>
-                    <td style='padding: 5px; text-align: right;'>
-                        <strong><?= number_format($details['dotationRemaniee'], 0, ',', ','); ?> FCFA</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>TOTAL ENGAGEMENT</strong></td>
-                    <td style='padding: 5px; text-align: right;'>
-                        <a href="liste_engsByCompte.php?numc=<?php echo $numCompte; ?>">
-                            <strong><?= number_format($details['totalEngagement'], 0, ',', ','); ?> FCFA</strong>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>ECART</strong></td>
-                    <td style='padding: 5px; text-align: right;color: green;'>
-                        <strong><?= number_format($details['ecart'], 0, ',', ','); ?> FCFA</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>TOTAL DES O.P</strong></td>
-                    <td style='padding: 5px; text-align: right;'>
-                        <strong><?= number_format($details['O.P'], 0, ',', ','); ?> FCFA</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>REGLEMENTS EFFECTIS</strong></td>
-                    <td style='padding: 5px; text-align: right;'><strong>0</strong></td>
-                </tr>
-                <tr>
-                    <td style='padding: 5px; text-align: left;'><strong>SOLDE DE TRESORIE ACTUEL</strong></td>
-                    <td style='padding: 5px; text-align: right;'>
-                        <strong><?= number_format($tresoreri, 0, ',', ','); ?> FCFA</strong>
-                    </td>
-                </tr>
-            </table>
-        </div>
+.table-finance td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.table-finance td:first-child {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.amount {
+    font-weight: 700;
+    color: #1f3a93;
+}
+
+.amount.green {
+    color: #1e8449;
+}
+
+.amount.red {
+    color: #c0392b;
+}
+
+.section-header {
+    border-left: 5px solid #4655a4;
+    padding-left: 10px;
+    margin-bottom: 15px;
+}
+</style>
+
+<main class="container py-4">
+
+    <!-- HEADER COMPTE -->
+    <div class="text-center mb-4">
+        <h4 class="title-admin">
+            Dossier du compte : <?= $data['numCompte']; ?> - <?= $data['libelle']; ?>
+        </h4>
     </div>
-    <!-- ################## 2222 ###################### -->
-    <!-- ################## AJOUTER ENGAGEMENT CI_DESSOUS ###################### -->
-    <div class='container'>
-        <div class='text-center' style='margin-bottom:15px;color:#4655a4;'>
-            <h4>NOUVEL ENGAGEMENT </h4>
+
+    <div class="row g-4">
+
+        <!-- ================= LEFT ================= -->
+        <div class="col-md-5">
+
+            <div class="card card-admin p-3">
+                <div class="section-header">
+                    <h5 class="mb-0">Situation budgétaire du compte</h5>
+                </div>
+
+                <table class="w-100 fw-bold text-uppercase table-finance">
+
+                    <!-- DOTATION -->
+                    <tr>
+                        <td>Dotation initiale :</td>
+                        <td class="text-end">
+                            <?= number_format($dotationInitiale, 0, ',', ' '); ?> FCFA
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>aprés remaniement(s) :</td>
+                        <td class="text-end amount">
+                            <?= number_format($dotationTotale, 0, ',', ' '); ?> FCFA
+                        </td>
+                    </tr>
+
+                    <!-- ENGAGEMENT -->
+                    <tr>
+                        <td>Total engagements :</td>
+                        <td class="text-end">
+                            <a href="liste_engsByCompte.php?numc=<?= $numCompte ?>" class="text-decoration-underline">
+                                <?= number_format($engagement, 0, ',', ' '); ?> FCFA
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- CREDIT -->
+                    <tr>
+                        <td>Crédit disponible :</td>
+                        <td class="text-end <?= $colorCredit ?>">
+                            <?= number_format($credit, 0, ',', ' '); ?> FCFA
+                        </td>
+                    </tr>
+
+                    <!-- MANDAT -->
+                    <tr>
+                        <td>Total mandat(s) :</td>
+                        <td class="text-end text-warning">
+                            <?= number_format($mandat, 0, ',', ' '); ?> FCFA
+                        </td>
+                    </tr>
+
+                    <!-- SOLDE -->
+                    <tr>
+                        <td>Solde réel :</td>
+                        <td class="text-end fw-bold <?= $colorSolde ?>">
+                            <?= number_format($solde, 0, ',', ' '); ?> FCFA
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+
         </div>
 
-        <!-- Formulaire centré avec design -->
-        <form action='traitement_eng.php' method='POST'>
-            <div
-                style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 5px;'>
+        <!-- ================= RIGHT ================= -->
+        <div class="col-md-7">
 
-                <table style='width: 90%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>NUMERO DU COMPTE :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type="hidden" name="idCompte" value="<?= htmlspecialchars($idCompte) ?>" />
-                            <input type='text' value="<?= $numCompte; ?>" readonly style='width: 100%; padding: 5px;'
-                                required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>DATE ENGAGEMENT :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type="date" name="dateEng" style="width: 100%; padding: 5px;" required
-                                min="<?= $min_date ?>" max="<?= $max_date ?>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>OBJET :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type='text' name='libelle' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>REFERENCE :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type='text' name='bc' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>SERVICE CONSERNÈ :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type='text' name='service' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>FOURNISSEUR :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <select name="idFourn" style="width: 100%; padding: 8px;" required>
+            <div class="card card-admin p-3">
+
+                <div class="section-header">
+                    <h5 class="mb-0">Enregistrement d’un nouvel engagement</h5>
+                </div>
+
+                <?php if (!empty($_GET['error'])): ?>
+                <div class="alert alert-danger">
+                    <?= $_GET['error']; ?>
+                </div>
+                <?php endif; ?>
+
+                <form action="traitement_eng.php" method="POST">
+
+                    <input type="hidden" name="idCompte" value="<?= htmlspecialchars($idCompte) ?>">
+
+                    <!-- Ligne 1 -->
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>NUMERO DE COMPTE</strong></label>
+                            <input style="border: 1px solid black;" type="text" class="form-control"
+                                value="<?= $numCompte ?>" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>DATE</strong></label>
+                            <input style="border: 1px solid black;" type="date" name="dateEng" value="<?= date('Y-m-d') ?>" class="form-control"
+                                min="<?= $min_date ?>" max="<?= $max_date ?>" required>
+                        </div>
+                    </div>
+
+                    <!-- Ligne 2 -->
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>OBJET DE LA DEPENSE</strong></label>
+                            <input type="text" style="border: 1px solid black;" name="objet" class="form-control"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Type</strong></label>
+                            <select style="border: 1px solid black;" name="type_eng" class="form-select" required>
+                                <option value="">Sélectionner le type</option>
+                                <option value="Biens et services">Biens et services</option>
+                                <option value="Personnel">Personnel</option>
+                                <option value="Transfert">Transfert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Ligne 3 -->
+                    <div class="row mb-2">
+                        <div class="col-md-12">
+                            <label class="form-label"><strong>BENIFICIARE</strong></label>
+                            <select style="border: 1px solid black;" name="idFourn" class="form-select" required>
                                 <option value="">Sélectionner un fournisseur</option>
-                                <?php foreach ($fourns as $fourn) : ?>
-                                <option value="<?= htmlspecialchars($fourn["idFourn"]) ?>">
-                                    <?= htmlspecialchars($fourn["numFourn"]) ?>
+                                <?php foreach ($fourns as $f): ?>
+                                <option value="<?= $f['idFourn'] ?>">
+                                    <?= $f['numFourn'] ?> : <?= $f['nom'] ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 5px 0;'><strong>MONTANT :</strong></td>
-                        <td style='padding: 5px 0;'>
-                            <input type='text' name='montant' style='width: 100%; padding: 5px;' required />
-                        </td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>MONTANT</strong></label>
+                        <input style="border: 1px solid black;" type="number" name="montant" class="form-control"
+                            required>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-success">
+                            <strong>Enregistrer</strong>
+                        </button>
+                        <a href="javascript:history.back()" class="btn btn-danger">
+                            <strong>Annuler</strong>
+                        </a>
+                    </div>
+
+                </form>
             </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 13px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Enregistrer</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
-            </div>
-        </form>
+        </div>
+
     </div>
-
-    <script>
-    document.querySelector("form").addEventListener("submit", function(e) {
-        const montantInput = document.querySelector("input[name='montant']");
-        const montant = parseFloat(montantInput.value);
-        const ecartDisponible = <?= $details['ecart']; ?>; // récupéré du PHP
-
-        if (montant < 0) {
-            alert("Le montant ne peut pas être inférieur à zéro.");
-            e.preventDefault();
-            return;
-        }
-
-        if (montant > ecartDisponible) {
-            alert("Le montant ne peut pas dépasser l'écart disponible (" + ecartDisponible.toLocaleString() +
-                " FCFA).");
-            e.preventDefault();
-            return;
-        }
-    });
-    </script>
-
 </main>
 
-<?php include '../../includes/footer.php';
-?>
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+    const montant = parseFloat(document.querySelector("[name='montant']").value);
+    const ecart = <?= (float)$details['ecart']; ?>;
+
+    if (montant < 0) {
+        alert("Le montant doit être supérieur ou égal à zéro.");
+        e.preventDefault();
+        return;
+    }
+
+    if (montant > ecart) {
+        const confirmation = confirm(
+            " Attention !\n\n" +
+            "Le montant dépasse le crédit disponible.\n\n" +
+            "Crédit disponible : " + ecart.toLocaleString() + " FCFA\n" +
+            "Montant saisi : " + montant.toLocaleString() + " FCFA\n\n" +
+            "Voulez-vous vraiment continuer ?"
+        );
+
+        if (!confirmation) {
+            e.preventDefault(); // bloque si utilisateur refuse
+        }
+    }
+});
+</script>
+
+<?php include '../../includes/footer.php'; ?>

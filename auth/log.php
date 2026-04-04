@@ -1,7 +1,8 @@
 <?php 
-include('../includes/fonctions.php');
 session_start(); // Démarrer la session
-
+$an = $_POST['annee_budgetaire'];
+$_SESSION['an'] = $an;
+include('../includes/fonctions.php');
 $error = "";
 
 if (!empty($_POST['utilisateur']) && !empty($_POST['motdepasse']) && !empty($_POST['annee_budgetaire'])) {

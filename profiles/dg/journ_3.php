@@ -5,7 +5,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';
+<?php include '../../includes/fonctions.php';  
 $date = $_GET['dateEng'];
 $numCompte = $_GET['numCompte'];
 $data = getCompteByNum($numCompte);
@@ -14,33 +14,51 @@ $TDotations = 0;
 $TEngs = 0;
 ?>
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
-    </div>
 
-    <!-- Barre de recherche -->
-    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h3>EXECUTION JOURNALIERE : <?= $date; ?></h3>
-        <strong>Compte <?= $data['numCompte']; ?> : <?= $data['libelle']; ?></strong>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container-fluid mt-3">
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-graph-up-arrow"></i> EXECUTION JOURNALIERE : <?= date('d/m/Y', strtotime($date));; ?>
+                </h5>
+                <small class="text-muted"><strong>Compte <?= $data['numCompte']; ?> :
+                        <?= $data['libelle']; ?></strong></small>
+            </div>
+
+            <div class="text-end">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+
+        </div>
     </div>
 
     <!-- Tableau -->
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <div
-            style='width: 100%; margin: 0 auto; border-top: 3px solid #4655a4; border-bottom: 3px solid #4655a4; padding: 20px;'>
-            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:15px;">
-                <thead style="color: white !important;">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <table id="tableComptes" class="table table-striped table-hover align-middle">
+                <thead class="text-white" style="background-color: #4655a4;">
                     <tr>
-                        <th style="background-color: #4655a4;">Numero</th>
-                        <th style="background-color: #4655a4;">Compte</th>
-                        <th style="background-color: #4655a4;">Date_Realisation</th>
-                        <th style="background-color: #4655a4;">Ref</th>
-                        <th style="background-color: #4655a4;">Objet</th>
-                        <th style="background-color: #4655a4;">Service</th>
-                        <th style="background-color: #4655a4;">FR/Bènèf</th>
-                        <th style="background-color: #4655a4;">Montant</th>
-                        <th style="background-color: #4655a4;">Bon_Eng</th>
+                        <th>Numero</th>
+                        <th>Compte</th>
+                        <th>Date_Realisation</th> 
+                        <th>Ref</th>
+                        <th>Objet</th>
+                        <th>Service</th>
+                        <th>FR/Bènèf</th>
+                        <th>Montant</th>
+                        <th>Bon_Eng</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -48,28 +66,28 @@ $TEngs = 0;
                 $n=1;
                 if (!empty($engs)) :
                     foreach ($engs as $eng) : ?>
-                    <tr>
+                    <tr> 
                         <td><?= formatNumEng($eng['idEng']); ?></td>
-                        <td style="padding: 15px;">
+                        <td>
                             <?= $eng['numCompte']; ?>
                         </td>
 
-                        <td style='padding: 15px;'>
-                            <?= $eng['dateEng']; ?>
+                        <td>
+                            <?= date('d/m/Y', strtotime($eng['dateEng'])); ?>
                         </td>
-                        <td style='padding: 15px;'>
-                            facture<br> N°<?= $eng['numFact']; ?>
+                        <td>
+                            N°<?= $eng['numFact']??"?"; ?>
                         </td>
-                        <td style='padding: 15px;max-width: 250px;'>
+                        <td>
                             <?= $eng['libelleC']; ?>
                         </td>
-                        <td style='padding: 15px;'>
+                        <td>
                             <?= $eng['service']; ?>
                         </td>
-                        <td style='padding: 15px;'>
+                        <td>
                             <?= $eng['nom']; ?>
                         </td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($eng['montant'], 0, ',', ','); ?>
+                        <td><?= number_format($eng['montant'], 0, ',', ','); ?>
                             FCFA</td>
                         <td>
                             <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
@@ -78,26 +96,52 @@ $TEngs = 0;
                     <?php 
                     $TEngs += $eng['montant'];
                     endforeach;?>
-                    <?php else : ?>
-                    <tr>
-                        <td colspan="9" class="text-danger">Aucune recette trouvée</td>
-                    </tr>
                     <?php endif; ?>
 
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="background-color: #4655a4;texte-align:center;color: white;">TOTAL JOURNALIERE</th>
-                        <th colspan="2" style="background-color: #4655a4;text-align: center;color: white;">
+                        <th colspan="7" class="text-center" style="text-align: center;color: black;">TOTAL
+                            JOURNALIERE</th>
+                        <th colspan="2" style="text-align: center;color: black;">
                             <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
                     </tr>
                 </tfooter>
             </table>
         </div>
     </div>
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
-    </div>
 </main>
 <?php include '../../includes/footer.php';?>
+
+<!-- jQuery + DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tableComptes').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ comptes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
+        }
+    });
+});
+</script>
+
+<!-- Alignement à gauche -->
+<style>
+#tableComptes th,
+#tableComptes td {
+    text-align: left !important;
+    vertical-align: middle;
+    font-size:12px !important;
+}
+</style>

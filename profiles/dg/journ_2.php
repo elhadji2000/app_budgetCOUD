@@ -1,90 +1,140 @@
 <?php
 session_start();
-if ( !isset( $_SESSION[ 'user' ] ) ) {
-    header( 'Location: ../../index.php' );
-    // Redirige vers la page de connexion
+if (!isset($_SESSION['user'])) {
+    header('Location: ../../index.php');
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';?>
-<?php include '../../includes/header.php';?>
+
 <?php 
-    $date = $_GET['dateEng'];
-    $nums = getCompteEngsByDate($date);
+include '../../includes/fonctions.php';
+
+$date = $_GET['dateEng'] ?? '';
+$nums = getCompteEngsByDate($date);
 ?>
 
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
-<main>
-    <div class='container'>
-        <div class='text-center' style='margin-bottom:45px;color: #4655a4;'>
-            <h3>RENSEIGNEMENT DU COMPTE !</h3>
+<?php include '../../includes/header.php';?>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center">
+
+            <h5 class="fw-bold text-primary mb-2">
+                <i class="bi bi-journal-text"></i> SÉLECTION DU COMPTE (JOURNALIER)
+            </h5>
+
+            <small class="text-muted">
+                Date sélectionnée :
+                <strong><?= htmlspecialchars($date) ?></strong>
+            </small>
+
+        </div>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form action="journ_3.php" method="GET">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <!-- Message erreur -->
+                <?php if (!empty($_GET['error'])) : ?>
+                    <div class="alert alert-danger text-center">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <?= htmlspecialchars($_GET['error']) ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Hidden date -->
+                <input type="hidden" name="dateEng" value="<?= htmlspecialchars($date) ?>">
+
+                <div class="row justify-content-center">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-folder"></i> Numéro du compte
+                        </label>
+
+                        <select name="numCompte" class="form-select" required>
+                            <option value="">-- Sélectionner un compte --</option>
+
+                            <?php if (!empty($nums)) : ?>
+                                <?php foreach ($nums as $num) : ?>
+                                    <option value="<?= htmlspecialchars($num['numCompte']) ?>">
+                                        <?= htmlspecialchars($num['numCompte']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <option disabled>Aucun compte disponible</option>
+                            <?php endif; ?>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="card-footer d-flex justify-content-between">
+
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-check-circle"></i> Valider
+                </button>
+
+                <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Annuler
+                </a>
+
+            </div>
         </div>
 
-        <!-- Formulaire centré avec design -->
-        <form action='journ_3.php' method='GET'>
-            <div
-                style='width: 60%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
+    </form>
 
-                <table style='width: 80%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <input type="hidden" name="dateEng" value="<?= $date; ?>" />
-                        <td style='padding: 10px 0;'><strong>Numéro du Compte :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <select name="numCompte" style="width: 100%; padding: 10px;" required>
-                                <option value="">Sélectionner un compte</option>
-                                <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["numCompte"]) ?>">
-                                    <?= htmlspecialchars($num["numCompte"]) ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Valider</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
-            </div>
-        </form>
-    </div>
 </main>
 
+<!-- SUCCESS MODAL -->
 <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+<div class="modal fade" id="successModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-success">
+
+        <div class="modal-content border-0 shadow">
+
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="successModalLabel">Succès</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Fermer"></button>
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle"></i> Succès
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                🎉 L'Engagement a été enregistrée avec succès !
+
+            <div class="modal-body text-center">
+                🎉 L’engagement a été enregistré avec succès !
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+                <button class="btn btn-outline-success" data-bs-dismiss="modal">
+                    Fermer
+                </button>
             </div>
+
         </div>
+
     </div>
 </div>
-<?php endif; ?>
 
-<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
 <script>
-// Une fois le DOM chargé, on lance la modal
-document.addEventListener('DOMContentLoaded', function() {
-    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-    successModal.show();
+document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
 });
 </script>
 <?php endif; ?>
-<?php include '../../includes/footer.php';
-?>
+
+<?php include '../../includes/footer.php';?>

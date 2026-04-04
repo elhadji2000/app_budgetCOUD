@@ -1,109 +1,144 @@
 <?php
 session_start();
-if ( !isset( $_SESSION[ 'user' ] ) ) {
-    header( 'Location: ../../index.php' );
-    // Redirige vers la page de connexion
+if (!isset($_SESSION['user'])) {
+    header('Location: ../../index.php');
     exit();
 }
-?>
-<?php include '../../includes/fonctions.php';?>
-<?php
-$annee_connexion = $_SESSION['an']; // ex: 2023
+
+include '../../includes/fonctions.php';
+
+$annee_connexion = $_SESSION['an'] ?? date("Y");
 $min_date = $annee_connexion . "-01-01";
-$max_date = date("Y-m-d"); // aujourd'hui
-?>
-<?php include '../../includes/header.php';?>
-<?php 
-    $nums = getNumCompteSansInitiale()
+$max_date = date("Y-m-d");
+$nums = getNumCompteSansInitiale();
+
+include '../../includes/header.php';
 ?>
 
-<div class='container'>
-    <?php include '../../shared/menu.php';?>
-</div>
 <main>
     <div class='container'>
-        <div class='text-center' style='margin-bottom:45px;color:#4655a4;'>
-            <h3>RENSEIGNEMENT DE LA DOTATION INITIALE !!</h3>
+
+        <!-- Titre -->
+        <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
+            <h3>DOTATION INITIALE</h3>
+            <p class="text-success fst-italic mb-0">
+                Veuillez renseigner correctement les informations
+            </p>
         </div>
 
-        <!-- Formulaire centré avec design -->
-        <form action='traitement_dot.php' method='POST'>
-            <div
-                style='width: 50%; margin: 0 auto; border-top: 4px solid #4655a4; border-bottom: 4px solid #4655a4; padding: 20px;'>
+        <!-- Formulaire -->
+        <form action="traitement_dot.php" method="POST" class="needs-validation" novalidate>
 
-                <table style='width: 70%; margin: 0 auto; text-align: left;'>
-                    <?php if ( !empty( $_GET[ 'error' ] ) ): ?>
-                    <center><i class='text-center' style='color: red;'><?php echo $_GET[ 'error' ];?></i></center>
-                    <?php endif;?>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Numéro du Compte :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <select name="ini_numc" style="width: 100%; padding: 7px;" required>
-                                <option value="">Sélectionner un compte</option>
-                                <?php foreach ($nums as $num) : ?>
-                                <option value="<?= htmlspecialchars($num["idCompte"]) ?>">
-                                    <?= htmlspecialchars($num["numCompte"]) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Date de la Dotation :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type="date" name="ini_date" style="width: 100%; padding: 5px;" required
-                                min="<?= $min_date ?>" max="<?= $max_date ?>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='padding: 10px 0;'><strong>Montant de la Dotation :</strong></td>
-                        <td style='padding: 10px 0;'>
-                            <input type="number" name="ini_volume" step="1" min="0" style="width: 100%; padding: 5px;"
-                                required />
+            <div class="mx-auto px-3 py-4"
+                style="max-width: 700px; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4;">
 
-                        </td>
-                    </tr>
-                </table>
+                <!-- Erreur -->
+                <?php if (!empty($_GET['error'])): ?>
+                    <div class="text-center mb-3">
+                        <i style="color:red;">
+                            <?= htmlspecialchars($_GET['error']); ?>
+                        </i>
+                    </div>
+                <?php endif; ?>
 
+                <div class="row">
+
+                    <!-- Compte -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            NUMÉRO DU COMPTE <span class="text-danger">*</span>
+                        </label>
+                        <select name="ini_numc" class="form-select" required>
+                            <option value="">-- Sélectionner --</option>
+                            <?php foreach ($nums as $num): ?>
+                                <option value="<?= htmlspecialchars($num["idCompte"]); ?>">
+                                    <?= htmlspecialchars($num["numCompte"]); ?> : <?= htmlspecialchars($num["libelle"]); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="invalid-feedback">Veuillez sélectionner un compte.</div>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            DATE <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="ini_date"
+                            class="form-control"
+                            required min="<?= $min_date ?>" max="<?= $max_date ?>">
+                        <div class="invalid-feedback">Veuillez choisir une date valide.</div>
+                    </div>
+
+                    <!-- Montant -->
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-semibold">
+                            MONTANT <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" name="ini_volume"
+                            class="form-control"
+                            required min="0" step="1">
+                        <div class="invalid-feedback">Veuillez saisir un montant valide.</div>
+                    </div>
+
+                </div>
             </div>
-            <div style='width: 50%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-                style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-                <button type='submit' class='btn btn-success'><strong>Enregistrer</strong></button>
-                <a href='javascript:history.back()' class='btn btn-danger mb-0 text-right'><strong>Annuler</strong></a>
+
+            <!-- Boutons -->
+            <div class="container mt-3" style="max-width:700px;">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                    <button type="submit" class="btn btn-success w-100 w-md-auto">
+                        <strong>Enregistrer</strong>
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-danger w-100 w-md-auto">
+                        <strong>Annuler</strong>
+                    </a>
+                </div>
             </div>
+
         </form>
     </div>
 </main>
 
+<!-- Modal succès -->
 <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+<div class="modal fade" id="successModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-success">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="successModalLabel">Succès</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Fermer"></button>
+                <h5 class="modal-title">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                🎉 La dotation a été enregistrée avec succès !
+            <div class="modal-body text-center">
+                La dotation a été enregistrée avec succès !
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+                <button class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>
 </div>
-<?php endif; ?>
 
-<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
 <script>
-// Une fois le DOM chargé, on lance la modal
 document.addEventListener('DOMContentLoaded', function() {
-    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-    successModal.show();
+    new bootstrap.Modal(document.getElementById('successModal')).show();
 });
+
+// Validation Bootstrap
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', e => {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+})();
 </script>
 <?php endif; ?>
 
-<?php include '../../includes/footer.php';
-?>
+<?php include '../../includes/footer.php'; ?>

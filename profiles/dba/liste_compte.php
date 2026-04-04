@@ -1,155 +1,165 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../index.php"); // Redirige vers la page de connexion
+    header("Location: ../../index.php");
     exit();
 }
 ?>
 <?php include '../../includes/fonctions.php';?>
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
-    </div>
 
-    <!-- Barre de recherche -->
-    <div class="d-flex container justify-content-between align-items-center py-2 px-3"
-        style="color: #4655a4; font-size: 13px; font-weight: 400;">
-        <input type="text" id="searchInput" class="form-control w-25" placeholder="Rechercher..."
-            style="max-width: 250px;" onkeyup="filterTable()">
-        <h3 class="mb-0 text-center">LES COMPTES ENREGISTRÉS</h3>
-        <strong></strong>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<main class="container-fluid mt-3">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 text-primary fw-bold">
+            <i class="bi bi-folder2-open"></i> LISTE DES COMPTES
+        </h5>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
     </div>
 
     <!-- Tableau -->
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <table class="table table-bordered table-striped text-center" style="margin-top: 10px;">
-            <thead style="color: white !important;">
-                <tr class="table-primary">
-                    <th style="background-color: #4655a4;">N°</th>
-                    <th style="background-color: #4655a4;">NumCompte</th>
-                    <th style="background-color: #4655a4;">Libelle</th>
-                    <th style="background-color: #4655a4;">NumCp</th>
-                    <th style="background-color: #4655a4;">Code</th>
-                    <th style="background-color: #4655a4;">Nature</th>
-                    <th style="background-color: #4655a4;">Action(s)</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <?php
-            $comptes = getAllCompte();
-             $n=0;
-            if (!empty($comptes)) {
-                foreach ($comptes as $compte) {
-                    $n++;
-                    echo "<tr>
-                    <td>{$n}</td>
-                            <td>{$compte['numCompte']}</td>
-                            <td>{$compte['libelle']}</td>
-                            <td>{$compte['numCp']}</td>
-                            <td>{$compte['code']}</td>
-                            <td>{$compte['nature']}</td>
-                            <td><a href=''>archiver</a></td>
-                          </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='5' class='text-danger'>Aucune compte trouvée</td></tr>";
-            }
-            ?>
-            </tbody>
-            <tbody id="noResultRow" style="display: none;">
-                <tr>
-                    <td colspan="5" class="text-danger">Aucun résultat trouvé</td>
-                </tr>
-            </tbody>
-        </table>
-        <div id="pagination" class="text-center mt-3"></div>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <table id="tableComptes" class="table table-striped table-hover align-middle">
+                <thead class="text-white" style="background-color: #4655a4;">
+                    <tr>
+                        <th>N°</th>
+                        <th>NumCompte</th>
+                        <th>Libellé</th>
+                        <th>NumCp</th>
+                        <th>Code</th>
+                        <th>Nature</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $comptes = getAllCompte();
+                        $n = 0;
+                    ?>
+
+                    <?php if (!empty($comptes)) : ?>
+                    <?php foreach ($comptes as $compte) : ?>
+                    <?php $n++; ?>
+                    <tr>
+                        <td><?= $n ?></td>
+                        <td><?= htmlspecialchars($compte['numCompte']) ?></td>
+                        <td><?= htmlspecialchars($compte['libelle']) ?></td>
+                        <td><?= htmlspecialchars($compte['numCp']) ?></td>
+                        <td><?= htmlspecialchars($compte['code']) ?></td>
+                        <td><?= htmlspecialchars(strtoupper($compte['nature'])) ?></td>
+                        <td>
+                            <a href="#" onclick="return confirm('Voulez-vous archiver ce compte ?')"
+                                class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-archive"></i> Archiver
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+
+                    <?php else : ?>
+                    <tr>
+                        <td colspan="7" class="text-danger text-start">
+                            <i class="bi bi-exclamation-triangle"></i> Aucun compte trouvé
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+        </div>
     </div>
 
-    <!-- Script pour la recherche et l'affichage du message -->
-    <script>
-    function filterTable() {
-        let input = document.getElementById("searchInput");
-        let filter = input.value.toLowerCase();
-        let tableBody = document.getElementById("tableBody");
-        let rows = tableBody.getElementsByTagName("tr");
-        let noResultRow = document.getElementById("noResultRow");
+</main>
 
-        let found = false;
+<?php include '../../includes/footer.php';?>
 
-        for (let i = 0; i < rows.length; i++) {
-            let cells = rows[i].getElementsByTagName("td");
-            let rowContainsFilter = false;
+<!-- jQuery + DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Buttons DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
-            for (let j = 0; j < cells.length; j++) {
-                if (cells[j].textContent.toLowerCase().includes(filter)) {
-                    rowContainsFilter = true;
-                    break;
-                }
-            }
+<!-- Export Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-            rows[i].style.display = rowContainsFilter ? "" : "none";
-            if (rowContainsFilter) found = true;
-        }
-
-        // Afficher ou cacher la ligne "Aucun résultat trouvé"
-        noResultRow.style.display = found ? "none" : "";
-    }
-    </script>
+<!-- Export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 15; // Nombre de lignes par page
-        const table = document.querySelector("tbody#tableBody");
-        const rows = table.querySelectorAll("tr");
-        const pagination = document.getElementById("pagination");
+$(document).ready(function() {
+    $('#tableComptes').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: [],
 
-        let currentPage = 1;
-        const totalPages = Math.ceil(rows.length / rowsPerPage);
+        dom: 'lBfrtip', //  ajout du "l"
 
-        function displayRows(page) {
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-
-            rows.forEach((row, index) => {
-                row.style.display = index >= start && index < end ? "" : "none";
-            });
-        }
-
-        function setupPagination() {
-            pagination.innerHTML = "";
-
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement("button");
-                btn.innerText = i;
-                btn.classList.add("btn", "btn-sm", "btn-outline-primary", "mx-1");
-
-                if (i === currentPage) {
-                    btn.classList.add("active");
+        buttons: [{
+                extend: 'excel',
+                text: 'Exporter Excel',
+                exportOptions: {
+                    columns: ':not(:last-child)'
                 }
+            },
+            {
+                extend: 'print',
+                text: 'Imprimer',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                },
 
-                btn.addEventListener("click", () => {
-                    currentPage = i;
-                    displayRows(currentPage);
-                    setupPagination(); // Re-render pour mettre à jour le bouton actif
-                });
+                customize: function(win) {
+                    // Réduire taille du texte
+                    $(win.document.body).css('font-size', '10px');
 
-                pagination.appendChild(btn);
+                    // Ajuster le tableau
+                    $(win.document.body).find('table')
+                        .addClass('compact')
+                        .css('font-size', '10px');
+
+                    // Centrer le titre
+                    $(win.document.body).find('h1').css('text-align', 'center');
+
+                    // Marges de page
+                    $(win.document.body).css('margin', '20px');
+                }
             }
+        ],
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ comptes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
         }
-
-        // Init display
-        displayRows(currentPage);
-        setupPagination();
     });
+});
 </script>
 
-
-
-
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
-    </div>
-</main>
-<?php include '../../includes/footer.php';?>
+<!-- Alignement à gauche -->
+<style>
+#tableComptes th,
+#tableComptes td {
+    text-align: left !important;
+    vertical-align: middle;
+    font-size: 13px !important;
+}
+</style>

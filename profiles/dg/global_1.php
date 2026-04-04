@@ -1,25 +1,21 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../index.php"); // Redirige vers la page de connexion
+    header("Location: ../../index.php");
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';
+
+<?php 
+include '../../includes/fonctions.php';
+
 $sommeDotations = sommeDot();
 $sommeEngs = sommeEngs();
-if ($sommeDotations != 0) {
-    $taux = ($sommeEngs * 100) / $sommeDotations;
-} else {
-    $taux = 0; // Ou un autre comportement selon ton besoin
-}
+$taux = ($sommeDotations != 0) ? ($sommeEngs * 100) / $sommeDotations : 0;
 
-?>
-<?php
 $execs1 = getExecutionOp_1();
-$showRemanier = false;
 
-// Première boucle pour vérifier s'il existe au moins une dotation remaniée
+$showRemanier = false;
 foreach ($execs1 as $exec) {
     if ($exec['totalDotRemanier'] != 0) {
         $showRemanier = true;
@@ -27,80 +23,213 @@ foreach ($execs1 as $exec) {
     }
 }
 ?>
+
 <?php include '../../includes/header.php';?>
-<main>
-    <div class='container'>
-        <?php include '../../shared/menu.php';?>
-    </div>
 
-    <!-- Barre de recherche -->
-    <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-        <h3>REALISATIONS: <?= number_format($sommeEngs, 0, ',', ','); ?>FCFA / <?= number_format($sommeDotations, 0, ',', ','); ?>FCFA soit <?= number_format($taux, 2); ?>%</h3>
-    </div>
+<!-- DataTables + Icons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    <!-- Tableau -->
-    <div class='container-fluid' style="margin-bottom: 20px;">
-        <div
-            style='width: 100%; margin: 0 auto; border-top: 3px solid #4655a4; border-bottom: 3px solid #4655a4; padding: 20px;'>
-            <table class="table table-bordered text-center" style="width: 100%;margin: 0 auto;font-size:15px;">
-                <thead style="color: white !important;">
+<main class="container-fluid mt-3">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-graph-up-arrow"></i> RAPPORT GLOBAL AVEC O.P
+                </h5>
+                <small class="text-muted">Analyse des engagements et opérations</small>
+            </div>
+
+            <div class="text-end">
+                <div class="fw-bold">
+                    <?= number_format($sommeEngs, 0, ',', ' ') ?> FCFA /
+                    <?= number_format($sommeDotations, 0, ',', ' ') ?> FCFA
+                </div>
+                <span class="badge <?= ($taux >= 80) ? 'bg-danger' : (($taux >= 50) ? 'bg-warning text-dark' : 'bg-success') ?>">
+                                    <?= number_format($taux, 2) ?> %
+                </span>
+            </div>
+
+        </div>
+    </div>
+    <!-- TABLE -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <table id="tableOP" class="table table-striped table-hover align-middle">
+
+                <thead class="custom-header">
                     <tr>
-                        <th style="background-color: #4655a4;">Compte_principal</th>
-                        <th style="background-color: #4655a4;">Libelle</th>
-                        <th style="background-color: #4655a4;">Dotation_Initiale</th>
+                        <th>Compte</th>
+                        <th>Libellé</th>
+                        <th>Dotation Initiale</th>
+
                         <?php if ($showRemanier): ?>
-                            <th style="background-color: #4655a4;">Variation</th>
-                            <th style="background-color: #4655a4;">Dotation_Remaniee</th>
+                            <th>Variation</th>
+                            <th>Dotation Remaniée</th>
                         <?php endif; ?>
-                        <th style="background-color: #4655a4;">Realisation</th>
-                        <th style="background-color: #4655a4;">Taux</th>
-                        <th style="background-color: #4655a4;">Disponible</th>
-                        <th style="background-color: #4655a4;">O.P</th>
-                        <th style="background-color: #4655a4;">Diff Eng/Op</th>
+
+                        <th>Engagement</th>
+                        <th>Taux (%)</th>
+                        <th>Disponible</th>
+                        <th>O.P</th>
+                        <th>Différence</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <?php
-                $n=1;
-                if (!empty($execs1)) :
-                    foreach ($execs1 as $exec) : ?>
-                    <tr>
-                        <td><?= $exec['numCp']; ?></td>
-                        <td style='text-align: left;padding: 15px;'><?= $exec['libelle']; ?></td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalDotInitial'], 0, ',', ','); ?> fcfa</td>
-                        <?php if ($showRemanier): ?>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalDotRemanier'], 0, ',', ','); ?> fcfa</td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalDotations'], 0, ',', ','); ?> fcfa</td>
-                        <?php endif; ?>
-                        <td style='text-align: right;padding: 15px;'>
-                            <a href="actuel_2.php?idCp=<?php echo $exec['idCp']; ?>&op=1"><?= number_format($exec['totalEngs'], 0, ',', ','); ?> fcfa</a>
-                        </td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['taux']), 2); ?>%</td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalDotations']-$exec['totalEngs']), 0, ',', ','); ?> fcfa</td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format($exec['totalOp'], 0, ',', ','); ?> fcfa</td>
-                        <td style='text-align: right;padding: 15px;'><?= number_format(($exec['totalEngs']-$exec['totalOp']), 0, ',', ','); ?> fcfa</td>
-                    </tr>
-                    <?php endforeach;?>
-                    <?php else : ?>
-                    <tr>
-                        <td colspan="6" class="text-danger">Aucune resultat trouvée</td>
-                    </tr>
-                    <?php endif; ?>
+
+                <tbody>
+
+                <?php if (!empty($execs1)) : ?>
+                    <?php foreach ($execs1 as $exec) : ?>
+                        <tr>
+
+                            <td><?= htmlspecialchars($exec['numCp']) ?></td>
+
+                            <td><?= htmlspecialchars($exec['libelle']) ?></td>
+
+                            <td class="text-end fw-semibold">
+                                <?= number_format($exec['totalDotInitial'], 0, ',', ' ') ?> F
+                            </td>
+
+                            <?php if ($showRemanier): ?>
+                                <td class="text-end">
+                                    <?= number_format($exec['totalDotRemanier'], 0, ',', ' ') ?> F
+                                </td>
+                                <td class="text-end fw-semibold">
+                                    <?= number_format($exec['totalDotations'], 0, ',', ' ') ?> F
+                                </td>
+                            <?php endif; ?>
+
+                            <td class="text-end">
+                                <a href="actuel_2.php?idCp=<?= $exec['idCp'] ?>&op=1"
+                                   class="fw-bold text-primary text-decoration-underline">
+                                    <?= number_format($exec['totalEngs'], 0, ',', ' ') ?> F
+                                </a>
+                            </td>
+
+                            <td class="text-end">
+                                <span class="badge 
+                                    <?= ($exec['taux'] >= 80) ? 'bg-danger' : (($exec['taux'] >= 50) ? 'bg-warning text-dark' : 'bg-success') ?>">
+                                    <?= number_format($exec['taux'], 2) ?> %
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+                                <?= number_format(($exec['totalDotations'] - $exec['totalEngs']), 0, ',', ' ') ?> F
+                            </td>
+
+                            <td class="text-end">
+                                <?= number_format($exec['totalOp'], 0, ',', ' ') ?> F
+                            </td>
+
+                            <td class="text-end fw-bold 
+                                <?= (($exec['totalEngs'] - $exec['totalOp']) > 0) ? 'text-success' : 'text-danger' ?>">
+                                <?= number_format(($exec['totalEngs'] - $exec['totalOp']), 0, ',', ' ') ?> F
+                            </td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
 
                 </tbody>
             </table>
-        </div>
-        <div style='width: 90%;' class="d-flex container justify-content-between align-items-center py-2 px-2"
-            style="color:rgb(69, 47, 196); font-size: 18px; font-weight: 400;">
-            <a href="pdf/global_1_pdf.php" target="_blank" class='btn btn-success'><strong>Imprimer en PDF</strong></a>
-            <a href="excel/global_excel_op.php" target="_blank" class='btn btn-info'><strong>Exporter en Excel</strong></a>
+
         </div>
     </div>
 
+    <!-- ACTIONS -->
+    <div class="d-flex justify-content-between mt-3">
+        <div>
+           
+        </div>
 
-
-    <div class="container text-center" style="font-size: 15px; font-weight: 400;margin-bottom:20px;">
-        <a href="javascript:history.back()" class="btn btn-info text-center"><strong>retour</strong></a>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
     </div>
+
 </main>
+
 <?php include '../../includes/footer.php';?>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Buttons DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<!-- Export Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- Export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#tableOP').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        dom: 'lBfrtip', //  ajout du "l"
+
+        buttons: [{
+                extend: 'excel',
+                text: 'Exporter Excel',
+            },
+            {
+                extend: 'print',
+                text: 'Imprimer',
+
+                customize: function(win) {
+                    // Réduire taille du texte
+                    $(win.document.body).css('font-size', '10px');
+
+                    // Ajuster le tableau
+                    $(win.document.body).find('table')
+                        .addClass('compact')
+                        .css('font-size', '10px');
+
+                    // Centrer le titre
+                    $(win.document.body).find('h1').css('text-align', 'center');
+
+                    // Marges de page
+                    $(win.document.body).css('margin', '20px');
+                }
+            }
+        ],
+        language: {
+            search: "<i class='bi bi-search'></i> Rechercher :",
+            lengthMenu: "Afficher _MENU_ lignes",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            },
+            zeroRecords: "Aucun résultat trouvé"
+        }
+    });
+});
+</script>
+
+<!-- STYLE -->
+<style>
+.custom-header {
+    background-color: #4655a4;
+    color: #fff;
+}
+
+#tableOP th,
+#tableOP td {
+    text-align: left !important;
+    vertical-align: middle;
+    font-size:13px;
+}
+
+.text-end {
+    text-align: right !important;
+}
+</style>

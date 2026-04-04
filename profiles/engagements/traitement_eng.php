@@ -2,16 +2,15 @@
 <?php 
 session_start(); // Démarrer la session
 
-if (isset($_POST['dateEng'], $_POST['service'], $_POST['montant'], $_POST['libelle'], $_POST['bc'], $_POST['idCompte'], $_POST['idFourn'])) {
+if (isset($_POST['dateEng'], $_POST['type_eng'], $_POST['montant'], $_POST['objet'], $_POST['idCompte'], $_POST['idFourn'])) {
     $dateEng = $_POST['dateEng'];
-    $service = $_POST['service'];
+    $type_eng = $_POST['type_eng'];
     $montant = $_POST['montant'];
-    $libelle = $_POST['libelle'];
-    $bc = $_POST['bc'];
+    $objet = $_POST['objet'];
     $idCompte = $_POST['idCompte'];
     $idFourn = $_POST['idFourn'];
 
-    $resultat = ajouterEngagement_temp($dateEng, $service, $montant, $libelle, $bc, $idCompte, $idFourn);
+    $resultat = ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn);
 
     if ($resultat === true) {
         header("Location: add_eng1.php?success=1");
