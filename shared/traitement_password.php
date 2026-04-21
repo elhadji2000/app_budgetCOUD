@@ -36,5 +36,5 @@ $newHash = SHA1($newPassword);
 updateUserPassword($userId, $newHash); // à implémenter dans fonctions.php
 
 // Redirection
-header("Location: accueil.php?success=1");
+header("Location: ../index?success=1");
 exit();

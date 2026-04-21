@@ -173,7 +173,7 @@ include '../../includes/header.php';
                 </div>
                 <?php endif; ?>
 
-                <form action="traitement_eng.php" method="POST">
+                <form action="traitement_eng.php" id="Form" method="POST">
 
                     <input type="hidden" name="idCompte" value="<?= htmlspecialchars($idCompte) ?>">
 
@@ -181,14 +181,17 @@ include '../../includes/header.php';
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <label class="form-label"><strong>NUMERO DE COMPTE</strong></label>
-                            <input style="border: 1px solid black;" type="text" class="form-control"
+                            <input style="border: 1px solid black;" name="numc" type="text" class="form-control"
                                 value="<?= $numCompte ?>" readonly>
+                            <input style="border: 1px solid black;" name="credit" type="text" class="form-control"
+                                value="<?= $credit ?>" hidden>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label"><strong>DATE</strong></label>
-                            <input style="border: 1px solid black;" type="date" name="dateEng" value="<?= date('Y-m-d') ?>" class="form-control"
-                                min="<?= $min_date ?>" max="<?= $max_date ?>" required>
+                            <input style="border: 1px solid black;" type="date" name="dateEng"
+                                value="<?= date('Y-m-d') ?>" class="form-control" min="<?= $min_date ?>"
+                                max="<?= $max_date ?>" required>
                         </div>
                     </div>
 
@@ -232,7 +235,7 @@ include '../../includes/header.php';
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <button class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                             <strong>Enregistrer</strong>
                         </button>
                         <a href="javascript:history.back()" class="btn btn-danger">
@@ -246,14 +249,18 @@ include '../../includes/header.php';
 
     </div>
 </main>
-
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<?php include '../../includes/footer.php'; ?>
 <script>
-document.querySelector("form").addEventListener("submit", function(e) {
-    const montant = parseFloat(document.querySelector("[name='montant']").value);
-    const ecart = <?= (float)$details['ecart']; ?>;
+document.getElementById('Form').addEventListener('submit', function(e) {
 
-    if (montant < 0) {
-        alert("Le montant doit être supérieur ou égal à zéro.");
+    const montantInput = document.querySelector("[name='montant']");
+    const montant = parseFloat(montantInput.value);
+
+    const ecart = <?= (float)$credit ?>; // 
+
+    if (isNaN(montant) || montant < 0) {
+        alert("Le montant doit être supérieur à zéro.");
         e.preventDefault();
         return;
     }
@@ -268,10 +275,8 @@ document.querySelector("form").addEventListener("submit", function(e) {
         );
 
         if (!confirmation) {
-            e.preventDefault(); // bloque si utilisateur refuse
+            e.preventDefault();
         }
     }
 });
 </script>
-
-<?php include '../../includes/footer.php'; ?>

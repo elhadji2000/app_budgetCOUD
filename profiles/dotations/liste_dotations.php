@@ -35,6 +35,7 @@ if (!isset($_SESSION['user'])) {
                     <tr>
                         <th>N°</th>
                         <th>Num_Compte</th>
+                        <th>Liblelle</th>
                         <th>Date</th>
                         <th>Volume</th>
                         <th>Type</th>
@@ -51,6 +52,7 @@ if (!isset($_SESSION['user'])) {
                     <tr>
                         <td><?= $n++; ?></td>
                         <td><?= $dotation['numCompte']; ?></td>
+                        <td class="text-align-left libelle"><?= $dotation['libelleCompte']; ?></td>
                         <td><?= date('d/m/Y', strtotime($dotation['date'])); ?></td>
                         <td class="fw-bold somme"><?= number_format($dotation['volume'], 0, ',', ' '); ?> F</td>
                         <td>
@@ -195,5 +197,8 @@ $(document).ready(function() {
 
 #tableComptes .somme {
     text-align: right !important;
+}
+#tableComptes .libelle{
+    text-align: left !important;
 }
 </style>

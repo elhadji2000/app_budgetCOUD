@@ -12,9 +12,9 @@ if (isset($_POST['ini_numc'], $_POST['ini_date'], $_POST['ini_volume'])) {
     $resultat = enregistrerDotation($idCompte, $date, $volume, $type);
 
     if ($resultat === true) {
-        header("Location: add_ini_dot.php?success=1");
+        header("Location: add_ini_dot?success=1");
     } else {
-        header("Location: add_ini_dot.php?error=" . urlencode($resultat));
+        header("Location: add_ini_dot?error=" . urlencode($resultat));
     }
 }
 
@@ -27,9 +27,9 @@ if (isset($_POST['rem_numc'], $_POST['rem_date'], $_POST['rem_volume'])) {
     $resultat = enregistrerDotation($idCompte, $date, $volume, $type);
 
     if ($resultat === true) {
-        header("Location: add_rem_dot.php?success=1");
+        header("Location: add_rem_dot?success=1");
     } else {
-        header("Location: add_rem_dot.php?error=" . urlencode($resultat));
+        header("Location: add_rem_dot?error=" . urlencode($resultat));
     }
 }
 
@@ -39,9 +39,9 @@ if (isset($_GET['suppr'])) {
     $resultat = supprDotation($suppr);
 
     if ($resultat === true) {
-        header("Location: liste_dotations.php?success=1");
+        header("Location: liste_dotations?success=1");
     } else {
-        header("Location: liste_dotations.php?error=" . urlencode($resultat));
+        header("Location: liste_dotations?error=" . urlencode($resultat));
     }
 }
 

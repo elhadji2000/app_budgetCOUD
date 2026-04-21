@@ -9,8 +9,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 function connexionBD()
 {
-    $connexion = mysqli_connect('localhost', 'root', '', 'budget_db_'.$_SESSION['an']) 
-    or die('Serveur inaccessible. Merci de reessayer plus tard.');
+    $connexion = mysqli_connect('localhost', 'root', '', 'budget_db_' . $_SESSION['an']) or
+        die('Serveur inaccessible. Merci de reessayer plus tard.');
     return $connexion;
 }
 
@@ -49,6 +49,56 @@ function getAllFournisseurs()
         return $result->fetch_all(MYSQLI_ASSOC);
     } else {
         return [];
+    }
+}
+
+function getFournisseurById($idFourn)
+{
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+    $idFourn = (int) $idFourn;
+
+    $query = "SELECT *
+              FROM fournisseur
+              WHERE idFourn = '$idFourn' 
+              LIMIT 1";
+
+    $result = $connexion->query($query);
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_assoc();  // Retourne une seule ligne sous forme de tableau associatif
+    } else {
+        return null;  // Ou false, selon ta logique
+    }
+}
+
+function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nature)
+{
+    global $connexion;
+
+    $sql = "UPDATE fournisseur 
+            SET numFourn = ?, nom = ?, adresse = ?, contact = ?, nature = ? 
+            WHERE idFourn = ?";
+
+    $stmt = $connexion->prepare($sql);
+
+    if (!$stmt) {
+        return "Erreur prepare : " . $connexion->error;
+    }
+
+    $stmt->bind_param(
+        "sssssi",
+        $numFourn,
+        $nom,
+        $adresse,
+        $contact,
+        $nature,
+        $idFourn
+    );
+
+    if ($stmt->execute()) {
+        return true;
+    } else {
+        return "Erreur execution : " . $stmt->error;
     }
 }
 
@@ -144,6 +194,7 @@ function getComptesDotations()
         return [];  // Si aucune ligne trouvée
     }
 }
+
 function getComptesDotationsByEng()
 {
     global $connexion;
@@ -271,7 +322,7 @@ function getNumCompteForOp()
 function getNumCompteForOr()
 {
     global $connexion;
-    $anneeEnCours = $_SESSION['an']; 
+    $anneeEnCours = $_SESSION['an'];
 
     $query = "SELECT DISTINCT compte.idCompte, compte.numCompte, compte.libelle
         FROM compte
@@ -303,7 +354,7 @@ function getEngs()
     // $anneeEnCours = date("Y"); // Récupère l'année en cours
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.objet, eng.type_eng, eng.montant, f.numFourn 
+    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.objet, eng.type_eng, eng.montant, f.nom, f.numFourn 
             FROM engagements as eng
             JOIN compte as c ON c.idCompte = eng.idCompte 
             JOIN comptep as cp ON c.idCp=cp.idCp 
@@ -329,7 +380,7 @@ function getEngagementsTemp()
     // $anneeEnCours = date("Y"); // Récupère l'année en cours
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.type_eng, eng.objet, eng.montant, f.numFourn 
+    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.type_eng, eng.objet, eng.montant, f.nom, f.numFourn 
             FROM engagements_temp as eng
             JOIN compte as c ON c.idCompte = eng.idCompte 
             JOIN comptep as cp ON c.idCp=cp.idCp 
@@ -585,7 +636,7 @@ function getTotalPayeByEng($idEng)
     $result = $connexion->query($query);
 
     if ($result && $row = $result->fetch_assoc()) {
-        return (float)$row['total'];
+        return (float) $row['total'];
     }
 
     return 0;
@@ -662,15 +713,15 @@ function getEngsAvecPaiement($numCompte)
     $query = "
         SELECT engagements.*
         FROM engagements
-        JOIN compte ON compte.idCompte = engagements.idCompte 
-        JOIN comptep ON compte.idCp = comptep.idCp 
+        JOIN compte ON compte.idCompte = engagements.idCompte
+        JOIN comptep ON compte.idCp = comptep.idCp
         WHERE compte.numCompte = '$numCompte'
         AND engagements.idEng NOT IN (
             SELECT idEng FROM operations
         )
         AND EXISTS (
-            SELECT 1 FROM dotations 
-            WHERE dotations.idCompte = compte.idCompte 
+            SELECT 1 FROM dotations
+            WHERE dotations.idCompte = compte.idCompte
               AND dotations.an = '$anneeEnCours'
         );
     ";
@@ -726,7 +777,7 @@ function getRecettesTemp()
 {
     global $connexion;
 
-    $sql = "SELECT 
+    $sql = 'SELECT 
                 ort.idOr,
                 ort.dateOr,
                 ort.objet_recette,
@@ -751,7 +802,7 @@ function getRecettesTemp()
             LEFT JOIN compte c ON ort.idCompte = c.idCompte
             LEFT JOIN users u ON ort.idUser = u.idUser
 
-            ORDER BY ort.idOr DESC";
+            ORDER BY ort.idOr DESC';
 
     $result = mysqli_query($connexion, $sql);
 
@@ -766,7 +817,7 @@ function getRecettes()
 {
     global $connexion;
 
-    $sql = "SELECT 
+    $sql = 'SELECT 
                 ort.idOr,
                 ort.dateOr,
                 ort.objet_recette,
@@ -791,7 +842,7 @@ function getRecettes()
             LEFT JOIN compte c ON ort.idCompte = c.idCompte
             LEFT JOIN users u ON ort.idUser = u.idUser
 
-            ORDER BY ort.idOr DESC";
+            ORDER BY ort.idOr DESC';
 
     $result = mysqli_query($connexion, $sql);
 
@@ -836,10 +887,10 @@ function getRecettesById($id)
     $result = mysqli_query($connexion, $sql);
 
     if (!$result || mysqli_num_rows($result) === 0) {
-        return null; // ou [] si tu préfères
+        return null;  // ou [] si tu préfères
     }
 
-    return mysqli_fetch_assoc($result); 
+    return mysqli_fetch_assoc($result);
 }
 
 /*
@@ -884,6 +935,7 @@ function getOperationsByType($typeOp)
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+
 function getOperationById($idOp)
 {
     global $connexion;
@@ -894,7 +946,7 @@ function getOperationById($idOp)
 
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "
+    $query = '
         SELECT 
             o.idOp,
             o.dateOp,
@@ -931,10 +983,10 @@ function getOperationById($idOp)
             AND d.an = ?
         )
         LIMIT 1
-    ";
+    ';
 
     $stmt = $connexion->prepare($query);
-    $stmt->bind_param("is", $idOp, $anneeEnCours);
+    $stmt->bind_param('is', $idOp, $anneeEnCours);
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -987,13 +1039,12 @@ function getOperationsTemp($typeOp)
  * #########    FONCTION POUR DOTATION ... ##############3
  * ********************************************************************************
  */
-function enregistrerDotation($idCompte, $date, $volume, $type)
+/* function enregistrerDotation($idCompte, $date, $volume, $type)
 {
     // Démarre la session si ce n'est pas déjà fait
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-
     // Connexion MySQLi
     global $connexion;
 
@@ -1028,6 +1079,62 @@ function enregistrerDotation($idCompte, $date, $volume, $type)
             VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
 
     // Exécution
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de l'enregistrement : " . mysqli_error($connexion);
+    }
+}
+ */
+function enregistrerDotation($idCompte, $date, $volume, $type)
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    global $connexion;
+
+    if (!$connexion) {
+        return 'Connexion échouée : ' . mysqli_connect_error();
+    }
+
+    if (!isset($_SESSION['idUser'])) {
+        return 'Utilisateur non connecté.';
+    }
+
+    $idUser = (int) $_SESSION['idUser'];
+    $an = (int) $_SESSION['an'];
+
+    $idCompte = (int) $idCompte;
+    $volume = (int) $volume;
+    $date = mysqli_real_escape_string($connexion, $date);
+    $type = mysqli_real_escape_string($connexion, $type);
+
+    //  Empêcher volume négatif
+    if ($type == 'initiale' && $volume < 0) {
+        return 'Le volume ne peut pas être négatif.';
+    }
+
+    // BLOQUER DOUBLE DOTATION INITIALE
+    if ($type == 'initiale') {
+
+        $checkSql = "SELECT idDot FROM dotations 
+                     WHERE idCompte = $idCompte 
+                     AND an = $an 
+                     AND type = 'initiale' 
+                     LIMIT 1";
+
+        $resultCheck = mysqli_query($connexion, $checkSql);
+
+        if (mysqli_num_rows($resultCheck) > 0) {
+            return "Une dotation initiale existe déjà pour ce compte pour l'année $an.";
+        }
+    }
+
+    //  Insertion
+    $sql = "INSERT INTO dotations (idCompte, date, an, volume, type, idUser) 
+            VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
+
     if (mysqli_query($connexion, $sql)) {
         return true;
     } else {
@@ -1235,15 +1342,12 @@ function getDetailsCompte($numCompte)
     return [
         'nature' => $nature,
         'type' => $type,
-
         'dotationInitiale' => $initiale,
         'dotationRemaniee' => $remaniee,
         'dotationTotale' => $dotationTotale,
-
         'totalEngagement' => $engagement,
         'totalDepense' => $depenses,
         'totalRecette' => $recettes,
-
         'solde' => $solde
     ];
 }
@@ -1325,7 +1429,7 @@ function ajouter_Ordre_Recette_temp($dateOr, $objet_recette, $montant, $pieces_a
     global $connexion;
 
     if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+        session_start();
     }
     if (!$connexion) {
         return 'Erreur de connexion : ' . mysqli_connect_error();
@@ -1484,6 +1588,7 @@ function getExecution_1()
 
     return mysqli_query($connexion, $query);
 }
+
 function getExecution($type = 'all')
 {
     global $connexion;
@@ -1491,7 +1596,7 @@ function getExecution($type = 'all')
     $anneeEnCours = $_SESSION['an'];
 
     //  filtre type compte
-    $conditionType = "";
+    $conditionType = '';
 
     if ($type === 'recette') {
         $conditionType = "WHERE cp.nature IN ('produit', 'ressource')";
@@ -1550,6 +1655,7 @@ function getExecution($type = 'all')
         ? $result->fetch_all(MYSQLI_ASSOC)
         : [];
 }
+
 function getExecutionOp_1()
 {
     global $connexion;
@@ -1693,6 +1799,147 @@ function getExecution_2($idCp)
         : [];
 }
 
+function get_produits_administratif()
+{
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            cp.idCp,
+            cp.libelle,
+            cp.numCp,
+            cp.type,
+
+           COALESCE(SUM(DISTINCT d.volume), 0) AS total_dot,
+           COALESCE(SUM(DISTINCT r.montant), 0) AS total_paye,
+           COALESCE(SUM(DISTINCT CASE 
+                WHEN d.type = 'remanier' THEN d.volume 
+            END), 0) AS totalDotRemanier,
+           COALESCE(SUM(DISTINCT CASE 
+                WHEN d.type = 'initiale' THEN d.volume 
+            END), 0) AS totalDotInitiale
+
+        FROM compte c
+        JOIN comptep cp ON c.idCp = cp.idCp
+
+        LEFT JOIN dotations d 
+            ON d.idCompte = c.idCompte 
+            AND d.an = '$anneeEnCours'
+
+        LEFT JOIN ordre_recette r 
+            ON r.idCompte = c.idCompte 
+
+        WHERE cp.nature IN ('produit', 'ressource')
+
+        GROUP BY cp.idCp, cp.libelle, cp.numCp
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+function get_charges_administratif()
+{
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            cp.idCp,
+            cp.libelle,
+            cp.numCp,
+            cp.type,
+
+            COALESCE(SUM(DISTINCT d.volume), 0) AS total_dot,
+            COALESCE(SUM(DISTINCT eng.montant), 0) AS total_eng,
+            COALESCE(SUM(DISTINCT op.montant), 0) AS total_paye,
+             COALESCE(SUM(DISTINCT CASE 
+                WHEN d.type = 'remanier' THEN d.volume 
+            END), 0) AS totalDotRemanier,
+           COALESCE(SUM(DISTINCT CASE 
+                WHEN d.type = 'initiale' THEN d.volume 
+            END), 0) AS totalDotInitiale
+
+        FROM compte c
+        JOIN comptep cp ON c.idCp = cp.idCp
+
+        LEFT JOIN dotations d 
+            ON d.idCompte = c.idCompte 
+            AND d.an = '$anneeEnCours'
+        LEFT JOIN engagements eng 
+            ON eng.idCompte = c.idCompte 
+
+        LEFT JOIN operations op 
+            ON op.idEng = eng.idEng 
+
+        WHERE cp.nature IN ('charge', 'emploi')
+
+        GROUP BY cp.idCp, cp.libelle, cp.numCp
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+function get_resultats()
+{
+    global $connexion;
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT 
+            cp.libelle,
+            cp.nature,
+            cp.type,
+
+            COALESCE(SUM(DISTINCT d.volume), 0) AS total_dot
+
+        FROM compte c
+        JOIN comptep cp ON c.idCp = cp.idCp
+
+        LEFT JOIN dotations d 
+            ON d.idCompte = c.idCompte 
+            AND d.an = '$anneeEnCours'
+
+        WHERE cp.nature IN ('produit', 'ressource', 'charge', 'emploi')
+
+        GROUP BY cp.idCp, cp.libelle, cp.nature
+        ORDER BY cp.nature, cp.libelle
+    ";
+
+    $result = $connexion->query($query);
+
+    $produits = [];
+    $charges  = [];
+
+    if ($result && $result->num_rows > 0) {
+        foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
+
+            if (in_array($row['nature'], ['produit', 'ressource'])) {
+                $produits[] = $row;
+            } else {
+                $charges[] = $row;
+            }
+        }
+    }
+
+    return [
+        'produits' => $produits,
+        'charges'  => $charges
+    ];
+}
+
 function getComptePById($idCp)
 {
     global $connexion;
@@ -1797,10 +2044,10 @@ function ajouterUtilisateur($nom, $login, $email, $privilege, $telephone, $sexe)
             'message' => 'Ce login existe déjà.'
         ];
     }
-
+    $an = $_SESSION["an"];
     // Insérer l'utilisateur
-    $insertQuery = "INSERT INTO users (nom, log, email, priv, mdp, type_mdp, telephone, sexe) 
-                    VALUES ('$nom', '$login', '$email', '$privilege', '$password', '$type_mdp', '$telephone', '$sexe')";
+    $insertQuery = "INSERT INTO users (nom, log, email, priv, mdp, type_mdp, telephone, sexe, an) 
+                    VALUES ('$nom', '$login', '$email', '$privilege', '$password', '$type_mdp', '$telephone', '$sexe', '$an')";
 
     if ($connexion->query($insertQuery)) {
         return [
@@ -1852,6 +2099,7 @@ function formatNumOP($idOp)
 
     return 'MD' . $deuxDerniersChiffres . '-' . $idFormate;
 }
+
 function formatNumOr($idOr)
 {
     // Vérifie que la session est démarrée
@@ -1870,7 +2118,6 @@ function formatNumOr($idOr)
 
     return 'OR' . $deuxDerniersChiffres . '-' . $idFormate;
 }
-
 
 function nombreEnLettres($nombre)
 {
@@ -1893,7 +2140,7 @@ function supprimerLigne($table, $champId, $valeur)
     if (mysqli_query($connexion, $sql)) {
         return true;
     } else {
-        return "Erreur : " . mysqli_error($connexion);
+        return 'Erreur : ' . mysqli_error($connexion);
     }
 }
 

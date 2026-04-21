@@ -16,87 +16,131 @@ include '../../includes/header.php';
 ?>
 
 <main>
-    <div class='container'>
+    <div class="container py-4">
 
-        <!-- Titre -->
-        <div class='text-center' style='margin-bottom:20px;color:#4655a4;'>
-            <h3>DOTATION INITIALE</h3>
-            <p class="text-success fst-italic mb-0">
-                Veuillez renseigner correctement les informations
-            </p>
+        <!-- HEADER -->
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-primary">DOTATION INITIALE</h3>
+            <p class="text-muted">Gestion des dotations initiales & import Excel</p>
         </div>
 
-        <!-- Formulaire -->
-        <form action="traitement_dot.php" method="POST" class="needs-validation" novalidate>
+        <div class="row g-4">
 
-            <div class="mx-auto px-3 py-4"
-                style="max-width: 700px; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4;">
+            <!-- 🟢 CARD FORMULAIRE -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-primary text-white rounded-top-4">
+                        <strong>Saisie manuelle</strong>
+                    </div>
 
-                <!-- Erreur -->
-                <?php if (!empty($_GET['error'])): ?>
-                    <div class="text-center mb-3">
-                        <i style="color:red;">
+                    <div class="card-body">
+
+                        <!-- Messages -->
+                        <?php if (!empty($_GET['error'])): ?>
+                        <div class="alert alert-danger">
                             <?= htmlspecialchars($_GET['error']); ?>
-                        </i>
+                        </div>
+                        <?php endif; ?>
+
+                        <form action="traitement_dot.php" method="POST" class="needs-validation" novalidate>
+
+                            <div class="mb-3">
+                                <label class="fw-semibold">Compte *</label>
+                                <select name="ini_numc" class="form-select" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <?php foreach ($nums as $num): ?>
+                                    <option value="<?= $num["idCompte"]; ?>">
+                                        <?= $num["numCompte"]; ?> - <?= $num["libelle"]; ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="fw-semibold">Date *</label>
+                                <input type="date" name="ini_date" class="form-control" required min="<?= $min_date ?>"
+                                    max="<?= $max_date ?>">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="fw-semibold">Montant *</label>
+                                <input type="number" name="ini_volume" class="form-control" required min="0">
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success w-100">
+                                    Enregistrer
+                                </button>
+                                <a href="javascript:history.back()" class="btn btn-outline-danger w-100">
+                                    Annuler
+                                </a>
+                            </div>
+
+                        </form>
                     </div>
-                <?php endif; ?>
-
-                <div class="row">
-
-                    <!-- Compte -->
-                    <div class="col-md-6 mb-3">
-                        <label class="fw-semibold">
-                            NUMÉRO DU COMPTE <span class="text-danger">*</span>
-                        </label>
-                        <select name="ini_numc" class="form-select" required>
-                            <option value="">-- Sélectionner --</option>
-                            <?php foreach ($nums as $num): ?>
-                                <option value="<?= htmlspecialchars($num["idCompte"]); ?>">
-                                    <?= htmlspecialchars($num["numCompte"]); ?> : <?= htmlspecialchars($num["libelle"]); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <div class="invalid-feedback">Veuillez sélectionner un compte.</div>
-                    </div>
-
-                    <!-- Date -->
-                    <div class="col-md-6 mb-3">
-                        <label class="fw-semibold">
-                            DATE <span class="text-danger">*</span>
-                        </label>
-                        <input type="date" name="ini_date"
-                            class="form-control"
-                            required min="<?= $min_date ?>" max="<?= $max_date ?>">
-                        <div class="invalid-feedback">Veuillez choisir une date valide.</div>
-                    </div>
-
-                    <!-- Montant -->
-                    <div class="col-md-6 mb-3">
-                        <label class="fw-semibold">
-                            MONTANT <span class="text-danger">*</span>
-                        </label>
-                        <input type="number" name="ini_volume"
-                            class="form-control"
-                            required min="0" step="1">
-                        <div class="invalid-feedback">Veuillez saisir un montant valide.</div>
-                    </div>
-
                 </div>
             </div>
 
-            <!-- Boutons -->
-            <div class="container mt-3" style="max-width:700px;">
-                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
-                    <button type="submit" class="btn btn-success w-100 w-md-auto">
-                        <strong>Enregistrer</strong>
-                    </button>
-                    <a href="javascript:history.back()" class="btn btn-danger w-100 w-md-auto">
-                        <strong>Annuler</strong>
-                    </a>
+            <!-- 🔵 CARD IMPORT EXCEL -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-dark text-white rounded-top-4">
+                        <strong>Import Excel</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <!-- Résultat import -->
+                        <?php if (isset($_SESSION['import_success'])): ?>
+                        <div class="alert alert-success">
+                            ✅ <?= $_SESSION['import_success'] ?> ligne(s) importée(s)
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($_SESSION['import_errors'])): ?>
+                        <div class="alert alert-warning">
+                            ⚠️ Certaines lignes ignorées :
+                            <ul class="mb-0">
+                                <?php foreach ($_SESSION['import_errors'] as $err): ?>
+                                <li><?= htmlspecialchars($err) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php
+                        unset($_SESSION['import_success']);
+                        unset($_SESSION['import_errors']);
+                        ?>
+
+                        <!-- Form import -->
+                        <form action="import_excel.php" method="POST" enctype="multipart/form-data">
+
+                            <div class="mb-3">
+                                <label class="fw-semibold">Fichier Excel</label>
+                                <input type="file" name="excel_file" class="form-control" accept=".xls,.xlsx" required>
+                            </div>
+
+                            <button class="btn btn-primary w-100">
+                                Importer les données
+                            </button>
+                        </form>
+
+                        <!-- Aide -->
+                        <div class="mt-3 small text-muted">
+                            Format attendu :
+                            <ul class="mb-0">
+                                <li>Colonne A : Numéro compte</li>
+                                <li>Colonne B : Date</li>
+                                <li>Colonne C : Montant</li>
+                            </ul>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-        </form>
+        </div>
     </div>
 </main>
 

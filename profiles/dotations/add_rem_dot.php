@@ -34,11 +34,11 @@ include '../../includes/header.php';
 
                 <!-- Message erreur -->
                 <?php if (!empty($_GET['error'])): ?>
-                    <div class="text-center mb-3">
-                        <i style="color:red;">
-                            <?= htmlspecialchars($_GET['error']); ?>
-                        </i>
-                    </div>
+                <div class="text-center mb-3">
+                    <i style="color:red;">
+                        <?= htmlspecialchars($_GET['error']); ?>
+                    </i>
+                </div>
                 <?php endif; ?>
 
                 <div class="row">
@@ -51,9 +51,9 @@ include '../../includes/header.php';
                         <select name="rem_numc" class="form-select" required>
                             <option value="">-- Sélectionner --</option>
                             <?php foreach ($nums as $num): ?>
-                                <option value="<?= htmlspecialchars($num["idCompte"]); ?>">
-                                    <?= htmlspecialchars($num["numCompte"]); ?>
-                                </option>
+                            <option value="<?= htmlspecialchars($num["idCompte"]); ?>">
+                                <?= htmlspecialchars($num["numCompte"]); ?>
+                            </option>
                             <?php endforeach; ?>
                         </select>
                         <div class="invalid-feedback">Veuillez sélectionner un compte.</div>
@@ -64,9 +64,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             DATE DE REMANIEMENT <span class="text-danger">*</span>
                         </label>
-                        <input type="date" name="rem_date"
-                            class="form-control"
-                            required min="<?= $min_date ?>" max="<?= $max_date ?>">
+                        <input type="date" name="rem_date" class="form-control" required min="<?= $min_date ?>"
+                            max="<?= $max_date ?>">
                         <div class="invalid-feedback">Veuillez choisir une date valide.</div>
                     </div>
 
@@ -75,9 +74,7 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             MONTANT DIFFÉRENTIEL <span class="text-danger">*</span>
                         </label>
-                        <input type="number" name="rem_volume"
-                            class="form-control"
-                            required step="1">
+                        <input type="number" name="rem_volume" class="form-control" required step="1">
                         <div class="invalid-feedback">Veuillez saisir un montant valide.</div>
                     </div>
 
@@ -86,11 +83,11 @@ include '../../includes/header.php';
 
             <!-- Boutons -->
             <div class="container mt-3" style="max-width:700px;">
-                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
-                    <button type="submit" class="btn btn-success w-100 w-md-auto">
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success">
                         <strong>Enregistrer</strong>
                     </button>
-                    <a href="javascript:history.back()" class="btn btn-danger w-100 w-md-auto">
+                    <a href="javascript:history.back()" class="btn btn-danger">
                         <strong>Annuler</strong>
                     </a>
                 </div>

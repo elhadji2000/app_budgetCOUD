@@ -123,7 +123,7 @@ foreach ($execs1 as $exec) {
 
                                 <?php else: ?>
 
-                                <a href="actuel_3.php?numCompte=<?= urlencode($exec['numCompte']); ?>"
+                                <a href="actuel_3?numCompte=<?= urlencode($exec['numCompte']); ?>"
                                     class="text-decoration-underline fw-bold text-primary">
                                     <?= number_format($realisation, 0, ',', ' '); ?>
                                 </a>

@@ -26,9 +26,9 @@
 
                     <!-- MESSAGE ERREUR -->
                     <?php if (!empty($_GET["error"])): ?>
-                        <div class="alert alert-danger text-center py-1 mb-2">
-                            <?php echo $_GET["error"]; ?>
-                        </div>
+                    <div class="alert alert-danger text-center py-1 mb-2">
+                        <?php echo $_GET["error"]; ?>
+                    </div>
                     <?php endif; ?>
 
                     <form action="auth/log.php" method="POST">
@@ -37,14 +37,14 @@
                         <div class="mb-2">
                             <label class="form-label small fw-semibold mb-1">Utilisateur</label>
                             <input type="text" name="utilisateur" class="form-control form-control-sm"
-                                   placeholder="Matricule Agent..." required>
+                                placeholder="Matricule Agent..." required>
                         </div>
 
                         <!-- MOT DE PASSE -->
                         <div class="mb-2">
                             <label class="form-label small fw-semibold mb-1">Mot de passe</label>
                             <input type="password" name="motdepasse" class="form-control form-control-sm"
-                                   placeholder="••••••••" required>
+                                placeholder="••••••••" required>
                         </div>
 
                         <!-- ANNEE -->
@@ -85,5 +85,34 @@
     </div>
 
 </div>
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                votre mot de passe a été modifiè avec succès !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
+<?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+<script>
+// Une fois le DOM chargé, on lance la modal
+document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
+});
+</script>
+<?php endif; ?>
 <?php include 'includes/footer.php'; ?>

@@ -70,11 +70,11 @@ if (isset($_GET['toggle_id'])) {
 
                 <tbody>
                     <?php
-$fournisseurs = getAllFournisseurs();
-$n=1;
-if (!empty($fournisseurs)):
-    foreach ($fournisseurs as $fournisseur):
-?>
+                    $fournisseurs = getAllFournisseurs();
+                    $n=1;
+                    if (!empty($fournisseurs)):
+                        foreach ($fournisseurs as $fournisseur):
+                    ?>
                     <tr>
                         <td><?= $n; ?></td>
                         <td><?= $fournisseur['numFourn']; ?></td>
@@ -82,14 +82,15 @@ if (!empty($fournisseurs)):
                         <td><?= $fournisseur['adresse']; ?></td>
                         <td><?= $fournisseur['contact']; ?></td>
                         <td><?= $fournisseur['nature']; ?></td>
-                        <td>
+                        <td class="action">
                             <?php if (!isFournisseurUsed($fournisseur['idFourn'])): ?>
                             <a href="supprimer_engagement.php?id=<?= $fournisseur['idFourn'] ?>"
                                 onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Fournisseur ?')">Supprimer</a>
                             <?php else: ?>
-                            <span style="color: grey; cursor: not-allowed;"
+                            <span class="btn btn-sm btn-secondary" style="color: white; cursor: not-allowed;"
                                 title="Fournisseur utilisé, suppression désactivée">Supprimer</span>
                             <?php endif; ?>
+                            <a href="add_fourn?idFourn=<?= $fournisseur['idFourn']; ?>" class="btn btn-sm btn-warning">modifier</a>
                         </td>
                     </tr>
                     <?php $n++; ?>
@@ -190,8 +191,11 @@ $(document).ready(function() {
 
 #tableUsers th,
 #tableUsers td {
-    text-align: left !important;
+    text-align: center !important;
     vertical-align: middle;
-    font-size:13px !important;
+    font-size: 13px !important;
+}
+#tableUsers .action {
+    text-align: right !important;
 }
 </style>

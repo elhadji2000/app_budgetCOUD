@@ -1,6 +1,6 @@
 <?php include '../../includes/fonctions.php';?>
 <?php 
-session_start(); // Démarrer la session
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['nom']) && !empty($_POST['log']) && !empty($_POST['mail']) && !empty($_POST['priv']) && !empty($_POST['telephone']) && !empty($_POST['sexe'])) {
@@ -10,16 +10,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if ($resultat['success']) { 
             $messageSuccess = $resultat['message'];
-            header("Location: add_user.php?success=1");
+            header("Location: add_user?success=1");
             exit();
         } else {
             $messageErreur = $resultat['message'];
-            header("Location: add_user.php?error=" . urlencode($messageErreur));
+            header("Location: add_user?error=" . urlencode($messageErreur));
             exit();
         }
     } else {
         $messageErreur = "Veuillez remplir tous les champs.";
-        header("Location: add_user.php?error=" . urlencode($messageErreur));
+        header("Location: add_user?error=" . urlencode($messageErreur));
         exit();
     }
 }

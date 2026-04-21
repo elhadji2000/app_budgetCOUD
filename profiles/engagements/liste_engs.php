@@ -36,7 +36,7 @@ if (!isset($_SESSION['user'])) {
                         <th>N°</th>
                         <th>NumCompte</th>
                         <th>NumEngs</th>
-                        <th>date</th>
+                        <th>Date</th>
                         <th>Type_eng</th>
                         <!-- <th>Objet</th> -->
                         <th>Montant</th>
@@ -61,10 +61,10 @@ if (!isset($_SESSION['user'])) {
                         <td><?= $eng['numCompte']; ?></td>
                         <td><?= formatNumEng($eng['idEng']); ?> <small class="text-warning">(temp)</small></td>
                         <td><?= date('d/m/Y', strtotime($eng['dateEng'])) ; ?></td>
-                        <td><?= $eng['tye_eng']; ?></td>
+                        <td><?= $eng['type_eng']; ?></td>
                         <!-- <td><?= $eng['objet']; ?></td> -->
                         <td class="text-align-rigth somme fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F </td>
-                        <td><?= $eng['numFourn']; ?></td>
+                        <td><?= $eng['nom']; ?></td>
                         <td>
                             <?php if ($_SESSION['priv'] === 'admin'): ?>
                             <a href="traitement_eng.php?valider_id=<?= $eng['idEng']; ?>"
@@ -95,7 +95,7 @@ if (!isset($_SESSION['user'])) {
                         <td><?= $eng['type_eng']; ?></td>
                         <!-- <td><?= $eng['objet']; ?></td> -->
                         <td class="text-align-right somme fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
-                        <td><?= $eng['numFourn']; ?></td>
+                        <td><?= $eng['nom']; ?></td>
                         <td><span style="cursor: not-allowed;" title="Engagement valider"
                                 class="badge bg-secondary">Valider</span></td>
                         <td class="somme">
@@ -106,7 +106,7 @@ if (!isset($_SESSION['user'])) {
                             <span class="btn btn-sm btn-secondary" style="cursor: not-allowed; text-decoration:underline;"
                                 title="Engagement utilisé, Annuler désactivée">Annuler</span>
                             <?php endif; ?>
-                            | <a target="_blank" href="be_vue_pdf.php?id=<?= $eng['idEng']; ?>"
+                            | <a target="_blank" href="be_vue_pdf?id=<?= $eng['idEng']; ?>"
                                 class="btn btn-sm btn-warning">
                                 BE_PDF
                             </a>

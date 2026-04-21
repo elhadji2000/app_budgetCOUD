@@ -72,9 +72,9 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                         <select name="priv" class="form-control" style="border: 1px solid black;" required>
                             <option value="">--Sélectionnez--</option>
                             <option value="admin">ADMIN</option>
-                            <option value="sag">SAG</option>
-                            <option value="mbis">MBIS</option>
-                            <option value="op">OP</option>
+                            <option value="Cf_D">Chef_Departement</option>
+                            <option value="or">Ordre_Recettes</option>
+                            <option value="op">Ordre_Paiements</option>
                         </select>
                     </div>
 

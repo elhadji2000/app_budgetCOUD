@@ -7,7 +7,16 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../../includes/fonctions.php';
+
+$idFourn = $_GET['idFourn'] ?? null;
+$fournisseur = null;
+
+if ($idFourn) {
+    $fournisseur = getFournisseurById($idFourn);  // fonction à créer si pas encore
+}
+
 include '../../includes/header.php';
+
 ?>
 
 <main>
@@ -24,16 +33,18 @@ include '../../includes/header.php';
         <!-- Formulaire -->
         <form action="traitement_fourn.php" method="POST" class="needs-validation" novalidate>
 
+            <input type="hidden" name="idFourn" value="<?= $fournisseur['idFourn'] ?? '' ?>">
+
             <div class="mx-auto px-3 py-4"
                 style="max-width: 700px; border-top: 2px solid #4655a4; border-bottom: 2px solid #4655a4;">
 
                 <!-- Erreur -->
                 <?php if (!empty($_GET['error'])): ?>
-                    <div class="text-center mb-3">
-                        <i style="color:red;">
-                            <?= htmlspecialchars($_GET['error']); ?>
-                        </i>
-                    </div>
+                <div class="text-center mb-3">
+                    <i style="color:red;">
+                        <?= htmlspecialchars($_GET['error']); ?>
+                    </i>
+                </div>
                 <?php endif; ?>
 
                 <div class="row">
@@ -43,7 +54,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             NUM F <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="numfourn" class="form-control" required>
+                        <input type="text" name="numFourn" class="form-control" required
+                            value="<?= htmlspecialchars($fournisseur['numFourn'] ?? '') ?>">
                         <div class="invalid-feedback">Veuillez entrer le numéro fournisseur.</div>
                     </div>
 
@@ -52,7 +64,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             NOM <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="nom" class="form-control" required>
+                        <input type="text" name="nom" class="form-control" required
+                            value="<?= htmlspecialchars($fournisseur['nom'] ?? '') ?>">
                         <div class="invalid-feedback">Veuillez entrer le nom.</div>
                     </div>
 
@@ -61,7 +74,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             ADRESSE <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="adresse" class="form-control" required>
+                        <input type="text" name="adresse" class="form-control" required
+                            value="<?= htmlspecialchars($fournisseur['adresse'] ?? '') ?>">
                         <div class="invalid-feedback">Veuillez entrer l'adresse.</div>
                     </div>
 
@@ -70,7 +84,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             CONTACT <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="contact" class="form-control" required>
+                        <input type="text" name="contact" class="form-control" required
+                            value="<?= htmlspecialchars($fournisseur['contact'] ?? '') ?>">
                         <div class="invalid-feedback">Veuillez entrer le contact.</div>
                     </div>
 
@@ -79,7 +94,8 @@ include '../../includes/header.php';
                         <label class="fw-semibold">
                             NATURE <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="nature" class="form-control" required>
+                        <input type="text" name="nature" class="form-control" required
+                            value="<?= htmlspecialchars($fournisseur['nature'] ?? '') ?>">
                         <div class="invalid-feedback">Veuillez préciser la nature.</div>
                     </div>
 
@@ -88,11 +104,14 @@ include '../../includes/header.php';
 
             <!-- Boutons -->
             <div class="container mt-3" style="max-width:700px;">
-                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
-                    <button type="submit" class="btn btn-success w-100 w-md-auto">
-                        <strong>Enregistrer</strong>
+                <div class="d-flex justify-content-between">
+                    <button type="submit"
+                        class="btn <?= isset($fournisseur['idFourn']) ? 'btn-warning' : 'btn-success' ?>">
+                        <strong>
+                            <?= isset($fournisseur['idFourn']) ? 'Modifier' : 'Valider' ?>
+                        </strong>
                     </button>
-                    <a href="javascript:history.back()" class="btn btn-danger w-100 w-md-auto">
+                    <a href="javascript:history.back()" class="btn btn-secondary">
                         <strong>Annuler</strong>
                     </a>
                 </div>

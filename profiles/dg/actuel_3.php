@@ -81,12 +81,12 @@ $TEngs = 0;
                             </td>
                             <td class="text-start fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
                             <td class="text-center">
-                                <a class="btn btn-sm btn-warning" target="_blank" href="../engagements/be_vue_pdf.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                                <a class="btn btn-sm btn-warning" target="_blank" href="../engagements/be_vue_pdf?id=<?= $eng['idEng'] ?>">vue_pdf</a>
                             </td>
                             <?php if ($op == 1): ?>
                             <td class="text-center">
                                 <?php if (!empty($eng['numFact'])): ?>
-                                <a class="btn btn-sm btn-primary" target="_blank"  href="../engagements/mandat_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                                <a class="btn btn-sm btn-primary" target="_blank"  href="../engagements/mandat_details?id=<?= $eng['idEng'] ?>">vue_pdf</a>
                                 <?php else: ?>
                                 <span title="Pas d'opération" style="color: grey; cursor: not-allowed;">vue_pdf</span>
                                 <?php endif; ?>
@@ -102,15 +102,15 @@ $TEngs = 0;
                     </tbody>
                     <tfooter>
                         <tr>
-                            <th colspan="7" class="text-center" style="text-align: left;">TOTAL DES REALISATIONS DU COMPTE</th>
-                            <th colspan="3" class="text-center" style="text-align: left;">
+                            <th colspan="7" class="text-left" style="text-align: left;">TOTAL DES REALISATIONS DU COMPTE</th>
+                            <th colspan="2" class="text-left" style="text-align: left;">
                                 <?= number_format($TEngs, 0, ',', ' '); ?> F</th>
                         </tr>
                         <tr>
-                            <th colspan="7" class="text-center" style="text-align: left;">
+                            <th colspan="7" class="text-left" style="text-align: left;">
                                 SOLDE DISPONIBLE DU COMPTE
                             </th>
-                            <th colspan="3" class="text-center" style="text-align: left;">
+                            <th colspan="2" class="text-left" style="text-align: left;">
                                 <?= number_format(($TDotations-$TEngs), 0, ',', ' '); ?> F</th>
                         </tr>
                     </tfooter>

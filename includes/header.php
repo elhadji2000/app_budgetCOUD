@@ -158,7 +158,7 @@ $anneeActuelle = date("Y");
             <!-- CONTENU CENTRE -->
             <div class="text-center px-0">
 
-                <a href="http://localhost/BUDGET/shared/accueil.php" class="text-decoration-none text-dark d-block">
+                <a href="http://localhost/BUDGET/shared/accueil" class="text-decoration-none text-dark d-block">
 
                     <p class="header-title">
                         REPUBLIQUE DU SENEGAL
@@ -206,19 +206,23 @@ $anneeActuelle = date("Y");
                             <ul class="dropdown-menu">
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dg/actuel_1.php">Globale</a>
+                                        href="http://localhost/BUDGET/profiles/dg/administratifs/rapports">Administratif</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dg/global_1.php">Globale O.P</a>
+                                        href="http://localhost/BUDGET/profiles/dg/actuel_1">Globale</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dg/borner_1.php">Borner</a>
+                                        href="http://localhost/BUDGET/profiles/dg/global_1">Globale O.P</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        href="http://localhost/BUDGET/profiles/dg/borner_1">Borner</a>
                                 </li>
 
                                 <li><a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dg/journ_1.php">Journaliere</a>
+                                        href="http://localhost/BUDGET/profiles/dg/journ_1">Journaliere</a>
                                 </li>
                             </ul>
                         </li>
@@ -231,7 +235,7 @@ $anneeActuelle = date("Y");
                                 <?php if ($anneeSession == $anneeActuelle): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dotations/add_ini_dot.php">
+                                        href="http://localhost/BUDGET/profiles/dotations/add_ini_dot">
                                         Initiale
                                     </a>
                                 </li>
@@ -248,7 +252,7 @@ $anneeActuelle = date("Y");
                                 <?php if ($anneeSession == $anneeActuelle): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dotations/add_rem_dot.php">
+                                        href="http://localhost/BUDGET/profiles/dotations/add_rem_dot">
                                         Remaniement
                                     </a>
                                 </li>
@@ -262,7 +266,7 @@ $anneeActuelle = date("Y");
                                 <?php endif; ?>
 
                                 <li><a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dotations/liste_dotations.php">Consulter</a>
+                                        href="http://localhost/BUDGET/profiles/dotations/liste_dotations">Consulter</a>
                                 </li>
                             </ul>
                         </li>
@@ -270,10 +274,10 @@ $anneeActuelle = date("Y");
                         <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
                         <li class="nav-item">
                             <a class="nav-link active"
-                                href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs.php">Fournisseurs</a>
+                                href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs">Fournisseurs</a>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'op') : ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Engagements</a>
@@ -281,7 +285,7 @@ $anneeActuelle = date("Y");
                                 <?php if ($anneeSession == $anneeActuelle): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/engagements/add_eng1.php">
+                                        href="http://localhost/BUDGET/profiles/engagements/add_eng1">
                                         Nouveau
                                     </a>
                                 </li>
@@ -295,12 +299,12 @@ $anneeActuelle = date("Y");
                                 <?php endif; ?>
 
                                 <li><a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/engagements/liste_engs.php">Consulter</a>
+                                        href="http://localhost/BUDGET/profiles/engagements/liste_engs">Consulter</a>
                                 </li>
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'op') : ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">M_Paiement</a>
@@ -308,7 +312,7 @@ $anneeActuelle = date("Y");
                                 <?php if ($anneeSession == $anneeActuelle): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/paiement/add_paie1.php">
+                                        href="http://localhost/BUDGET/profiles/paiement/add_paie1">
                                         Nouveau
                                     </a>
                                 </li>
@@ -322,12 +326,12 @@ $anneeActuelle = date("Y");
                                 <?php endif; ?>
 
                                 <li><a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/paiement/liste_op.php">Consulter</a>
+                                        href="http://localhost/BUDGET/profiles/paiement/liste_op">Consulter</a>
                                 </li>
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'or') : ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">O.R</a>
@@ -335,7 +339,7 @@ $anneeActuelle = date("Y");
                                 <?php if ($anneeSession == $anneeActuelle): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/recettes/add_rec1.php">
+                                        href="http://localhost/BUDGET/profiles/recettes/add_rec1">
                                         Nouveau
                                     </a>
                                 </li>
@@ -349,7 +353,7 @@ $anneeActuelle = date("Y");
                                 <?php endif; ?>
 
                                 <li><a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/recettes/liste_rec.php">Consulter</a>
+                                        href="http://localhost/BUDGET/profiles/recettes/liste_rec">Consulter</a>
                                 </li>
                             </ul>
                         </li>
@@ -357,13 +361,13 @@ $anneeActuelle = date("Y");
                         <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
                         <li class="nav-item">
                             <a class="nav-link active"
-                                href="http://localhost/BUDGET/profiles/dba/liste_compte.php">Comptes</a>
+                                href="http://localhost/BUDGET/profiles/dba/liste_compte">Comptes</a>
                         </li>
                         <?php endif; ?>
                         <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
                         <li class="nav-item">
                             <a class="nav-link active"
-                                href="http://localhost/BUDGET/profiles/dba/liste_users.php">Utilisateurs</a>
+                                href="http://localhost/BUDGET/profiles/dba/liste_users">Utilisateurs</a>
                         </li>
                         <?php endif; ?>
                         <li class="nav-item dropdown">
@@ -375,7 +379,8 @@ $anneeActuelle = date("Y");
 
                                 <!-- CHANGER ANNEE -->
                                 <li>
-                                    <form action="http://localhost/BUDGET/auth/chance_annee.php" method="POST" class="px-3 py-2">
+                                    <form action="http://localhost/BUDGET/auth/chance_annee" method="POST"
+                                        class="px-3 py-2">
                                         <label class="small fw-semibold">Année</label>
                                         <select name="annee" class="form-select form-select-sm mb-2" required>
                                             <?php
@@ -401,14 +406,14 @@ $anneeActuelle = date("Y");
 
                                 <!-- MOT DE PASSE -->
                                 <li>
-                                    <a class="dropdown-item" href="http://localhost/BUDGET/shared/updated_mdp.php">
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/shared/updated_mdp">
                                         Mot_de_passe
                                     </a>
                                 </li>
 
                                 <!-- DECONNEXION -->
                                 <li>
-                                    <a class="dropdown-item" href="http://localhost/BUDGET/auth/logout.php"
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/auth/logout"
                                         onclick="return confirm('Etes-vous sûr ?')">
                                         Déconnexion
                                     </a>

@@ -29,7 +29,8 @@ $TEngs = 0;
 
             <div>
                 <h5 class="fw-bold text-primary mb-1">
-                    <i class="bi bi-graph-up-arrow"></i> EXECUTION DU :<?= date('d/m/Y', strtotime($date1)); ?> AU <?= date('d/m/Y', strtotime($date2)); ?>
+                    <i class="bi bi-graph-up-arrow"></i> EXECUTION DU :<?= date('d/m/Y', strtotime($date1)); ?> AU
+                    <?= date('d/m/Y', strtotime($date2)); ?>
                 </h5>
                 <small class="text-muted"><strong>Compte <?= $data['numCompte']; ?> :
                         <?= $data['libelle']; ?></strong></small>
@@ -54,10 +55,9 @@ $TEngs = 0;
                         <th>Numero</th>
                         <th>Compte</th>
                         <th>Date_Realisation</th>
-                        <th>Ref</th>
                         <th>Objet</th>
-                        <th>Service</th>
-                        <th>FR/Bènèf</th>
+                        <th>Type_Eng</th>
+                        <th>Bènèficiaire</th>
                         <th>Montant</th>
                         <th>Bon_Eng</th>
                     </tr>
@@ -77,21 +77,20 @@ $TEngs = 0;
                             <?= date('d/m/Y', strtotime($eng['dateEng'])); ?>
                         </td>
                         <td>
-                            N°<?= $eng['numFact']??"?"; ?>
+                            <?= $eng['objet']; ?>
                         </td>
                         <td>
-                            <?= $eng['libelleC']; ?>
-                        </td>
-                        <td>
-                            <?= $eng['service']; ?>
+                            <?= $eng['type_eng']; ?>
                         </td>
                         <td>
                             <?= $eng['nom']; ?>
                         </td>
-                        <td><?= number_format($eng['montant'], 0, ',', ','); ?>
-                            FCFA</td>
+                        <td><?= number_format($eng['montant'], 0, ',', ' '); ?>F</td>
                         <td>
-                            <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                            <a target="_blank" href="../engagements/be_vue_pdf.php?id=<?= $eng['idEng']; ?>"
+                                class="btn btn-sm btn-warning">
+                                BE_PDF
+                            </a>
                         </td>
                     </tr>
                     <?php 
@@ -102,9 +101,9 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" style="text-align: center;color: black;">TOTAL DES REALISATIONS DU COMPTE</th>
-                        <th colspan="2" style="text-align: center;color: black;">
-                            <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
+                        <th colspan="6" style="text-align: center;color: black;">TOTAL DES REALISATIONS DU COMPTE</th>
+                        <th colspan="2" style="text-align: left;color: black;">
+                            <?= number_format($TEngs, 0, ',', ' '); ?>F</th>
                     </tr>
                 </tfooter>
             </table>

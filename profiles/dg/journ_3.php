@@ -28,7 +28,8 @@ $TEngs = 0;
 
             <div>
                 <h5 class="fw-bold text-primary mb-1">
-                    <i class="bi bi-graph-up-arrow"></i> EXECUTION JOURNALIERE : <?= date('d/m/Y', strtotime($date));; ?>
+                    <i class="bi bi-graph-up-arrow"></i> EXECUTION JOURNALIERE :
+                    <?= date('d/m/Y', strtotime($date));; ?>
                 </h5>
                 <small class="text-muted"><strong>Compte <?= $data['numCompte']; ?> :
                         <?= $data['libelle']; ?></strong></small>
@@ -52,11 +53,10 @@ $TEngs = 0;
                     <tr>
                         <th>Numero</th>
                         <th>Compte</th>
-                        <th>Date_Realisation</th> 
-                        <th>Ref</th>
+                        <th>Date_Realisation</th>
                         <th>Objet</th>
                         <th>Service</th>
-                        <th>FR/Bènèf</th>
+                        <th>Bènèficiare</th>
                         <th>Montant</th>
                         <th>Bon_Eng</th>
                     </tr>
@@ -66,7 +66,7 @@ $TEngs = 0;
                 $n=1;
                 if (!empty($engs)) :
                     foreach ($engs as $eng) : ?>
-                    <tr> 
+                    <tr>
                         <td><?= formatNumEng($eng['idEng']); ?></td>
                         <td>
                             <?= $eng['numCompte']; ?>
@@ -76,21 +76,20 @@ $TEngs = 0;
                             <?= date('d/m/Y', strtotime($eng['dateEng'])); ?>
                         </td>
                         <td>
-                            N°<?= $eng['numFact']??"?"; ?>
+                            <?= $eng['objet']; ?>
                         </td>
                         <td>
-                            <?= $eng['libelleC']; ?>
-                        </td>
-                        <td>
-                            <?= $eng['service']; ?>
+                            <?= $eng['type_eng']; ?>
                         </td>
                         <td>
                             <?= $eng['nom']; ?>
                         </td>
-                        <td><?= number_format($eng['montant'], 0, ',', ','); ?>
-                            FCFA</td>
+                        <td><?= number_format($eng['montant'], 0, ',', ' '); ?>F</td>
                         <td>
-                            <a href="../engagements/eng_details.php?id=<?= $eng['idEng'] ?>">vue_pdf</a>
+                            <a target="_blank" href="../engagements/be_vue_pdf?id=<?= $eng['idEng']; ?>"
+                                class="btn btn-sm btn-warning">
+                                BE_PDF
+                            </a>
                         </td>
                     </tr>
                     <?php 
@@ -101,10 +100,10 @@ $TEngs = 0;
                 </tbody>
                 <tfooter>
                     <tr>
-                        <th colspan="7" class="text-center" style="text-align: center;color: black;">TOTAL
+                        <th colspan="6" class="text-center" style="text-align: center;color: black;">TOTAL
                             JOURNALIERE</th>
-                        <th colspan="2" style="text-align: center;color: black;">
-                            <?= number_format($TEngs, 0, ',', ','); ?> FCFA</th>
+                        <th colspan="2" style="text-align: left;color: black;">
+                            <?= number_format($TEngs, 0, ',', ' '); ?> F</th>
                     </tr>
                 </tfooter>
             </table>
@@ -142,6 +141,6 @@ $(document).ready(function() {
 #tableComptes td {
     text-align: left !important;
     vertical-align: middle;
-    font-size:12px !important;
+    font-size: 12px !important;
 }
 </style>

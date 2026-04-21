@@ -49,7 +49,7 @@ $engs = getEngsByCompte($numCompte);
                     <tr>
                     <th>N°</th>
                     <th>NumEngs</th>
-                    <th>date</th>
+                    <th>Date</th>
                     <th>Type_eng</th>
                     <th>Objet</th>
                     <th>Montant</th>
@@ -72,13 +72,13 @@ $engs = getEngsByCompte($numCompte);
                     <td><?= $eng['type_eng']; ?></td>
                     <td><?= $eng['objet']; ?></td>
                     <td class="fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
-                    <td><?= $eng['numFourn']; ?></td>
+                    <td><?= $eng['nom']; ?></td>
                     <td>
-                        <a class="btn btn-sm btn-warning" href="be_vue_pdf.php?id=<?= $eng['idEng'] ?>">Vue_PDF</a>
+                        <a class="btn btn-sm btn-warning" target="_blank" href="be_vue_pdf?id=<?= $eng['idEng'] ?>">BE_Vue_PDF</a>
                     </td>
                     <td>
                         <?php if (!isEngagementUsed($eng['idEng'])): ?>
-                        <a class="btn btn-sm btn-danger" href="supprimer_engagement.php?id=<?= $eng['idEng'] ?>"
+                        <a class="btn btn-sm btn-danger" href="supprimer_engagement?id=<?= $eng['idEng'] ?>"
                             onclick="return confirm('Êtes-vous sûr de vouloir Annuler cet engagement ?')">Annuler</a>
                         <?php else: ?>
                         <span class="btn btn-sm btn-secondary" style="color: black; cursor: not-allowed;"
