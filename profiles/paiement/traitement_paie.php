@@ -1,11 +1,12 @@
 <?php include '../../includes/fonctions.php'; ?>
 <?php
-session_start();  // Démarrer la session
+//session_start();  // Démarrer la session
 
 if (isset($_POST['dateOp'], $_POST['idEng'], $_POST['numFact'])) {
     $dateOp = $_POST['dateOp'];
     $idEng = $_POST['idEng'];
     $numFact = $_POST['numFact'];
+    $montant = $_POST['montant'];
     $typeOp = 'paiement';
 
     $eng = getEngById($idEng);
@@ -18,7 +19,7 @@ if (isset($_POST['dateOp'], $_POST['idEng'], $_POST['numFact'])) {
         exit();
     }
 
-    $resultat = ajouterOp_temp($dateOp, $idEng, $numFact, $typeOp);
+    $resultat = ajouterOp_temp($dateOp, $idEng, $numFact, $montant, $typeOp);
 
     if ($resultat === true) {
         header('Location: add_paie1.php?success=1');
@@ -31,9 +32,10 @@ if (isset($_POST['dateOr'], $_POST['idEng'], $_POST['numFact'])) {
     $dateOp = $_POST['dateOr'];
     $idEng = $_POST['idEng'];
     $numFact = $_POST['numFact'];
+    $montant = $_POST['montant'];
     $typeOp = 'recette';
 
-    $resultat = ajouterOp_temp($dateOp, $idEng, $numFact, $typeOp);
+    $resultat = ajouterOp_temp($dateOp, $idEng, $numFact, $montant, $typeOp);
 
     if ($resultat === true) {
         header('Location: add_paie1.php?success=1');
@@ -48,7 +50,7 @@ if (isset($_GET['valider_id'])) {
     $conn = connexionBD();  // Connexion à la BD
 
     // Récupération de la ligne temporaire
-    $query = "SELECT * FROM operations_temp WHERE idOp = $idTemp";
+    $query = "SELECT * FROM bud_operations_temp WHERE idOp = $idTemp";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
 
@@ -57,17 +59,18 @@ if (isset($_GET['valider_id'])) {
         $dateOp = mysqli_real_escape_string($conn, $row['dateOp']);
         $idEng = (int) $row['idEng'];
         $numFact = mysqli_real_escape_string($conn, $row['numFact']);
+        $montant = mysqli_real_escape_string($conn, $row['montant']);
         $typeOp = mysqli_real_escape_string($conn, $row['typeOp']);  // devrait être "paiement"
 
         // Insertion dans la table operations
         $insert = "
-            INSERT INTO operations (dateOp, idEng, numFact, typeOp)
-            VALUES ('$dateOp', $idEng, '$numFact', '$typeOp')
+            INSERT INTO bud_operations (dateOp, idEng, numFact, montant, typeOp)
+            VALUES ('$dateOp', $idEng, '$numFact', '$montant', '$typeOp')
         ";
 
         if (mysqli_query($conn, $insert)) {
             // Suppression de la ligne temporaire
-            mysqli_query($conn, "DELETE FROM operations_temp WHERE idOp = $idTemp");
+            mysqli_query($conn, "DELETE FROM bud_operations_temp WHERE idOp = $idTemp");
             if ($typeOp === 'recette') {
                 header('Location: ../recettes/liste_rec.php?success=2');
                 exit();
@@ -103,7 +106,7 @@ if (isset($_GET['supprOp'])) {
     $conn = connexionBD();
 
     // 1. Récupérer les données de l'opération à supprimer
-    $query = "SELECT * FROM operations WHERE idOp = $suppr";
+    $query = "SELECT * FROM bud_operations WHERE idOp = $suppr";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
 
@@ -112,11 +115,12 @@ if (isset($_GET['supprOp'])) {
         $dateOp = mysqli_real_escape_string($conn, $row['dateOp']);
         $idEng = (int) $row['idEng'];
         $numFact = mysqli_real_escape_string($conn, $row['numFact']);
+        $montant = mysqli_real_escape_string($conn, $row['montant']);
         $typeOp = mysqli_real_escape_string($conn, $row['typeOp']);
 
         $backup = "
-            INSERT INTO operations_suppr (dateOp, idEng, numFact, typeOp)
-            VALUES ('$dateOp', $idEng, '$numFact', '$typeOp')
+            INSERT INTO bud_operations_suppr (dateOp, idEng, numFact, montant, typeOp)
+            VALUES ('$dateOp', $idEng, '$numFact', '$montant', '$typeOp')
         ";
 
         if (mysqli_query($conn, $backup)) {
@@ -176,11 +180,12 @@ if (isset($_GET['supprOr'])) {
         $dateOp = mysqli_real_escape_string($conn, $row['dateOp']);
         $idEng = (int) $row['idEng'];
         $numFact = mysqli_real_escape_string($conn, $row['numFact']);
+        $montant = mysqli_real_escape_string($conn, $row['montant']);
         $typeOp = mysqli_real_escape_string($conn, $row['typeOp']);
 
         $backup = "
-            INSERT INTO operations_suppr (dateOp, idEng, numFact, typeOp)
-            VALUES ('$dateOp', $idEng, '$numFact', '$typeOp')
+            INSERT INTO bud_operations_suppr (dateOp, idEng, numFact, montant, typeOp)
+            VALUES ('$dateOp', $idEng, '$numFact', '$montant', '$typeOp')
         ";
 
         if (mysqli_query($conn, $backup)) {

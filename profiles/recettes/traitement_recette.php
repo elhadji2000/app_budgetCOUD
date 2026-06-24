@@ -30,21 +30,21 @@ if (isset($_GET['valider_id'])) {
     $conn = connexionBD();
 
     // Récupération depuis ordre_recette_temp
-    $query = "SELECT * FROM ordre_recette_temp WHERE idOr = $idTemp";
+    $query = "SELECT * FROM bud_ordre_recette_temp WHERE idOr = $idTemp";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
 
     if ($row) {
 
         // Insertion dans ordre_recette
-        $insert = "INSERT INTO ordre_recette (dateOr, objet_recette, montant, pieces_annexees, idCompte, idFourn, idUser)
+        $insert = "INSERT INTO bud_ordre_recette (dateOr, objet_recette, montant, pieces_annexees, idCompte, idFourn, idUser)
                    VALUES ('{$row['dateOr']}', '{$row['objet_recette']}', '{$row['montant']}',
                            '{$row['pieces_annexees']}', '{$row['idCompte']}', '{$row['idFourn']}', '{$row['idUser']}')";
 
         if (mysqli_query($conn, $insert)) {
 
             // Suppression dans temp
-            mysqli_query($conn, "DELETE FROM ordre_recette_temp WHERE idOr = $idTemp");
+            mysqli_query($conn, "DELETE FROM bud_ordre_recette_temp WHERE idOr = $idTemp");
 
             header("Location: liste_rec.php?success=2");
         } else {
@@ -63,7 +63,7 @@ if (isset($_GET['valider_id'])) {
 if (isset($_GET['supprTemp'])) {
     $suppr = intval($_GET['supprTemp']);
 
-    $resultat = supprimerLigne('ordre_recette_temp', 'idOr', $suppr);
+    $resultat = supprimerLigne('bud_ordre_recette_temp', 'idOr', $suppr);
 
     if ($resultat === true) {
         header("Location: liste_recettes.php?success=1");
@@ -78,7 +78,7 @@ if (isset($_GET['supprTemp'])) {
 if (isset($_GET['suppr'])) {
     $suppr = intval($_GET['suppr']);
 
-    $resultat = supprimerLigne('ordre_recette', 'idOr', $suppr);
+    $resultat = supprimerLigne('bud_ordre_recette', 'idOr', $suppr);
 
     if ($resultat === true) {
         header("Location: liste_rec.php?success=1");

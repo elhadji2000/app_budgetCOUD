@@ -41,12 +41,12 @@ if (isset($_GET['valider_id'])) {
 
     if ($row) {
         // Insère dans engagements
-        $insert = "INSERT INTO engagements (dateEng, type_eng, montant, objet,idCompte, idFourn)
+        $insert = "INSERT INTO bud_engagements (dateEng, type_eng, montant, objet,idCompte, idFourn)
                    VALUES ('{$row['dateEng']}', '{$row['type_eng']}', '{$row['montant']}',
                            '{$row['objet']}','{$row['idCompte']}', '{$row['idFourn']}')";
         if (mysqli_query($conn, $insert)) {
             // Supprime de engagements_temp
-            mysqli_query($conn, "DELETE FROM engagements_temp WHERE idEng = $idTemp");
+            mysqli_query($conn, "DELETE FROM bud_engagements_temp WHERE idEng = $idTemp");
             header("Location: liste_engs?success=2");
         } else {
             header("Location: liste_engs?error=Erreur lors de l'insertion");

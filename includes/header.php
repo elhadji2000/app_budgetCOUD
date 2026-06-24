@@ -1,6 +1,6 @@
-<?php 
-$anneeSession = $_SESSION['an'] ?? date("Y"); // Valeur par défaut si la session n'a pas 'annee'
-$anneeActuelle = date("Y");
+<?php
+$anneeSession = $_SESSION['an'] ?? date('Y');  // Valeur par défaut si la session n'a pas 'annee'
+$anneeActuelle = date('Y');
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -139,9 +139,9 @@ $anneeActuelle = date("Y");
         }
     }
     </style>
-    <?php 
-    include($_SERVER['DOCUMENT_ROOT'] . '/BUDGET/includes/activite.php');
-    //session_start();
+    <?php
+    include ($_SERVER['DOCUMENT_ROOT'] . '/BUDGET/includes/activite.php');
+    // session_start();
     ?>
 </head>
 
@@ -199,7 +199,7 @@ $anneeActuelle = date("Y");
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                     <ul class="navbar-nav">
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D'): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Consulter</a>
@@ -213,8 +213,8 @@ $anneeActuelle = date("Y");
                                         href="http://localhost/BUDGET/profiles/dg/actuel_1">Globale</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/dg/global_1">Globale O.P</a>
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/profiles/dg/global_1">Globale
+                                        O.P</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item"
@@ -227,7 +227,7 @@ $anneeActuelle = date("Y");
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D'): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Dotations</a>
@@ -271,24 +271,26 @@ $anneeActuelle = date("Y");
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
                                 href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs">Fournisseurs</a>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'op') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'eng_add' || $_SESSION['priv'] == 'eng_all' || $_SESSION['priv'] == 'eng_val'): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Engagements</a>
                             <ul class="dropdown-menu">
                                 <?php if ($anneeSession == $anneeActuelle): ?>
+                                <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'eng_add' || $_SESSION['priv'] == 'eng_all'): ?>
                                 <li>
                                     <a class="dropdown-item"
                                         href="http://localhost/BUDGET/profiles/engagements/add_eng1">
                                         Nouveau
                                     </a>
                                 </li>
+                                <?php endif; ?>
                                 <?php else: ?>
                                 <li>
                                     <span class="dropdown-item text-muted" style="cursor: not-allowed; opacity: 0.5;"
@@ -304,18 +306,21 @@ $anneeActuelle = date("Y");
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'op') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'op_add' || $_SESSION['priv'] == 'op_all' || $_SESSION['priv'] == 'op_val'): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">M_Paiement</a>
                             <ul class="dropdown-menu">
                                 <?php if ($anneeSession == $anneeActuelle): ?>
+
+                                <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'op_add' || $_SESSION['priv'] == 'op_all'): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/paiement/add_paie1">
+                                        href="http://localhost/BUDGET/profiles/paiement/add_paie1.php">
                                         Nouveau
                                     </a>
                                 </li>
+                                <?php endif; ?>
                                 <?php else: ?>
                                 <li>
                                     <span class="dropdown-item text-muted" style="cursor: not-allowed; opacity: 0.5;"
@@ -331,18 +336,45 @@ $anneeActuelle = date("Y");
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'or') : ?>
+                        <?php if ($_SESSION['priv'] == 'personnel' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'personnel'): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">Bordereau</a>
+                            <ul class="dropdown-menu">
+                                <?php if ($anneeSession == $anneeActuelle): ?>
+                                <li>
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/profiles/bordereau/nouveau">
+                                        Nouveau
+                                    </a>
+                                </li>
+                                <?php else: ?>
+                                <li>
+                                    <span class="dropdown-item text-muted" style="cursor: not-allowed; opacity: 0.5;"
+                                        title="Lien désactivé car l'année de session est différente">
+                                        Nouveau
+                                    </span>
+                                </li>
+                                <?php endif; ?>
+
+                                <li><a class="dropdown-item"
+                                        href="http://localhost/BUDGET/profiles/bordereau/consulter">Consulter</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <?php endif; ?>
+                        <?php if ($_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'or_add' || $_SESSION['priv'] == 'or_all' || $_SESSION['priv'] == 'or_val'): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">O.R</a>
                             <ul class="dropdown-menu">
                                 <?php if ($anneeSession == $anneeActuelle): ?>
+                                <?php if ($_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'or_add' || $_SESSION['priv'] == 'or_all'): ?>
                                 <li>
-                                    <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/recettes/add_rec1">
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/profiles/recettes/add_rec1">
                                         Nouveau
                                     </a>
                                 </li>
+                                <?php endif; ?>
                                 <?php else: ?>
                                 <li>
                                     <span class="dropdown-item text-muted" style="cursor: not-allowed; opacity: 0.5;"
@@ -358,13 +390,13 @@ $anneeActuelle = date("Y");
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'Cs_pb'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
                                 href="http://localhost/BUDGET/profiles/dba/liste_compte">Comptes</a>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'sag' || $_SESSION['priv'] == 'admin') : ?>
+                        <?php if ($_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'admin'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
                                 href="http://localhost/BUDGET/profiles/dba/liste_users">Utilisateurs</a>
@@ -384,13 +416,13 @@ $anneeActuelle = date("Y");
                                         <label class="small fw-semibold">Année</label>
                                         <select name="annee" class="form-select form-select-sm mb-2" required>
                                             <?php
-                                                $annee_actuelle = date("Y");
-                                                $annee_debut = 2025;
+                                            $annee_actuelle = date('Y');
+                                            $annee_debut = 2025;
 
-                                                for ($i = $annee_actuelle; $i >= $annee_debut; $i--) {
-                                                    $selected = ($_SESSION['an'] == $i) ? 'selected' : '';
-                                                    echo "<option value='$i' $selected>$i</option>";
-                                                }
+                                            for ($i = $annee_actuelle; $i >= $annee_debut; $i--) {
+                                                $selected = ($_SESSION['an'] == $i) ? 'selected' : '';
+                                                echo "<option value='$i' $selected>$i</option>";
+                                            }
                                             ?>
                                         </select>
 

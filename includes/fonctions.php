@@ -7,9 +7,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-function connexionBD()
+/* function connexionBD()
 {
     $connexion = mysqli_connect('localhost', 'root', '', 'budget_db_' . $_SESSION['an']) or
+        die('Serveur inaccessible. Merci de reessayer plus tard.');
+    return $connexion;
+} */
+
+function connexionBD()
+{
+    $connexion = mysqli_connect('localhost', 'root', '', 'budget_db_2024') or
         die('Serveur inaccessible. Merci de reessayer plus tard.');
     return $connexion;
 }
@@ -23,8 +30,7 @@ $connexion = connexionBD();
 function login($username, $password)
 {
     global $connexion;
-    $users = "SELECT * FROM `users` where `log`='$username' and `mdp` =  '" . SHA1($password) . "' ";
-    // $users = "SELECT * FROM `codif_user` where `username_user`='$username' and `password_user` =  '$password' ";
+    $users = "SELECT * FROM `bud_users` where `log`='$username' and `mdp` =  '" . SHA1($password) . "' ";
 
     $info = $connexion->query($users);
     return $info->fetch_assoc();
@@ -42,7 +48,7 @@ function login($username, $password)
 function getAllFournisseurs()
 {
     global $connexion;
-    $query = 'SELECT * FROM `fournisseur`';
+    $query = 'SELECT * FROM `bud_fournisseur`';
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -59,7 +65,7 @@ function getFournisseurById($idFourn)
     $idFourn = (int) $idFourn;
 
     $query = "SELECT *
-              FROM fournisseur
+              FROM bud_fournisseur
               WHERE idFourn = '$idFourn' 
               LIMIT 1";
 
@@ -75,7 +81,7 @@ function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nat
 {
     global $connexion;
 
-    $sql = "UPDATE fournisseur 
+    $sql = "UPDATE bud_fournisseur 
             SET numFourn = ?, nom = ?, adresse = ?, contact = ?, nature = ? 
             WHERE idFourn = ?";
 
@@ -109,7 +115,7 @@ function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nat
 function getNumCompte()
 {
     global $connexion;
-    $query = 'SELECT idCompte, numCompte, libelle FROM `compte` ORDER BY numCompte ASC';
+    $query = 'SELECT idCompte, numCompte, libelle FROM `bud_compte` ORDER BY numCompte ASC';
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -125,8 +131,8 @@ function getNumCompteSansInitiale()
 
     $query = "
         SELECT c.numCompte, c.idCompte , c.libelle
-        FROM compte c
-        LEFT JOIN dotations d ON c.idCompte = d.idCompte AND d.type = 'initiale'
+        FROM bud_compte c
+        LEFT JOIN bud_dotations d ON c.idCompte = d.idCompte AND d.type = 'initiale'
         WHERE d.idDot IS NULL
         ORDER BY c.numCompte ASC
     ";
@@ -143,7 +149,7 @@ function getNumCompteSansInitiale()
 function getCompteByNum($numCompte)
 {
     global $connexion;
-    $query = "SELECT numCompte, libelle, code FROM `compte` WHERE numCompte='$numCompte'";
+    $query = "SELECT numCompte, libelle, code FROM `bud_compte` WHERE numCompte='$numCompte'";
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -160,7 +166,7 @@ function getCompteByNum($numCompte)
 function getAllCompte()
 {
     global $connexion;
-    $query = 'SELECT c.numCompte,c.code, c.libelle, cp.numCp, cp.nature FROM compte As c JOIN compteP As cp ON c.idCp=cp.idCp ORDER BY cp.numCp ASC';
+    $query = 'SELECT c.numCompte,c.code, c.libelle, cp.numCp, cp.nature FROM bud_compte As c JOIN bud_compteP As cp ON c.idCp=cp.idCp ORDER BY cp.numCp ASC';
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -178,10 +184,10 @@ function getComptesDotations()
     // Requête SQL pour récupérer les comptes déjà dotés et dont l'année de dotation est égale à l'année en cours
     $query = "
         SELECT c.numCompte, c.code, c.libelle, cp.numCp, cp.nature
-        FROM compte AS c
-        JOIN compteP AS cp ON c.idCp = cp.idCp
+        FROM bud_compte AS c
+        JOIN bud_compteP AS cp ON c.idCp = cp.idCp
         WHERE EXISTS (
-            SELECT 1 FROM dotations d 
+            SELECT 1 FROM bud_dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
             )
         ORDER BY cp.numCp ASC";
@@ -203,10 +209,10 @@ function getComptesDotationsByEng()
     // Requête SQL pour récupérer les comptes déjà dotés et dont l'année de dotation est égale à l'année en cours
     $query = "
         SELECT c.numCompte, c.code, c.libelle, cp.numCp, cp.nature
-        FROM compte AS c
-        JOIN compteP AS cp ON c.idCp = cp.idCp
+        FROM bud_compte AS c
+        JOIN bud_compteP AS cp ON c.idCp = cp.idCp
         WHERE EXISTS (
-            SELECT 1 FROM dotations d 
+            SELECT 1 FROM bud_dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
             )
         AND (cp.nature = 'charge' OR cp.nature = 'emploi')
@@ -243,9 +249,9 @@ function getAllDotations()
             c.idCompte,
             c.numCompte,
             c.libelle AS libelleCompte
-        FROM dotations d
-        INNER JOIN users u ON d.idUser = u.idUser
-        INNER JOIN compte c ON d.idCompte = c.idCompte
+        FROM bud_dotations d
+        INNER JOIN bud_users u ON d.idUser = u.idUser
+        INNER JOIN bud_compte c ON d.idCompte = c.idCompte
         WHERE d.an = '$anneeEnCours'
         ORDER BY d.dateSys DESC
     ";
@@ -266,7 +272,7 @@ function getAllDotations()
 function getAllUsers()
 {
     global $connexion;
-    $query = 'SELECT * FROM `users` ORDER BY date_sys DESC';
+    $query = 'SELECT * FROM `bud_users` ORDER BY date_sys DESC';
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -279,7 +285,7 @@ function getAllUsers()
 function getAllFourniseurs()
 {
     global $connexion;
-    $query = 'SELECT * FROM `fournisseur`';
+    $query = 'SELECT * FROM `bud_fournisseur`';
     $result = $connexion->query($query);
 
     if ($result->num_rows > 0) {
@@ -296,15 +302,15 @@ function getAllFourniseurs()
 function getNumCompteForOp()
 {
     global $connexion;
-    $query = "SELECT DISTINCT compte.idCompte, compte.numCompte,compte.libelle
-        FROM compte
-        JOIN comptep ON compte.idCp = comptep.idCp
-        JOIN engagements ON compte.idCompte = engagements.idCompte
-        WHERE (comptep.nature = 'charge' OR comptep.nature = 'emploi')
-        AND engagements.idEng NOT IN (
-            SELECT DISTINCT idEng FROM operations WHERE idEng IS NOT NULL
+    $query = "SELECT DISTINCT bud_compte.idCompte, bud_compte.numCompte,bud_compte.libelle
+        FROM bud_compte
+        JOIN bud_comptep ON bud_compte.idCp = bud_comptep.idCp
+        JOIN bud_engagements ON bud_compte.idCompte = bud_engagements.idCompte
+        WHERE (bud_comptep.nature = 'charge' OR bud_comptep.nature = 'emploi')
+        AND bud_engagements.idEng NOT IN (
+            SELECT DISTINCT idEng FROM bud_operations WHERE idEng IS NOT NULL
         )
-        ORDER BY compte.numCompte ASC
+        ORDER BY bud_compte.numCompte ASC
     ";
 
     $result = $connexion->query($query);
@@ -324,15 +330,15 @@ function getNumCompteForOr()
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT DISTINCT compte.idCompte, compte.numCompte, compte.libelle
-        FROM compte
-        JOIN comptep ON compte.idCp = comptep.idCp
-        WHERE (comptep.nature = 'ressource' OR comptep.nature = 'produit')
+    $query = "SELECT DISTINCT  bud_compte.idCompte,  bud_compte.numCompte,  bud_compte.libelle
+        FROM bud_compte
+        JOIN bud_comptep ON bud_compte.idCp = bud_comptep.idCp
+        WHERE (bud_comptep.nature = 'ressource' OR bud_comptep.nature = 'produit')
         AND EXISTS (
-            SELECT 1 FROM dotations d 
-            WHERE d.idCompte = compte.idCompte AND d.an = '$anneeEnCours'
+            SELECT 1 FROM bud_dotations d 
+            WHERE d.idCompte = bud_compte.idCompte AND d.an = '$anneeEnCours'
             )
-        ORDER BY compte.numCompte ASC
+        ORDER BY bud_compte.numCompte ASC
     ";
 
     $result = $connexion->query($query);
@@ -345,7 +351,7 @@ function getNumCompteForOr()
 }
 
 /*
- * Fonction pour recuperer les engagements
+ * Fonction pour recuperer les bud_engagements
  * ********************************************************************************
  */
 function getEngs()
@@ -355,12 +361,12 @@ function getEngs()
     $anneeEnCours = $_SESSION['an'];
 
     $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.objet, eng.type_eng, eng.montant, f.nom, f.numFourn 
-            FROM engagements as eng
-            JOIN compte as c ON c.idCompte = eng.idCompte 
-            JOIN comptep as cp ON c.idCp=cp.idCp 
-            JOIN fournisseur as f ON f.idFourn= eng.idFourn 
+            FROM bud_engagements as eng
+            JOIN bud_compte as c ON c.idCompte = eng.idCompte 
+            JOIN bud_comptep as cp ON c.idCp=cp.idCp 
+            JOIN bud_fournisseur as f ON f.idFourn= eng.idFourn 
             WHERE EXISTS (
-            SELECT 1 FROM dotations d 
+            SELECT 1 FROM bud_dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
             )
             ORDER BY eng.idEng DESC
@@ -374,6 +380,67 @@ function getEngs()
     }
 }
 
+function getOperationsSansBordereau()
+{
+    global $connexion;
+
+    $anneeEnCours = $_SESSION['an'];
+
+    $query = "
+        SELECT
+            op.idOp,
+            op.idEng,
+            op.montant AS montantOperation,
+
+            c.numCompte,
+            cp.numCp,
+            cp.libelle AS libelleCp,
+            c.libelle AS libelleC,
+
+            eng.dateEng,
+            eng.objet,
+            eng.type_eng,
+            eng.montant AS montantEngagement,
+
+            f.nom,
+            f.numFourn
+
+        FROM bud_operations AS op
+
+        INNER JOIN bud_engagements AS eng
+            ON eng.idEng = op.idEng
+
+        INNER JOIN bud_compte AS c
+            ON c.idCompte = eng.idCompte
+
+        INNER JOIN bud_comptep AS cp
+            ON cp.idCp = c.idCp
+
+        INNER JOIN bud_fournisseur AS f
+            ON f.idFourn = eng.idFourn
+
+        WHERE EXISTS (
+            SELECT 1
+            FROM bud_dotations d
+            WHERE d.idCompte = c.idCompte
+              AND d.an = '$anneeEnCours'
+        )
+
+        AND op.idBordereau IS NULL
+
+        ORDER BY op.idOp DESC
+    ";
+
+    $result = $connexion->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    return [];
+}
+
+
 function getEngagementsTemp()
 {
     global $connexion;
@@ -381,12 +448,12 @@ function getEngagementsTemp()
     $anneeEnCours = $_SESSION['an'];
 
     $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.type_eng, eng.objet, eng.montant, f.nom, f.numFourn 
-            FROM engagements_temp as eng
-            JOIN compte as c ON c.idCompte = eng.idCompte 
-            JOIN comptep as cp ON c.idCp=cp.idCp 
-            JOIN fournisseur as f ON f.idFourn= eng.idFourn 
+            FROM bud_engagements_temp as eng
+            JOIN bud_compte as c ON c.idCompte = eng.idCompte 
+            JOIN bud_comptep as cp ON c.idCp=cp.idCp 
+            JOIN bud_fournisseur as f ON f.idFourn= eng.idFourn 
             WHERE EXISTS (
-            SELECT 1 FROM dotations d 
+            SELECT 1 FROM bud_dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
             )
             ORDER BY eng.idEng DESC
@@ -420,14 +487,14 @@ function getEngsByCompte($numCompte)
             f.numFourn,
             f.nom,
             '$anneeEnCours' AS an
-        FROM engagements AS eng
-        JOIN compte AS c ON c.idCompte = eng.idCompte 
-        JOIN comptep AS cp ON c.idCp = cp.idCp 
-        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        FROM bud_engagements AS eng
+        JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+        JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+        JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN bud_operations AS op ON op.idEng = eng.idEng
         WHERE c.numCompte = '$numCompte' 
         AND EXISTS (
-            SELECT 1 FROM dotations d 
+            SELECT 1 FROM bud_dotations d 
             WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
         )
     ";
@@ -461,15 +528,15 @@ function getEngsByCompteAndDate($numCompte, $date)
             f.numFourn,
             f.nom,
             '$anneeEnCours' AS an
-        FROM engagements AS eng
-        JOIN compte AS c ON c.idCompte = eng.idCompte 
-        JOIN comptep AS cp ON c.idCp = cp.idCp 
-        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        FROM bud_engagements AS eng
+        JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+        JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+        JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN bud_operations AS op ON op.idEng = eng.idEng
         WHERE c.numCompte = '$numCompte' 
           AND eng.dateEng = '$date'
           AND EXISTS (
-              SELECT 1 FROM dotations d 
+              SELECT 1 FROM bud_dotations d 
               WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
           )
     ";
@@ -504,15 +571,15 @@ function getEngsByCompteAndDate2($numCompte, $date1, $date2)
             f.numFourn,
             f.nom,
             '$anneeEnCours' AS an
-        FROM engagements AS eng
-        JOIN compte AS c ON c.idCompte = eng.idCompte 
-        JOIN comptep AS cp ON c.idCp = cp.idCp 
-        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        FROM bud_engagements AS eng
+        JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+        JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+        JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN bud_operations AS op ON op.idEng = eng.idEng
         WHERE c.numCompte = '$numCompte' 
           AND eng.dateEng BETWEEN '$date1' AND '$date2'
           AND EXISTS (
-              SELECT 1 FROM dotations d 
+              SELECT 1 FROM bud_dotations d 
               WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
           )
     ";
@@ -538,14 +605,14 @@ function getCompteEngsByDate($date)
             op.numFact,
             eng.dateEng,
             '$anneeEnCours' AS an
-        FROM engagements AS eng
-        JOIN compte AS c ON c.idCompte = eng.idCompte 
-        JOIN comptep AS cp ON c.idCp = cp.idCp 
-        JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-        LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        FROM bud_engagements AS eng
+        JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+        JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+        JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+        LEFT JOIN bud_operations AS op ON op.idEng = eng.idEng
         WHERE eng.dateEng = '$date'
           AND EXISTS (
-              SELECT 1 FROM dotations d 
+              SELECT 1 FROM bud_dotations d 
               WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
           )
         GROUP BY 
@@ -574,14 +641,14 @@ function getCompteEngsByDate2($date1, $date2)
         MIN(op.numFact) AS numFact, -- on prend le premier numFact (ou n'importe lequel)
         MIN(eng.dateEng) AS dateEng, -- date minimale d'engagement (ou n'importe laquelle selon ton besoin)
         '$anneeEnCours' AS an
-        FROM engagements AS eng
-            JOIN compte AS c ON c.idCompte = eng.idCompte 
-            JOIN comptep AS cp ON c.idCp = cp.idCp 
-            JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-            LEFT JOIN operations AS op ON op.idEng = eng.idEng
+        FROM bud_engagements AS eng
+            JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+            JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+            JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+            LEFT JOIN bud_operations AS op ON op.idEng = eng.idEng
         WHERE eng.dateEng BETWEEN '$date1' AND '$date2'
             AND EXISTS (
-                    SELECT 1 FROM dotations d 
+                    SELECT 1 FROM bud_dotations d 
                         WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
                     )
         GROUP BY 
@@ -606,12 +673,12 @@ function getEngById($idEng)
 
     $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.type_eng, eng.objet, eng.montant, 
                      f.numFourn, f.nom, d.an, op.numFact, op.dateOp, op.idOp
-              FROM engagements AS eng
-              JOIN compte AS c ON c.idCompte = eng.idCompte 
-              JOIN comptep AS cp ON c.idCp = cp.idCp 
-              JOIN dotations AS d ON c.idCompte = d.idCompte 
-              JOIN fournisseur AS f ON f.idFourn = eng.idFourn 
-              LEFT JOIN operations AS op ON eng.idEng=op.idEng
+              FROM bud_engagements AS eng
+              JOIN bud_compte AS c ON c.idCompte = eng.idCompte 
+              JOIN bud_comptep AS cp ON c.idCp = cp.idCp 
+              JOIN bud_dotations AS d ON c.idCompte = d.idCompte 
+              JOIN bud_fournisseur AS f ON f.idFourn = eng.idFourn 
+              LEFT JOIN bud_operations AS op ON eng.idEng=op.idEng
               WHERE d.an = '$anneeEnCours' AND eng.idEng = '$idEng'";
 
     $result = $connexion->query($query);
@@ -629,7 +696,7 @@ function getTotalPayeByEng($idEng)
 
     $query = "
         SELECT COALESCE(SUM(montant), 0) AS total
-        FROM operations
+        FROM bud_operations
         WHERE idEng = '$idEng'
     ";
 
@@ -651,15 +718,15 @@ function getEngsByNumCompte($numCompte)
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT engagements.*, compte.*, comptep.*
-              FROM engagements
-              JOIN compte ON compte.idCompte = engagements.idCompte 
-              JOIN comptep ON compte.idCp = comptep.idCp 
-              WHERE compte.numCompte = '$numCompte'
+    $query = "SELECT bud_engagements.*,  bud_compte.*, comptep.*
+              FROM bud_engagements
+              JOIN bud_compte ON  bud_compte.idCompte = bud_engagements.idCompte 
+              JOIN bud_comptep ON  bud_compte.idCp = comptep.idCp 
+              WHERE  bud_compte.numCompte = '$numCompte'
                 AND EXISTS (
-                    SELECT 1 FROM dotations 
-                    WHERE dotations.idCompte = compte.idCompte 
-                      AND dotations.an = '$anneeEnCours'
+                    SELECT 1 FROM bud_dotations 
+                    WHERE bud_dotations.idCompte =  bud_compte.idCompte 
+                      AND bud_dotations.an = '$anneeEnCours'
                 )";
 
     $result = $connexion->query($query);
@@ -682,12 +749,12 @@ function getEngsAvecPaiement($numCompte)
             e.type_eng,
             COUNT(o.idOp) AS nb_paiements,
             COALESCE(SUM(o.montant), 0) AS total_paye
-        FROM engagements e
-        JOIN compte c ON c.idCompte = e.idCompte
-        LEFT JOIN operations o ON o.idEng = e.idEng
+        FROM bud_engagements e
+        JOIN bud_compte c ON c.idCompte = e.idCompte
+        LEFT JOIN bud_operations o ON o.idEng = e.idEng
         WHERE c.numCompte = '$numCompte'
         AND EXISTS (
-            SELECT 1 FROM dotations d
+            SELECT 1 FROM bud_dotations d
             WHERE d.idCompte = c.idCompte
             AND d.an = '$anneeEnCours'
         )
@@ -711,18 +778,18 @@ function getEngsAvecPaiement($numCompte)
     $anneeEnCours = $_SESSION['an'];
 
     $query = "
-        SELECT engagements.*
-        FROM engagements
-        JOIN compte ON compte.idCompte = engagements.idCompte
-        JOIN comptep ON compte.idCp = comptep.idCp
-        WHERE compte.numCompte = '$numCompte'
-        AND engagements.idEng NOT IN (
-            SELECT idEng FROM operations
+        SELECT bud_engagements.*
+        FROM bud_engagements
+        JOIN bud_compte ON  bud_compte.idCompte = bud_engagements.idCompte
+        JOIN bud_comptep ON  bud_compte.idCp =  bud_comptep.idCp
+        WHERE  bud_compte.numCompte = '$numCompte'
+        AND bud_engagements.idEng NOT IN (
+            SELECT idEng FROM bud_operations
         )
         AND EXISTS (
-            SELECT 1 FROM dotations
-            WHERE dotations.idCompte = compte.idCompte
-              AND dotations.an = '$anneeEnCours'
+            SELECT 1 FROM bud_dotations
+            WHERE bud_dotations.idCompte =  bud_compte.idCompte
+              AND bud_dotations.an = '$anneeEnCours'
         );
     ";
 
@@ -737,7 +804,7 @@ function getEngsAvecPaiement($numCompte)
 function isEngagementUsed($idEng)
 {
     global $connexion;
-    $query = 'SELECT 1 FROM operations WHERE idEng = ?';
+    $query = 'SELECT 1 FROM bud_operations WHERE idEng = ?';
     $stmt = $connexion->prepare($query);
     $stmt->bind_param('i', $idEng);
     $stmt->execute();
@@ -748,7 +815,7 @@ function isEngagementUsed($idEng)
 function isFournisseurUsed($idFournisseur)
 {
     global $connexion;
-    $query = 'SELECT 1 FROM engagements WHERE idFourn = ?';
+    $query = 'SELECT 1 FROM bud_engagements WHERE idFourn = ?';
     $stmt = $connexion->prepare($query);
     $stmt->bind_param('i', $idFournisseur);
     $stmt->execute();
@@ -761,8 +828,8 @@ function isDotationUsed($idDotation)
     global $connexion;
     $query = '
         SELECT 1
-        FROM dotations d
-        INNER JOIN engagements e ON d.idCompte = e.idCompte
+        FROM bud_dotations d
+        INNER JOIN bud_engagements e ON d.idCompte = e.idCompte
         WHERE d.idDot = ?
         LIMIT 1
     ';
@@ -796,11 +863,11 @@ function getRecettesTemp()
                 u.nom AS nomUser,
                 u.log AS logUser
 
-            FROM ordre_recette_temp ort
+            FROM bud_ordre_recette_temp ort
 
-            LEFT JOIN fournisseur f ON ort.idFourn = f.idFourn
-            LEFT JOIN compte c ON ort.idCompte = c.idCompte
-            LEFT JOIN users u ON ort.idUser = u.idUser
+            LEFT JOIN bud_fournisseur f ON ort.idFourn = f.idFourn
+            LEFT JOIN bud_compte c ON ort.idCompte = c.idCompte
+            LEFT JOIN bud_users u ON ort.idUser = u.idUser
 
             ORDER BY ort.idOr DESC';
 
@@ -836,11 +903,11 @@ function getRecettes()
                 u.nom AS nomUser,
                 u.log AS logUser
 
-            FROM ordre_recette ort
+            FROM bud_ordre_recette ort
 
-            LEFT JOIN fournisseur f ON ort.idFourn = f.idFourn
-            LEFT JOIN compte c ON ort.idCompte = c.idCompte
-            LEFT JOIN users u ON ort.idUser = u.idUser
+            LEFT JOIN bud_fournisseur f ON ort.idFourn = f.idFourn
+            LEFT JOIN bud_compte c ON ort.idCompte = c.idCompte
+            LEFT JOIN bud_users u ON ort.idUser = u.idUser
 
             ORDER BY ort.idOr DESC';
 
@@ -876,11 +943,11 @@ function getRecettesById($id)
                 u.nom AS nomUser,
                 u.log AS logUser
 
-            FROM ordre_recette ort
+            FROM bud_ordre_recette ort
 
-            LEFT JOIN fournisseur f ON ort.idFourn = f.idFourn
-            LEFT JOIN compte c ON ort.idCompte = c.idCompte
-            LEFT JOIN users u ON ort.idUser = u.idUser
+            LEFT JOIN bud_fournisseur f ON ort.idFourn = f.idFourn
+            LEFT JOIN bud_compte c ON ort.idCompte = c.idCompte
+            LEFT JOIN bud_users u ON ort.idUser = u.idUser
             WHERE ort.idOr = $id
             LIMIT 1";  // sécurise la requête et limite à une seule ligne
 
@@ -894,7 +961,7 @@ function getRecettesById($id)
 }
 
 /*
- * Fonction pour recuperer les engagements a partir d'un numero de compte
+ * Fonction pour recuperer les bud_engagements a partir d'un numero de compte
  * ********************************************************************************
  */
 function getOperationsByType($typeOp)
@@ -916,13 +983,13 @@ function getOperationsByType($typeOp)
             f.numFourn,
             f.nom,
             c.numCompte
-        FROM operations o
-        JOIN engagements e ON o.idEng = e.idEng
-        JOIN compte c ON e.idCompte = c.idCompte
-        JOIN fournisseur f ON e.idFourn = f.idFourn
+        FROM bud_operations o
+        JOIN bud_engagements e ON o.idEng = e.idEng
+        JOIN bud_compte c ON e.idCompte = c.idCompte
+        JOIN bud_fournisseur f ON e.idFourn = f.idFourn
         WHERE o.typeOp = ?
         AND EXISTS (
-            SELECT 1 FROM dotations d
+            SELECT 1 FROM bud_dotations d
             WHERE d.idCompte = c.idCompte 
               AND d.an = '$anneeEnCours'
         )
@@ -970,15 +1037,15 @@ function getOperationById($idOp)
 
             cp.numCp
 
-        FROM operations o
-        JOIN engagements e ON o.idEng = e.idEng
-        JOIN compte c ON e.idCompte = c.idCompte
-        JOIN comptep cp ON c.idCp = cp.idCp
-        JOIN fournisseur f ON e.idFourn = f.idFourn
+        FROM bud_operations o
+        JOIN bud_engagements e ON o.idEng = e.idEng
+        JOIN bud_compte c ON e.idCompte = c.idCompte
+        JOIN bud_comptep cp ON c.idCp = cp.idCp
+        JOIN bud_fournisseur f ON e.idFourn = f.idFourn
 
         WHERE o.idOp = ?
         AND EXISTS (
-            SELECT 1 FROM dotations d
+            SELECT 1 FROM bud_dotations d
             WHERE d.idCompte = c.idCompte 
             AND d.an = ?
         )
@@ -1006,7 +1073,7 @@ function getOperationsTemp($typeOp)
             o.idOp,
             o.dateOp,
             o.numFact,
-            o.numFact AS montant_op,
+            o.montant AS montant_op,
             e.montant,
             e.idEng,
             e.dateEng,
@@ -1015,13 +1082,13 @@ function getOperationsTemp($typeOp)
             f.numFourn,
             f.nom,
             c.numCompte
-        FROM operations_temp o
-        JOIN engagements e ON o.idEng = e.idEng
-        JOIN compte c ON e.idCompte = c.idCompte
-        JOIN fournisseur f ON e.idFourn = f.idFourn
+        FROM bud_operations_temp o
+        JOIN bud_engagements e ON o.idEng = e.idEng
+        JOIN bud_compte c ON e.idCompte = c.idCompte
+        JOIN bud_fournisseur f ON e.idFourn = f.idFourn
         WHERE o.typeOp = ?
         AND EXISTS (
-            SELECT 1 FROM dotations d
+            SELECT 1 FROM bud_dotations d
             WHERE d.idCompte = c.idCompte 
               AND d.an = '$anneeEnCours'
         )
@@ -1075,7 +1142,7 @@ function getOperationsTemp($typeOp)
     $type = mysqli_real_escape_string($connexion, $type);
 
     // Requête d'insertion
-    $sql = "INSERT INTO dotations (idCompte, date, an, volume, type, idUser) 
+    $sql = "INSERT INTO bud_dotations (idCompte, date, an, volume, type, idUser) 
             VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
 
     // Exécution
@@ -1118,7 +1185,7 @@ function enregistrerDotation($idCompte, $date, $volume, $type)
     // BLOQUER DOUBLE DOTATION INITIALE
     if ($type == 'initiale') {
 
-        $checkSql = "SELECT idDot FROM dotations 
+        $checkSql = "SELECT idDot FROM bud_dotations 
                      WHERE idCompte = $idCompte 
                      AND an = $an 
                      AND type = 'initiale' 
@@ -1132,7 +1199,7 @@ function enregistrerDotation($idCompte, $date, $volume, $type)
     }
 
     //  Insertion
-    $sql = "INSERT INTO dotations (idCompte, date, an, volume, type, idUser) 
+    $sql = "INSERT INTO bud_dotations (idCompte, date, an, volume, type, idUser) 
             VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
 
     if (mysqli_query($connexion, $sql)) {
@@ -1152,7 +1219,7 @@ function supprDotation($suppr)
     }
     $suppr = (int) $suppr;
     // Requête d'insertion
-    $sql = " DELETE FROM dotations WHERE idDot='$suppr';";
+    $sql = " DELETE FROM bud_dotations WHERE idDot='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -1172,7 +1239,7 @@ function supprEngagementTemp($suppr)
     }
     $suppr = (int) $suppr;
     // Requête d'insertion
-    $sql = " DELETE FROM engagements_temp WHERE idEng='$suppr';";
+    $sql = " DELETE FROM bud_engagements_temp WHERE idEng='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -1192,7 +1259,7 @@ function supprEngagement($suppr)
     }
     $suppr = (int) $suppr;
     // Requête d'insertion
-    $sql = " DELETE FROM engagements WHERE idEng='$suppr';";
+    $sql = " DELETE FROM bud_engagements WHERE idEng='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -1212,7 +1279,7 @@ function supprOpTemp($suppr)
     }
     $suppr = (int) $suppr;
     // Requête d'insertion
-    $sql = " DELETE FROM operations_temp WHERE idOp='$suppr';";
+    $sql = " DELETE FROM bud_operations_temp WHERE idOp='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -1232,7 +1299,7 @@ function supprOp($suppr)
     }
     $suppr = (int) $suppr;
     // Requête d'insertion
-    $sql = " DELETE FROM operations WHERE idOp='$suppr';";
+    $sql = " DELETE FROM bud_operations WHERE idOp='$suppr';";
 
     // Exécution
     if (mysqli_query($connexion, $sql)) {
@@ -1254,7 +1321,7 @@ function getIdCompteByNum($numCompte)
     $numCompte = mysqli_real_escape_string($connexion, $numCompte);
 
     // Requête
-    $sql = "SELECT idCompte FROM compte WHERE numCompte = '$numCompte' LIMIT 1";
+    $sql = "SELECT idCompte FROM bud_compte WHERE numCompte = '$numCompte' LIMIT 1";
     $result = mysqli_query($connexion, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -1273,8 +1340,8 @@ function getDetailsCompte($numCompte)
 
     // ================= RECUP ID + NATURE =================
     $sqlInfo = "SELECT c.idCompte, cp.nature
-                FROM compte c
-                LEFT JOIN comptep cp ON c.numCompte = cp.numcp
+                FROM bud_compte c
+                LEFT JOIN bud_comptep cp ON c.numCompte = cp.numcp
                 WHERE c.numCompte = '$numCompte'
                 LIMIT 1";
 
@@ -1288,11 +1355,11 @@ function getDetailsCompte($numCompte)
     $idCompte = $info['idCompte'];
     $nature = strtolower($info['nature'] ?? '');
 
-    // ================= DOTATIONS =================
+    // ================= bud_dotations =================
     $sqlDot = "SELECT 
                     SUM(CASE WHEN type = 'initiale' THEN volume ELSE 0 END) AS initiale,
                     SUM(CASE WHEN type = 'remanier' THEN volume ELSE 0 END) AS remaniee
-               FROM dotations
+               FROM bud_dotations
                WHERE idCompte = $idCompte";
 
     $resDot = mysqli_query($connexion, $sqlDot);
@@ -1302,24 +1369,24 @@ function getDetailsCompte($numCompte)
     $remaniee = (int) ($dot['remaniee'] ?? 0);
     $dotationTotale = $initiale + $remaniee;
 
-    // ================= ENGAGEMENTS =================
+    // ================= bud_engagements =================
     $sqlEng = "SELECT SUM(montant) AS total 
-               FROM engagements 
+               FROM bud_engagements 
                WHERE idCompte = $idCompte";
 
     $engagement = (int) (mysqli_fetch_assoc(mysqli_query($connexion, $sqlEng))['total'] ?? 0);
 
     // ================= DEPENSES =================
     $sqlDep = "SELECT SUM(o.montant) AS total 
-               FROM operations o
-               INNER JOIN engagements e ON o.idEng = e.idEng
+               FROM bud_operations o
+               INNER JOIN bud_engagements e ON o.idEng = e.idEng
                WHERE e.idCompte = $idCompte";
 
     $depenses = (int) (mysqli_fetch_assoc(mysqli_query($connexion, $sqlDep))['total'] ?? 0);
 
     // ================= RECETTES =================
     $sqlRec = "SELECT SUM(montant) AS total 
-               FROM ordre_recette 
+               FROM bud_ordre_recette 
                WHERE idCompte = $idCompte";
 
     $recettes = (int) (mysqli_fetch_assoc(mysqli_query($connexion, $sqlRec))['total'] ?? 0);
@@ -1368,15 +1435,15 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
     $nature = mysqli_real_escape_string($connexion, $nature);
 
     // Vérifie si le numéro fournisseur existe déjà
-    $verif_sql = "SELECT idFourn FROM fournisseur WHERE numFourn = '$numFourn'";
+    $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn'";
     $verif_res = mysqli_query($connexion, $verif_sql);
 
     if (mysqli_num_rows($verif_res) > 0) {
-        return 'Ce numéro de fournisseur existe déjà.';
+        return 'Ce numéro de bud_fournisseur existe déjà.';
     }
 
     // Insertion
-    $sql = "INSERT INTO fournisseur (numFourn, nom, adresse, contact, nature) 
+    $sql = "INSERT INTO bud_fournisseur (numFourn, nom, adresse, contact, nature) 
             VALUES ('$numFourn', '$nom', '$adresse', '$contact', '$nature')";
 
     if (mysqli_query($connexion, $sql)) {
@@ -1414,7 +1481,7 @@ function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte
     $montant = (float) $montant;
 
     // Requête d'insertion
-    $sql = "INSERT INTO engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idUser) 
+    $sql = "INSERT INTO bud_engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idUser) 
             VALUES ('$dateEng', '$type_eng', $montant, '$objet', $idCompte, $idFourn, $idUser)";
 
     if (mysqli_query($connexion, $sql)) {
@@ -1451,7 +1518,7 @@ function ajouter_Ordre_Recette_temp($dateOr, $objet_recette, $montant, $pieces_a
     $idFourn = (int) $idFourn;
     $montant = (float) $montant;
     // Requête d'insertion
-    $sql = "INSERT INTO ordre_recette_temp(dateOr, objet_recette, montant, pieces_annexees, idCompte, idFourn, idUser)
+    $sql = "INSERT INTO bud_ordre_recette_temp(dateOr, objet_recette, montant, pieces_annexees, idCompte, idFourn, idUser)
             VALUES ('$dateOr', '$objet_recette', $montant, '$pieces_annexees', $idCompte, $idFourn, $idUser)";
 
     if (mysqli_query($connexion, $sql)) {
@@ -1461,7 +1528,7 @@ function ajouter_Ordre_Recette_temp($dateOr, $objet_recette, $montant, $pieces_a
     }
 }
 
-function ajouterOp_temp($dateOp, $idEng, $numFact, $typeOp)
+function ajouterOp_temp($dateOp, $idEng, $numFact, $montant, $typeOp)
 {
     global $connexion;
 
@@ -1470,11 +1537,12 @@ function ajouterOp_temp($dateOp, $idEng, $numFact, $typeOp)
     $idEng = (int) $idEng;
     $numFact = mysqli_real_escape_string($connexion, $numFact);
     $typeOp = mysqli_real_escape_string($connexion, $typeOp);
+    $montant = (float) $montant;
 
     // Requête d'insertion
     $query = "
-        INSERT INTO operations_temp (dateOp, idEng, numFact, typeOp)
-        VALUES ('$dateOp', $idEng, '$numFact', '$typeOp')
+        INSERT INTO bud_operations_temp (dateOp, idEng, numFact, montant, typeOp)
+        VALUES ('$dateOp', $idEng, '$numFact', '$montant', '$typeOp')
     ";
 
     // Exécution
@@ -1491,7 +1559,7 @@ function getPasswordHashByUserId($userId)
 
     $userId = (int) $userId;  // Sécurisation de l'ID (casting entier)
 
-    $sql = "SELECT mdp FROM users WHERE idUser = $userId";
+    $sql = "SELECT mdp FROM bud_users WHERE idUser = $userId";
     $result = mysqli_query($connexion, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -1511,7 +1579,7 @@ function updateUserPassword($id, $newHash)
     $newHash = mysqli_real_escape_string($connexion, $newHash);
     $type_mdp = mysqli_real_escape_string($connexion, 'updated');
 
-    $sql = "UPDATE users SET mdp = '$newHash', type_mdp = '$type_mdp' WHERE idUser = $id";
+    $sql = "UPDATE bud_users SET mdp = '$newHash', type_mdp = '$type_mdp' WHERE idUser = $id";
     mysqli_query($connexion, $sql);
 }
 
@@ -1550,7 +1618,7 @@ function getExecution_1()
             )
         END AS tauxRecette
 
-    FROM comptep cp
+    FROM bud_comptep cp
 
     /* DOTATIONS */
     JOIN (
@@ -1559,8 +1627,8 @@ function getExecution_1()
             SUM(d.volume) AS totalDotations,
             SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
             SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
-        FROM compte c
-        JOIN dotations d ON d.idCompte = c.idCompte
+        FROM bud_compte c
+        JOIN bud_dotations d ON d.idCompte = c.idCompte
         WHERE d.an = '$anneeEnCours'
         GROUP BY c.idCp
     ) d ON d.idCp = cp.idCp
@@ -1570,8 +1638,8 @@ function getExecution_1()
         SELECT 
             c.idCp, 
             SUM(eng.montant) AS totalEngs
-        FROM compte c
-        JOIN engagements eng ON eng.idCompte = c.idCompte
+        FROM bud_compte c
+        JOIN bud_engagements eng ON eng.idCompte = c.idCompte
         GROUP BY c.idCp
     ) e ON e.idCp = cp.idCp
 
@@ -1580,8 +1648,8 @@ function getExecution_1()
         SELECT 
             c.idCp, 
             SUM(orx.montant) AS totalRecettes
-        FROM compte c
-        JOIN ordre_recette orx ON orx.idCompte = c.idCompte
+        FROM bud_compte c
+        JOIN bud_ordre_recette orx ON orx.idCompte = c.idCompte
         GROUP BY c.idCp
     ) r ON r.idCp = cp.idCp
     ";
@@ -1623,7 +1691,7 @@ function getExecution($type = 'all')
             )
         END AS taux
 
-    FROM comptep cp
+    FROM bud_comptep cp
 
     LEFT JOIN (
         SELECT 
@@ -1631,8 +1699,8 @@ function getExecution($type = 'all')
             SUM(d.volume) AS totalDotations,
             SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
             SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
-        FROM compte c
-        JOIN dotations d ON d.idCompte = c.idCompte
+        FROM bud_compte c
+        JOIN bud_dotations d ON d.idCompte = c.idCompte
         WHERE d.an = '$anneeEnCours'
         GROUP BY c.idCp
     ) d ON d.idCp = cp.idCp
@@ -1641,8 +1709,8 @@ function getExecution($type = 'all')
         SELECT 
             c.idCp, 
             SUM(eng.montant) AS totalEngs
-        FROM compte c
-        JOIN engagements eng ON eng.idCompte = c.idCompte
+        FROM bud_compte c
+        JOIN bud_engagements eng ON eng.idCompte = c.idCompte
         GROUP BY c.idCp
     ) e ON e.idCp = cp.idCp
 
@@ -1680,15 +1748,15 @@ function getExecutionOp_1()
         )
     END,
 0) AS taux
-FROM comptep cp
+FROM bud_comptep cp
 JOIN (
     SELECT 
         c.idCp, 
         SUM(d.volume) AS totalDotations,
         SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
         SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
-    FROM compte c
-    JOIN dotations d ON d.idCompte = c.idCompte
+    FROM bud_compte c
+    JOIN bud_dotations d ON d.idCompte = c.idCompte
     WHERE d.an = '$anneeEnCours'
     GROUP BY c.idCp
 ) d ON d.idCp = cp.idCp
@@ -1696,17 +1764,17 @@ JOIN (
     SELECT 
         c.idCp, 
         SUM(eng.montant) AS totalEngs
-    FROM compte c
-    JOIN engagements eng ON eng.idCompte = c.idCompte
+    FROM bud_compte c
+    JOIN bud_engagements eng ON eng.idCompte = c.idCompte
     GROUP BY c.idCp
 ) e ON e.idCp = cp.idCp
 LEFT JOIN (
     SELECT 
         c.idCp,
         SUM(eng.montant) AS totalOp
-    FROM operations op
-    JOIN engagements eng ON eng.idEng = op.idEng
-    JOIN compte c ON c.idCompte = eng.idCompte
+    FROM bud_operations op
+    JOIN bud_engagements eng ON eng.idEng = op.idEng
+    JOIN bud_compte c ON c.idCompte = eng.idCompte
     GROUP BY c.idCp
 ) f ON f.idCp = cp.idCp
 ";
@@ -1744,9 +1812,9 @@ function getExecution_2($idCp)
         COALESCE(r.totalRecettes, 0) AS totalRecettes,
         COALESCE(o.totalOp, 0) AS totalOp
 
-    FROM comptep cp
+    FROM bud_comptep cp
 
-    JOIN compte c ON c.idCp = cp.idCp
+    JOIN bud_compte c ON c.idCp = cp.idCp
 
     /* DOTATIONS */
     LEFT JOIN (
@@ -1755,17 +1823,17 @@ function getExecution_2($idCp)
             SUM(d.volume) AS totalDotations,
             SUM(CASE WHEN d.type = 'initiale' THEN d.volume ELSE 0 END) AS totalDotInitial,
             SUM(CASE WHEN d.type = 'remanier' THEN d.volume ELSE 0 END) AS totalDotRemanier
-        FROM dotations d
+        FROM bud_dotations d
         WHERE d.an = '$anneeEnCours'
         GROUP BY d.idCompte
     ) d ON d.idCompte = c.idCompte
 
-    /* ENGAGEMENTS */
+    /* bud_engagements */
     LEFT JOIN (
         SELECT 
             eng.idCompte, 
             SUM(eng.montant) AS totalEngs
-        FROM engagements eng
+        FROM bud_engagements eng
         GROUP BY eng.idCompte
     ) e ON e.idCompte = c.idCompte
 
@@ -1774,7 +1842,7 @@ function getExecution_2($idCp)
         SELECT 
             idCompte,
             SUM(montant) AS totalRecettes
-        FROM ordre_recette
+        FROM bud_ordre_recette
         GROUP BY idCompte
     ) r ON r.idCompte = c.idCompte
 
@@ -1783,8 +1851,8 @@ function getExecution_2($idCp)
         SELECT 
             eng.idCompte,
             SUM(op.montant) AS totalOp
-        FROM operations op
-        JOIN engagements eng ON eng.idEng = op.idEng
+        FROM bud_operations op
+        JOIN bud_engagements eng ON eng.idEng = op.idEng
         GROUP BY eng.idCompte
     ) o ON o.idCompte = c.idCompte
 
@@ -1820,14 +1888,14 @@ function get_produits_administratif()
                 WHEN d.type = 'initiale' THEN d.volume 
             END), 0) AS totalDotInitiale
 
-        FROM compte c
-        JOIN comptep cp ON c.idCp = cp.idCp
+        FROM bud_compte c
+        JOIN bud_comptep cp ON c.idCp = cp.idCp
 
-        LEFT JOIN dotations d 
+        LEFT JOIN bud_dotations d 
             ON d.idCompte = c.idCompte 
             AND d.an = '$anneeEnCours'
 
-        LEFT JOIN ordre_recette r 
+        LEFT JOIN bud_ordre_recette r 
             ON r.idCompte = c.idCompte 
 
         WHERE cp.nature IN ('produit', 'ressource')
@@ -1866,16 +1934,16 @@ function get_charges_administratif()
                 WHEN d.type = 'initiale' THEN d.volume 
             END), 0) AS totalDotInitiale
 
-        FROM compte c
-        JOIN comptep cp ON c.idCp = cp.idCp
+        FROM bud_compte c
+        JOIN bud_comptep cp ON c.idCp = cp.idCp
 
-        LEFT JOIN dotations d 
+        LEFT JOIN bud_dotations d 
             ON d.idCompte = c.idCompte 
             AND d.an = '$anneeEnCours'
-        LEFT JOIN engagements eng 
+        LEFT JOIN bud_engagements eng 
             ON eng.idCompte = c.idCompte 
 
-        LEFT JOIN operations op 
+        LEFT JOIN bud_operations op 
             ON op.idEng = eng.idEng 
 
         WHERE cp.nature IN ('charge', 'emploi')
@@ -1905,10 +1973,10 @@ function get_resultats()
 
             COALESCE(SUM(DISTINCT d.volume), 0) AS total_dot
 
-        FROM compte c
-        JOIN comptep cp ON c.idCp = cp.idCp
+        FROM bud_compte c
+        JOIN bud_comptep cp ON c.idCp = cp.idCp
 
-        LEFT JOIN dotations d 
+        LEFT JOIN bud_dotations d 
             ON d.idCompte = c.idCompte 
             AND d.an = '$anneeEnCours'
 
@@ -1947,7 +2015,7 @@ function getComptePById($idCp)
     $idCp = (int) $idCp;
 
     $query = "SELECT cp.idCp, cp.numCp, cp.libelle 
-              FROM comptep cp 
+              FROM bud_comptep cp 
               WHERE cp.idCp = '$idCp' 
               LIMIT 1";
 
@@ -1965,7 +2033,7 @@ function sommeDot()
 
     $anneeEnCours = $_SESSION['an'];
 
-    $sql = "SELECT COALESCE(SUM(d.volume),0) as totalDotations FROM dotations d WHERE d.an='$anneeEnCours'";
+    $sql = "SELECT COALESCE(SUM(d.volume),0) as totalDotations FROM bud_dotations d WHERE d.an='$anneeEnCours'";
     $result = mysqli_query($connexion, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -1983,8 +2051,8 @@ function sommeDotByCompte($numCompte)
     $anneeEnCours = $_SESSION['an'];
 
     $sql = "SELECT COALESCE(SUM(d.volume),0) as totalDotations, c.numCompte 
-            FROM dotations d 
-            JOIN compte c ON d.idCompte=c.idCompte
+            FROM bud_dotations d 
+            JOIN bud_compte c ON d.idCompte=c.idCompte
             WHERE d.an='$anneeEnCours' AND c.numCompte='$numCompte'";
     $result = mysqli_query($connexion, $sql);
 
@@ -2002,10 +2070,10 @@ function sommeEngs()
 
     $anneeEnCours = $_SESSION['an'];
 
-    $sql = "SELECT COALESCE(SUM(engs.montant),0) as totalEngs FROM engagements engs 
-            JOIN compte c ON c.idCompte=engs.idCompte
+    $sql = "SELECT COALESCE(SUM(engs.montant),0) as totalEngs FROM bud_engagements engs 
+            JOIN bud_compte c ON c.idCompte=engs.idCompte
             AND EXISTS (
-            SELECT 1 FROM dotations d
+            SELECT 1 FROM bud_dotations d
             WHERE d.idCompte = c.idCompte 
               AND d.an = '$anneeEnCours'
         )
@@ -2035,7 +2103,7 @@ function ajouterUtilisateur($nom, $login, $email, $privilege, $telephone, $sexe)
     $type_mdp = 'default';
 
     // Vérifie si le login existe déjà
-    $checkQuery = "SELECT idUser FROM users WHERE log = '$login'";
+    $checkQuery = "SELECT idUser FROM bud_users WHERE log = '$login'";
     $checkResult = $connexion->query($checkQuery);
 
     if ($checkResult && $checkResult->num_rows > 0) {
@@ -2046,7 +2114,7 @@ function ajouterUtilisateur($nom, $login, $email, $privilege, $telephone, $sexe)
     }
     $an = $_SESSION["an"];
     // Insérer l'utilisateur
-    $insertQuery = "INSERT INTO users (nom, log, email, priv, mdp, type_mdp, telephone, sexe, an) 
+    $insertQuery = "INSERT INTO bud_users (nom, log, email, priv, mdp, type_mdp, telephone, sexe, an) 
                     VALUES ('$nom', '$login', '$email', '$privilege', '$password', '$type_mdp', '$telephone', '$sexe', '$an')";
 
     if ($connexion->query($insertQuery)) {
@@ -2142,6 +2210,160 @@ function supprimerLigne($table, $champId, $valeur)
     } else {
         return 'Erreur : ' . mysqli_error($connexion);
     }
+}
+
+function getBordereaux()
+{
+    global $connexion;
+
+    $sql = "
+        SELECT
+            b.idBordereau,
+            b.numeroBordereau,
+            b.dateSys,
+            GROUP_CONCAT(
+                CONCAT('BE', RIGHT(YEAR(e.dateEng), 2), '-', LPAD(e.idEng, 4, '0'))
+                ORDER BY e.idEng
+                SEPARATOR ', '
+            ) AS bud_engagements,
+            SUM(e.montant) AS total
+        FROM bud_bordereaux b
+        INNER JOIN bud_engagements e
+            ON e.idBordereau = b.idBordereau
+        GROUP BY
+            b.idBordereau,
+            b.numeroBordereau,
+            b.dateSys
+        ORDER BY b.idBordereau DESC
+    ";
+
+    $result = $connexion->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    return [];
+}
+
+function getBordereauxOperations()
+{
+    global $connexion;
+
+    $sql = "
+        SELECT
+            b.idBordereau,
+            b.numeroBordereau,
+            b.dateSys,
+
+            /* Liste des opérations */
+            GROUP_CONCAT(
+                DISTINCT CONCAT(
+                    'MD',
+                    RIGHT(YEAR(o.dateOp), 2),
+                    '-',
+                    LPAD(o.idOp, 4, '0')
+                )
+                ORDER BY o.idOp
+                SEPARATOR ', '
+            ) AS operations,
+
+            /* Liste des engagements associés */
+            GROUP_CONCAT(
+                DISTINCT CONCAT(
+                    'BE',
+                    RIGHT(YEAR(e.dateEng), 2),
+                    '-',
+                    LPAD(e.idEng, 4, '0')
+                )
+                ORDER BY e.idEng
+                SEPARATOR ', '
+            ) AS engagements,
+
+            /* Nombre d'opérations */
+            COUNT(DISTINCT o.idOp) AS nbOperations,
+
+            /* Total du bordereau */
+            SUM(o.montant) AS total
+
+        FROM bud_bordereaux b
+
+        INNER JOIN bud_operations o
+            ON o.idBordereau = b.idBordereau
+
+        INNER JOIN bud_engagements e
+            ON e.idEng = o.idEng
+
+        GROUP BY
+            b.idBordereau,
+            b.numeroBordereau,
+            b.dateSys
+
+        ORDER BY b.idBordereau DESC
+    ";
+
+    $result = $connexion->query($sql);
+
+    return ($result && $result->num_rows > 0)
+        ? $result->fetch_all(MYSQLI_ASSOC)
+        : [];
+}
+
+function getOperationsByBordereau($idBordereau)
+{
+    global $connexion;
+
+    $sql = "
+        SELECT
+            o.idOp,
+            e.objet,
+            o.montant,
+            f.nom
+        FROM bud_operations o
+        INNER JOIN bud_engagements e ON e.idEng = o.idEng
+        INNER JOIN bud_fournisseur f ON f.idFourn = e.idFourn
+        WHERE o.idBordereau = ?
+        ORDER BY o.idOp
+    ";
+
+    $stmt = $connexion->prepare($sql);
+    $stmt->bind_param("i", $idBordereau);
+    $stmt->execute();
+
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+function getBordereauById($idBordereau)
+{
+    global $connexion;
+
+    $sql = "
+        SELECT
+            b.idBordereau,
+            b.numeroBordereau,
+            b.dateSys,
+            b.idUser
+        FROM bud_bordereaux b
+        WHERE b.idBordereau = ?
+        LIMIT 1
+    ";
+
+    $stmt = $connexion->prepare($sql);
+
+    if (!$stmt) {
+        return null;
+    }
+
+    $stmt->bind_param("i", $idBordereau);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+
+    return null;
 }
 
 ?>

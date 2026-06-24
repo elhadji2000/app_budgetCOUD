@@ -66,7 +66,7 @@ if (!isset($_SESSION['user'])) {
                         <td class="text-align-rigth somme fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F </td>
                         <td><?= $eng['nom']; ?></td>
                         <td>
-                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <?php if ($_SESSION['priv'] === 'admin' || $_SESSION['priv'] === 'eng_val' || $_SESSION['priv'] === 'Cf_D' || $_SESSION['priv'] === 'eng_all' ): ?>
                             <a href="traitement_eng.php?valider_id=<?= $eng['idEng']; ?>"
                                 onclick="return confirm('Êtes-vous sûr de vouloir valider cet engagement ?')"
                                 class="btn btn-sm  btn-success">Valider</a>
@@ -94,7 +94,7 @@ if (!isset($_SESSION['user'])) {
                         <td><?= date('d/m/Y', strtotime($eng['dateEng'])) ; ?></td>
                         <td><?= $eng['type_eng']; ?></td>
                         <!-- <td><?= $eng['objet']; ?></td> -->
-                        <td class="text-align-right somme fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td>
+                        <td class="text-align-right somme fw-bold"><?= number_format($eng['montant'], 0, ',', ' '); ?> F</td> 
                         <td><?= $eng['nom']; ?></td>
                         <td><span style="cursor: not-allowed;" title="Engagement valider"
                                 class="badge bg-secondary">Valider</span></td>

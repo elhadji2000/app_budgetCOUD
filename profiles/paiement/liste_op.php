@@ -70,7 +70,7 @@ $an = $_SESSION['an'];
                         <td><?= strtoupper($op['numFact']); ?></td>
                         <td class="fw-bold somme"><?= number_format($op['montant_op'], 0, ',', ' '); ?> F</td>
                         <td>
-                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <?php if ($_SESSION['priv'] === 'admin' || $_SESSION['priv'] === 'op_val' || $_SESSION['priv'] === 'Cf_D' || $_SESSION['priv'] === 'op_all' ): ?>
                             <a href="traitement_paie.php?valider_id=<?= $op['idOp']; ?>"
                                 onclick="return confirm('Valider cette opération ?')"
                                 class="btn btn-sm  btn-success">Valider</a>
@@ -113,7 +113,7 @@ $an = $_SESSION['an'];
                                 class="btn btn-sm btn-warning">
                                 MP_PDF
                             </a> |
-                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <?php if ($_SESSION['priv'] === 'admin' || $_SESSION['priv'] === 'Cf_D' || $_SESSION['priv'] === 'op_all' ): ?>
                             <a href="traitement_paie.php?supprOp=<?= $op['idOp']; ?>"
                                 onclick="return confirm('Annuler cette opération ?')" class="btn btn-sm btn-danger">
                                 Annuler

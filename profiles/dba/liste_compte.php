@@ -34,9 +34,9 @@ if (!isset($_SESSION['user'])) {
                 <thead class="text-white" style="background-color: #4655a4;">
                     <tr>
                         <th>N°</th>
+                        <th>NumCp</th>
                         <th>NumCompte</th>
                         <th>Libellé</th>
-                        <th>NumCp</th>
                         <th>Code</th>
                         <th>Nature</th>
                         <th>Actions</th>
@@ -53,9 +53,9 @@ if (!isset($_SESSION['user'])) {
                     <?php $n++; ?>
                     <tr>
                         <td><?= $n ?></td>
+                        <td><?= htmlspecialchars($compte['numCp']) ?></td>
                         <td><?= htmlspecialchars($compte['numCompte']) ?></td>
                         <td><?= htmlspecialchars($compte['libelle']) ?></td>
-                        <td><?= htmlspecialchars($compte['numCp']) ?></td>
                         <td><?= htmlspecialchars($compte['code']) ?></td>
                         <td><?= htmlspecialchars(strtoupper($compte['nature'])) ?></td>
                         <td>
@@ -103,8 +103,8 @@ if (!isset($_SESSION['user'])) {
 <script>
 $(document).ready(function() {
     $('#tableComptes').DataTable({
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        pageLength: 50,
+        lengthMenu: [5, 10, 25, 50, 100],
         order: [],
 
         dom: 'lBfrtip', //  ajout du "l"

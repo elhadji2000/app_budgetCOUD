@@ -84,7 +84,7 @@ $an = $_SESSION['an'];
 
                         <!-- VALIDATION -->
                         <td>
-                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <?php if ($_SESSION['priv'] === 'admin' || $_SESSION['priv'] === 'or_val' || $_SESSION['priv'] === 'Cf_D' || $_SESSION['priv'] === 'or_all' ): ?>
                             <a href="traitement_recette.php?valider_id=<?= $op['idOr']; ?>"
                                 onclick="return confirm('Valider cette recette ?')" class="badge bg-success">
                                 Valider
@@ -138,7 +138,7 @@ $an = $_SESSION['an'];
 
                         <!-- ACTION -->
                         <td>
-                            <?php if ($_SESSION['priv'] === 'admin'): ?>
+                            <?php if ($_SESSION['priv'] === 'admin' || $_SESSION['priv'] === 'Cf_D' || $_SESSION['priv'] === 'or_all' ): ?>
                             <a href="traitement_recette.php?suppr=<?= $op['idOr']; ?>"
                                 onclick="return confirm('Annuler cette recette ?')" class="btn btn-sm btn-danger">
                                 Annuler

@@ -68,8 +68,22 @@ $data_charges = $data['charges'];
                     </thead>
 
                     <tbody>
-                        <?php 
-                        foreach ($produits as $p): 
+
+                        <tr>
+                            <td colspan="" style="background-color: #f8f9fa;">Fonctionnement</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        <!-- ================= FONCTIONNEMENT ================= -->
+                        <?php foreach ($produits as $p): ?>
+                        <?php
+                        if ($p['type'] == 'fonctionnement'):
                             $prevision = $p['total_dot'];
                             $remanier = $p['totalDotRemanier'];
                             $initiale = $p['totalDotInitiale'];
@@ -77,40 +91,61 @@ $data_charges = $data['charges'];
 
                             $reste = $prevision - $realisation;
                             $taux = ($prevision > 0) ? ($realisation / $prevision) * 100 : 0;
-                        ?>
-
+                            ?>
                         <tr class="table-success">
-
                             <td><?= htmlspecialchars($p['numCp']) ?></td>
-
                             <td><?= htmlspecialchars($p['libelle']) ?></td>
-
-                            <td class="text-end fw-semibold">
-                                <?= number_format($initiale, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end fw-semibold">
-                                <?= number_format($remanier, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end fw-semibold">
-                                <?= number_format($prevision, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end text-success fw-semibold">
-                                <?= number_format($realisation, 0, ',', ' ') ?> F
-                            </td>
-
+                            <td class="text-end"><?= number_format($initiale, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($remanier, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($prevision, 0, ',', ' ') ?> F</td>
+                            <td class="text-end text-success"><?= number_format($realisation, 0, ',', ' ') ?> F</td>
                             <td class="text-end <?= $reste < 0 ? 'text-danger' : 'text-primary' ?>">
                                 <?= number_format($reste, 0, ',', ' ') ?> F
                             </td>
-
-                            <td class="text-center">
-                                <?= number_format($taux, 2, ',', ' ') ?> %
-                            </td>
+                            <td class="text-center"><?= number_format($taux, 2, ',', ' ') ?> %</td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+                        <!-- Ligne vide de séparation -->
+                        <tr>
+                            <td colspan="" style="background-color: #f8f9fa;">Investissement</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
 
+
+                        <!-- ================= INVESTISSEMENT ================= -->
+                        <?php foreach ($produits as $p): ?>
+                        <?php
+                        if ($p['type'] == 'investissement'):
+                            $prevision = $p['total_dot'];
+                            $remanier = $p['totalDotRemanier'];
+                            $initiale = $p['totalDotInitiale'];
+                            $realisation = $p['total_paye'];
+
+                            $reste = $prevision - $realisation;
+                            $taux = ($prevision > 0) ? ($realisation / $prevision) * 100 : 0;
+                            ?>
+                        <tr class="table-info">
+                            <td><?= htmlspecialchars($p['numCp']) ?></td>
+                            <td><?= htmlspecialchars($p['libelle']) ?></td>
+                            <td class="text-end"><?= number_format($initiale, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($remanier, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($prevision, 0, ',', ' ') ?> F</td>
+                            <td class="text-end text-success"><?= number_format($realisation, 0, ',', ' ') ?> F</td>
+                            <td class="text-end <?= $reste < 0 ? 'text-danger' : 'text-primary' ?>">
+                                <?= number_format($reste, 0, ',', ' ') ?> F
+                            </td>
+                            <td class="text-center"><?= number_format($taux, 2, ',', ' ') ?> %</td>
+                        </tr>
+                        <?php endif; ?>
                         <?php endforeach; ?>
+
                     </tbody>
 
                     <?php
@@ -129,7 +164,7 @@ $data_charges = $data['charges'];
                     <!-- BON ENDROIT -->
                     <tfoot>
                         <tr class="fw-bold table-secondary">
-                            <td colspan="2" class="text-end">TOTAL FONCTIONNEMENT(S)</td>
+                            <td colspan="2" class="text-end">TOTAL</td>
 
                             <td class="text-end">
                                 <?= number_format($total_initiale, 0, ',', ' ') ?> F
@@ -176,47 +211,84 @@ $data_charges = $data['charges'];
                     </thead>
 
                     <tbody>
-                        <?php
-                        foreach ($charges as $c):
-                            $prevision = $c['total_dot'];
-                            $remanier = $c['totalDotRemanier'];
-                            $initiale = $c['totalDotInitiale'];
-                            $engagement = $c['total_eng'];
-                            $paye = $c['total_paye'];
 
-                            //  Dépassement logique
-                            $depassement = max(0, $engagement - $prevision);
-
-                            ?>
-                        <tr class="table-warning">
-                            <td><?= htmlspecialchars($c['numCp']) ?></td>
-
-                            <td><?= htmlspecialchars($c['libelle']) ?></td>
-
-                            <td class="text-end fw-semibold">
-                                <?= number_format($initiale, 0, ',', ' ') ?> F
-                            </td>
-                            <td class="text-end fw-semibold">
-                                <?= number_format($remanier, 0, ',', ' ') ?> F
-                            </td>
-                            <td class="text-end fw-semibold">
-                                <?= number_format($prevision, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end text-primary">
-                                <?= number_format($engagement, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end text-success">
-                                <?= number_format($paye, 0, ',', ' ') ?> F
-                            </td>
-
-                            <td class="text-end <?= $depassement > 0 ? 'text-danger fw-bold' : 'text-muted' ?>">
-                                <?= number_format($depassement, 0, ',', ' ') ?> F
-                            </td>
+                        <!-- ===== FONCTIONNEMENT ===== -->
+                        <tr>
+                            <td style="background-color: #f8f9fa;">Fonctionnement</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
 
+                        <?php foreach ($charges as $p): ?>
+                        <?php
+                        if ($p['type'] == 'fonctionnement'):
+                            $prevision = $p['total_dot'];
+                            $remanier = $p['totalDotRemanier'];
+                            $initiale = $p['totalDotInitiale'];
+                            $realisation = $p['total_paye'];
+
+                            $reste = $prevision - $realisation;
+                            $taux = ($prevision > 0) ? ($realisation / $prevision) * 100 : 0;
+                            ?>
+                        <tr class="table-warning">
+                            <td><?= htmlspecialchars($p['numCp']) ?></td>
+                            <td><?= htmlspecialchars($p['libelle']) ?></td>
+                            <td class="text-end"><?= number_format($initiale, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($remanier, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($prevision, 0, ',', ' ') ?> F</td>
+                            <td class="text-end text-success"><?= number_format($realisation, 0, ',', ' ') ?> F</td>
+                            <td class="text-end <?= $reste < 0 ? 'text-danger' : 'text-primary' ?>">
+                                <?= number_format($reste, 0, ',', ' ') ?> F
+                            </td>
+                            <td class="text-center"><?= number_format($taux, 2, ',', ' ') ?> %</td>
+                        </tr>
+                        <?php endif; ?>
                         <?php endforeach; ?>
+
+
+                        <!-- ===== INVESTISSEMENT ===== -->
+                        <tr>
+                            <td style="background-color: #f8f9fa;">Investissement</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        <?php foreach ($charges as $p): ?>
+                        <?php
+                        if ($p['type'] == 'investissement'):
+                            $prevision = $p['total_dot'];
+                            $remanier = $p['totalDotRemanier'];
+                            $initiale = $p['totalDotInitiale'];
+                            $realisation = $p['total_paye'];
+
+                            $reste = $prevision - $realisation;
+                            $taux = ($prevision > 0) ? ($realisation / $prevision) * 100 : 0;
+                            ?>
+                        <tr class="table-success">
+                            <td><?= htmlspecialchars($p['numCp']) ?></td>
+                            <td><?= htmlspecialchars($p['libelle']) ?></td>
+                            <td class="text-end"><?= number_format($initiale, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($remanier, 0, ',', ' ') ?> F</td>
+                            <td class="text-end"><?= number_format($prevision, 0, ',', ' ') ?> F</td>
+                            <td class="text-end text-success"><?= number_format($realisation, 0, ',', ' ') ?> F</td>
+                            <td class="text-end <?= $reste < 0 ? 'text-danger' : 'text-primary' ?>">
+                                <?= number_format($reste, 0, ',', ' ') ?> F
+                            </td>
+                            <td class="text-center"><?= number_format($taux, 2, ',', ' ') ?> %</td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+
                     </tbody>
 
                     <?php
@@ -276,7 +348,7 @@ $data_charges = $data['charges'];
                         </tr> -->
                     </thead>
 
-                    <tbody class="table-dark">
+                    <tbody class="table-primary">
                         <?php
                         $nbProduits = count($produits);
                         $nbCharges = count($charges);
@@ -404,8 +476,9 @@ $data_charges = $data['charges'];
 <script>
 $(document).ready(function() {
     $('#tableProduits').DataTable({
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        pageLength: 50,
+        lengthMenu: [5, 10, 25, 50, 100],
+        order: [],
         dom: 'lBfrtip', //  ajout du "l"
 
         buttons: [{
@@ -453,8 +526,9 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $('#tableCharges').DataTable({
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        pageLength: 50,
+        lengthMenu: [5, 10, 25, 50, 100],
+        order: [],
         dom: 'lBfrtip', //  ajout du "l"
 
         buttons: [{
@@ -502,8 +576,8 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $('#tableResultats').DataTable({
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        pageLength: 50,
+        lengthMenu: [5, 10, 25, 50, 100],
         responsive: true,
         order: [],
         dom: 'lBfrtip', //  ajout du "l"

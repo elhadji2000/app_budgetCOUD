@@ -73,8 +73,16 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                             <option value="">--Sélectionnez--</option>
                             <option value="admin">ADMIN</option>
                             <option value="Cf_D">Chef_Departement</option>
-                            <option value="or">Ordre_Recettes</option>
-                            <option value="op">Ordre_Paiements</option>
+                            <option value="Cs_pb">Cs_pb</option>
+                             <option value="eng_all">eng_all</option>
+                            <option value="eng_add">eng_add</option>
+                            <option value="eng_val">eng_val</option>
+                            <option value="op_all">op_all</option>
+                            <option value="op_add">op_add</option>
+                            <option value="op_val">op_val</option>
+                             <option value="or_all">or_all</option>
+                            <option value="or_add">or_add</option>
+                            <option value="or_val">or_val</option>
                         </select>
                     </div>
 

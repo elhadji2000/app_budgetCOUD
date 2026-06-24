@@ -144,8 +144,8 @@ if (isset($_GET['toggle_id'])) {
 <script>
 $(document).ready(function() {
     $('#tableUsers').DataTable({
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        pageLength: 50,
+        lengthMenu: [5, 10, 25, 50, 100],
         order: [],
 
         dom: 'lBfrtip', //  ajout du "l"
