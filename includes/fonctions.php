@@ -41,24 +41,33 @@ function login($username, $password)
  * ********************************************************************************
  */
 
-/*
- * Fonction pour recuperer tous les Fournisseurs
- * ********************************************************************************
+/**
+ * Récupérer tous les fournisseurs
  */
 function getAllFournisseurs()
 {
     global $connexion;
-    $query = 'SELECT * FROM `bud_fournisseur`';
-    $result = $connexion->query($query);
 
-    if ($result->num_rows > 0) {
-        return $result->fetch_all(MYSQLI_ASSOC);
-    } else {
+    if (!$connexion) {
         return [];
     }
+
+    $sql = 'SELECT * FROM bud_fournisseur ORDER BY nom ASC';
+    $result = mysqli_query($connexion, $sql);
+
+    if (!$result) {
+        return [];
+    }
+
+    $fournisseurs = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $fournisseurs[] = $row;
+    }
+
+    return $fournisseurs;
 }
 
-function getFournisseurById($idFourn)
+/* function getFournisseurById($idFourn)
 {
     global $connexion;
     $anneeEnCours = $_SESSION['an'];
@@ -66,7 +75,7 @@ function getFournisseurById($idFourn)
 
     $query = "SELECT *
               FROM bud_fournisseur
-              WHERE idFourn = '$idFourn' 
+              WHERE idFourn = '$idFourn'
               LIMIT 1";
 
     $result = $connexion->query($query);
@@ -75,37 +84,154 @@ function getFournisseurById($idFourn)
     } else {
         return null;  // Ou false, selon ta logique
     }
-}
+} */
 
-function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nature)
+/**
+ * Ajouter un nouveau fournisseur
+ */
+function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea, $rccm, $email, $observations)
 {
     global $connexion;
 
-    $sql = "UPDATE bud_fournisseur 
-            SET numFourn = ?, nom = ?, adresse = ?, contact = ?, nature = ? 
-            WHERE idFourn = ?";
+    if (!$connexion) {
+        return 'Erreur de connexion : ' . mysqli_connect_error();
+    }
+
+    // Échappement des données pour éviter les injections
+    $numFourn = mysqli_real_escape_string($connexion, $numFourn);
+    $nom = mysqli_real_escape_string($connexion, $nom);
+    $adresse = mysqli_real_escape_string($connexion, $adresse);
+    $contact = mysqli_real_escape_string($connexion, $contact);
+    $nature = mysqli_real_escape_string($connexion, $nature);
+    $ninea = mysqli_real_escape_string($connexion, $ninea);
+    $rccm = mysqli_real_escape_string($connexion, $rccm);
+    $email = mysqli_real_escape_string($connexion, $email);
+    $observations = mysqli_real_escape_string($connexion, $observations);
+
+    // Vérifie si le numéro fournisseur existe déjà
+    $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn'";
+    $verif_res = mysqli_query($connexion, $verif_sql);
+
+    if (mysqli_num_rows($verif_res) > 0) {
+        return 'Ce numéro de fournisseur existe déjà.';
+    }
+
+    // Insertion avec les nouveaux champs
+    $sql = "INSERT INTO bud_fournisseur (
+                numFourn, 
+                nom, 
+                adresse, 
+                contact, 
+                nature, 
+                ninea, 
+                rccm, 
+                email, 
+                observations
+            ) VALUES (
+                '$numFourn', 
+                '$nom', 
+                '$adresse', 
+                '$contact', 
+                '$nature', 
+                '$ninea', 
+                '$rccm', 
+                '$email', 
+                '$observations'
+            )";
+
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur lors de l'ajout : " . mysqli_error($connexion);
+    }
+}
+
+/**
+ * Modifier un fournisseur existant
+ */
+function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nature, $ninea, $rccm, $email, $observations)
+{
+    global $connexion;
+
+    if (!$connexion) {
+        return 'Erreur de connexion : ' . mysqli_connect_error();
+    }
+
+    // Vérifier si le numéro fournisseur existe déjà (pour un autre enregistrement)
+    $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn' AND idFourn != $idFourn";
+    $verif_res = mysqli_query($connexion, $verif_sql);
+
+    if (mysqli_num_rows($verif_res) > 0) {
+        return 'Ce numéro de fournisseur existe déjà.';
+    }
+
+    // Utilisation de requête préparée pour la sécurité
+    $sql = 'UPDATE bud_fournisseur 
+            SET numFourn = ?, 
+                nom = ?, 
+                adresse = ?, 
+                contact = ?, 
+                nature = ?, 
+                ninea = ?, 
+                rccm = ?, 
+                email = ?, 
+                observations = ? 
+            WHERE idFourn = ?';
 
     $stmt = $connexion->prepare($sql);
 
     if (!$stmt) {
-        return "Erreur prepare : " . $connexion->error;
+        return 'Erreur prepare : ' . $connexion->error;
     }
 
     $stmt->bind_param(
-        "sssssi",
+        'sssssssssi',  // 9 strings + 1 int
         $numFourn,
         $nom,
         $adresse,
         $contact,
         $nature,
+        $ninea,
+        $rccm,
+        $email,
+        $observations,
         $idFourn
     );
 
     if ($stmt->execute()) {
         return true;
     } else {
-        return "Erreur execution : " . $stmt->error;
+        return 'Erreur execution : ' . $stmt->error;
     }
+}
+
+/**
+ * Récupérer un fournisseur par son ID (avec les nouveaux champs)
+ */
+function getFournisseurById($idFourn)
+{
+    global $connexion;
+
+    if (!$connexion) {
+        return null;
+    }
+
+    $sql = 'SELECT * FROM bud_fournisseur WHERE idFourn = ?';
+    $stmt = $connexion->prepare($sql);
+
+    if (!$stmt) {
+        return null;
+    }
+
+    $stmt->bind_param('i', $idFourn);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+
+    return null;
 }
 
 /*
@@ -439,7 +565,6 @@ function getOperationsSansBordereau()
 
     return [];
 }
-
 
 function getEngagementsTemp()
 {
@@ -1106,52 +1231,54 @@ function getOperationsTemp($typeOp)
  * #########    FONCTION POUR DOTATION ... ##############3
  * ********************************************************************************
  */
-/* function enregistrerDotation($idCompte, $date, $volume, $type)
-{
-    // Démarre la session si ce n'est pas déjà fait
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    // Connexion MySQLi
-    global $connexion;
 
-    if (!$connexion) {
-        return 'Connexion échouée : ' . mysqli_connect_error();
-    }
-
-    // Vérifie que l'utilisateur est connecté
-    if (!isset($_SESSION['idUser'])) {
-        return 'Utilisateur non connecté.';
-    }
-
-    $idUser = (int) $_SESSION['idUser'];
-    $an = (int) $_SESSION['an'];
-
-    // Validation : montant non négatif
-    if ($type == 'initiale') {
-        if ($volume < 0) {
-            return 'Le volume ne peut pas être négatif.';
-        }
-    }
-
-    // Échappement des données
-    $idCompte = mysqli_real_escape_string($connexion, $idCompte);
-    $idCompte = (int) $idCompte;
-    $date = mysqli_real_escape_string($connexion, $date);
-    $volume = (int) $volume;
-    $type = mysqli_real_escape_string($connexion, $type);
-
-    // Requête d'insertion
-    $sql = "INSERT INTO bud_dotations (idCompte, date, an, volume, type, idUser) 
-            VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
-
-    // Exécution
-    if (mysqli_query($connexion, $sql)) {
-        return true;
-    } else {
-        return "Erreur lors de l'enregistrement : " . mysqli_error($connexion);
-    }
-}
+/*
+ * function enregistrerDotation($idCompte, $date, $volume, $type)
+ * {
+ *     // Démarre la session si ce n'est pas déjà fait
+ *     if (session_status() === PHP_SESSION_NONE) {
+ *         session_start();
+ *     }
+ *     // Connexion MySQLi
+ *     global $connexion;
+ *
+ *     if (!$connexion) {
+ *         return 'Connexion échouée : ' . mysqli_connect_error();
+ *     }
+ *
+ *     // Vérifie que l'utilisateur est connecté
+ *     if (!isset($_SESSION['idUser'])) {
+ *         return 'Utilisateur non connecté.';
+ *     }
+ *
+ *     $idUser = (int) $_SESSION['idUser'];
+ *     $an = (int) $_SESSION['an'];
+ *
+ *     // Validation : montant non négatif
+ *     if ($type == 'initiale') {
+ *         if ($volume < 0) {
+ *             return 'Le volume ne peut pas être négatif.';
+ *         }
+ *     }
+ *
+ *     // Échappement des données
+ *     $idCompte = mysqli_real_escape_string($connexion, $idCompte);
+ *     $idCompte = (int) $idCompte;
+ *     $date = mysqli_real_escape_string($connexion, $date);
+ *     $volume = (int) $volume;
+ *     $type = mysqli_real_escape_string($connexion, $type);
+ *
+ *     // Requête d'insertion
+ *     $sql = "INSERT INTO bud_dotations (idCompte, date, an, volume, type, idUser)
+ *             VALUES ($idCompte, '$date', '$an', $volume, '$type', $idUser)";
+ *
+ *     // Exécution
+ *     if (mysqli_query($connexion, $sql)) {
+ *         return true;
+ *     } else {
+ *         return "Erreur lors de l'enregistrement : " . mysqli_error($connexion);
+ *     }
+ * }
  */
 function enregistrerDotation($idCompte, $date, $volume, $type)
 {
@@ -1184,7 +1311,6 @@ function enregistrerDotation($idCompte, $date, $volume, $type)
 
     // BLOQUER DOUBLE DOTATION INITIALE
     if ($type == 'initiale') {
-
         $checkSql = "SELECT idDot FROM bud_dotations 
                      WHERE idCompte = $idCompte 
                      AND an = $an 
@@ -1419,7 +1545,7 @@ function getDetailsCompte($numCompte)
     ];
 }
 
-function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
+/* function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
 {
     global $connexion;
 
@@ -1434,7 +1560,7 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
     $contact = mysqli_real_escape_string($connexion, $contact);
     $nature = mysqli_real_escape_string($connexion, $nature);
 
-    // Vérifie si le numéro fournisseur existe déjà
+    // Vérifie si le numéro fournisseur existe déj�
     $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn'";
     $verif_res = mysqli_query($connexion, $verif_sql);
 
@@ -1443,7 +1569,7 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
     }
 
     // Insertion
-    $sql = "INSERT INTO bud_fournisseur (numFourn, nom, adresse, contact, nature) 
+    $sql = "INSERT INTO bud_fournisseur (numFourn, nom, adresse, contact, nature)
             VALUES ('$numFourn', '$nom', '$adresse', '$contact', '$nature')";
 
     if (mysqli_query($connexion, $sql)) {
@@ -1451,7 +1577,7 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature)
     } else {
         return "Erreur lors de l'ajout : " . mysqli_error($connexion);
     }
-}
+} */
 
 function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn)
 {
@@ -1989,11 +2115,10 @@ function get_resultats()
     $result = $connexion->query($query);
 
     $produits = [];
-    $charges  = [];
+    $charges = [];
 
     if ($result && $result->num_rows > 0) {
         foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
-
             if (in_array($row['nature'], ['produit', 'ressource'])) {
                 $produits[] = $row;
             } else {
@@ -2004,7 +2129,7 @@ function get_resultats()
 
     return [
         'produits' => $produits,
-        'charges'  => $charges
+        'charges' => $charges
     ];
 }
 
@@ -2112,7 +2237,7 @@ function ajouterUtilisateur($nom, $login, $email, $privilege, $telephone, $sexe)
             'message' => 'Ce login existe déjà.'
         ];
     }
-    $an = $_SESSION["an"];
+    $an = $_SESSION['an'];
     // Insérer l'utilisateur
     $insertQuery = "INSERT INTO bud_users (nom, log, email, priv, mdp, type_mdp, telephone, sexe, an) 
                     VALUES ('$nom', '$login', '$email', '$privilege', '$password', '$type_mdp', '$telephone', '$sexe', '$an')";
@@ -2313,7 +2438,7 @@ function getOperationsByBordereau($idBordereau)
 {
     global $connexion;
 
-    $sql = "
+    $sql = '
         SELECT
             o.idOp,
             e.objet,
@@ -2324,10 +2449,10 @@ function getOperationsByBordereau($idBordereau)
         INNER JOIN bud_fournisseur f ON f.idFourn = e.idFourn
         WHERE o.idBordereau = ?
         ORDER BY o.idOp
-    ";
+    ';
 
     $stmt = $connexion->prepare($sql);
-    $stmt->bind_param("i", $idBordereau);
+    $stmt->bind_param('i', $idBordereau);
     $stmt->execute();
 
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -2337,7 +2462,7 @@ function getBordereauById($idBordereau)
 {
     global $connexion;
 
-    $sql = "
+    $sql = '
         SELECT
             b.idBordereau,
             b.numeroBordereau,
@@ -2346,7 +2471,7 @@ function getBordereauById($idBordereau)
         FROM bud_bordereaux b
         WHERE b.idBordereau = ?
         LIMIT 1
-    ";
+    ';
 
     $stmt = $connexion->prepare($sql);
 
@@ -2354,7 +2479,7 @@ function getBordereauById($idBordereau)
         return null;
     }
 
-    $stmt->bind_param("i", $idBordereau);
+    $stmt->bind_param('i', $idBordereau);
     $stmt->execute();
 
     $result = $stmt->get_result();

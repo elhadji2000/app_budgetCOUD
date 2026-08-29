@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mer. 17 juin 2026 à 09:58
+-- Généré le : sam. 29 août 2026 à 20:52
 -- Version du serveur : 9.1.0
 -- Version de PHP : 8.3.14
 
@@ -420,19 +420,24 @@ CREATE TABLE IF NOT EXISTS `bud_fournisseur` (
   `adresse` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nom` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nature` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ninea` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `rccm` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `observations` text COLLATE utf8mb4_general_ci,
   `dateSys` datetime DEFAULT CURRENT_TIMESTAMP,
   `contact` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`idFourn`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `bud_fournisseur`
 --
 
-INSERT INTO `bud_fournisseur` (`idFourn`, `numFourn`, `adresse`, `nom`, `nature`, `dateSys`, `contact`) VALUES
-(1, 'EMD', 'malicounda', 'Cellule information', 'repreneur', '2025-04-16 11:27:02', '784413400'),
-(2, 'EL', 'dakar', 'ELTON', 'bénéficiaire', '2025-04-24 11:35:11', '764019147'),
-(3, 'YYY', 'mbour', 'bud', 'beneficiaire', '2026-05-13 10:40:52', '754019647');
+INSERT INTO `bud_fournisseur` (`idFourn`, `numFourn`, `adresse`, `nom`, `nature`, `ninea`, `rccm`, `email`, `observations`, `dateSys`, `contact`) VALUES
+(1, 'EMD', 'malicounda', 'Cellule information', 'repreneur', NULL, NULL, NULL, NULL, '2025-04-16 11:27:02', '784413400'),
+(2, 'EL', 'dakar', 'ELTON', 'bénéficiaire', NULL, NULL, NULL, NULL, '2025-04-24 11:35:11', '764019147'),
+(3, 'YYY', 'mbour', 'bud', 'beneficiaire', NULL, NULL, NULL, NULL, '2026-05-13 10:40:52', '754019647'),
+(4, 'F001', 'mbour', 'MAYFAY GLOBAL BUSINESS', 'Entreprise', '78336339722', 'SB-SJHSJS-4252', 'diopelhadjimadiop@gmail.com', 'dhdd dhdhhd', '2026-08-29 20:01:52', '221774412344');
 
 -- --------------------------------------------------------
 
@@ -453,7 +458,7 @@ CREATE TABLE IF NOT EXISTS `bud_operations` (
   PRIMARY KEY (`idOp`),
   KEY `idEng` (`idEng`),
   KEY `idBordereau` (`idBordereau`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `bud_operations`
@@ -462,7 +467,8 @@ CREATE TABLE IF NOT EXISTS `bud_operations` (
 INSERT INTO `bud_operations` (`idOp`, `typeOp`, `dateOp`, `montant`, `numFact`, `dateSys`, `idEng`, `idBordereau`) VALUES
 (6, 'paiement', '2026-03-05', 200000, 'Bon', '2026-03-27 09:55:02', 6, 8),
 (8, 'paiement', '2026-05-21', 200000, 'testAA', '2026-05-21 10:10:11', 6, 8),
-(9, 'paiement', '2026-06-10', 300000, 'testAA', '2026-06-10 09:42:20', 7, NULL);
+(9, 'paiement', '2026-06-10', 300000, 'testAA', '2026-06-10 09:42:20', 7, NULL),
+(10, 'paiement', '2026-06-17', 100000, 'testAA- hege _\'uej', '2026-06-17 10:39:56', 7, NULL);
 
 -- --------------------------------------------------------
 
@@ -499,7 +505,7 @@ CREATE TABLE IF NOT EXISTS `bud_operations_temp` (
   `idEng` int DEFAULT NULL,
   PRIMARY KEY (`idOp`),
   KEY `idEng` (`idEng`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -579,7 +585,7 @@ CREATE TABLE IF NOT EXISTS `bud_users` (
   PRIMARY KEY (`idUser`),
   UNIQUE KEY `log` (`log`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `bud_users`
@@ -590,7 +596,121 @@ INSERT INTO `bud_users` (`idUser`, `nom`, `log`, `mdp`, `email`, `priv`, `teleph
 (2, 'Modou Waly FAYE', '902000/A', 'f6a7651443d5867f394fe61ab082aac01c3c25fd', 'fayefaye@gmail.com', 'sag', NULL, NULL, 'updated', 1, '2025-04-23', NULL),
 (3, 'Ibrahima DIOP', '936009/C', '11af43dbc3e4d14f498633eba99515ce2d3fd9fc', 'khalil@hotmail.com', 'op', NULL, NULL, 'updated', 1, '2025-04-29', NULL),
 (4, 'Papa Amath Ndiaye', '934343/H', '11af43dbc3e4d14f498633eba99515ce2d3fd9fc', 'amathcoud@gmail.com', 'admin', '771565419', 'M', 'updated', 1, '0000-00-00', '2026'),
-(5, 'Mamadou diop', '80024/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 'diopmamadou@gmail.com', 'Cf_D', '+221784413400', 'M', 'default', 1, '0000-00-00', '2026');
+(5, 'Mamadou diop', '80024/M', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 'diopmamadou@gmail.com', 'Cf_D', '+221784413400', 'M', 'default', 1, '0000-00-00', '2026'),
+(7, 'El Hadji Madiop diop', 'op_all', '11af43dbc3e4d14f498633eba99515ce2d3fd9fc', 'op_all@gmail.com', 'op_all', '+221784413400', 'F', 'updated', 1, '0000-00-00', '2026'),
+(8, 'op val', 'op_val', '9ead80632f1a0ff63cc214fa50b034ae7f48dde4', 'op_val@gmail.com', 'op_val', '+221784413400', 'M', 'default', 1, '0000-00-00', '2026'),
+(9, 'eng val', 'eng_val', '11af43dbc3e4d14f498633eba99515ce2d3fd9fc', 'eng_val@gmail.com', 'eng_val', '+221764019647', 'F', 'updated', 1, '0000-00-00', '2026'),
+(10, 'drp', 'drp', 'f2e593008db5ab3395b2c88aab307c4794532fe1', 'drp@coud.sn', 'drp', '7844413400', 'M', 'updated', 1, '0000-00-00', '2026');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `sigm_marches`
+--
+
+DROP TABLE IF EXISTS `sigm_marches`;
+CREATE TABLE IF NOT EXISTS `sigm_marches` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `reference` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `annee` year NOT NULL,
+  `montant` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `type_marche` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `objet` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_fournisseur` int NOT NULL,
+  `statut` enum('en_attente','valide','annule') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en_attente',
+  `motif_annulation` text COLLATE utf8mb4_unicode_ci,
+  `created_by` int DEFAULT NULL,
+  `validated_by` int DEFAULT NULL,
+  `cancelled_by` int DEFAULT NULL,
+  `date_creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_validation` datetime DEFAULT NULL,
+  `date_annulation` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `reference` (`reference`),
+  KEY `idx_annee` (`annee`),
+  KEY `idx_statut` (`statut`),
+  KEY `idx_type_marche` (`type_marche`),
+  KEY `idx_created_by` (`created_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `sigm_marches`
+--
+
+INSERT INTO `sigm_marches` (`id`, `reference`, `annee`, `montant`, `type_marche`, `objet`, `id_fournisseur`, `statut`, `motif_annulation`, `created_by`, `validated_by`, `cancelled_by`, `date_creation`, `date_validation`, `date_annulation`, `updated_at`) VALUES
+(1, 'RF-25-003', '2026', 200000.00, 'Fourniture de biens', 'azertyui', 0, 'valide', NULL, NULL, NULL, NULL, '2026-08-29 11:26:17', '2026-08-29 11:41:54', NULL, '2026-08-29 11:41:54'),
+(2, 'EB-2026-0001', '2026', 390000.00, 'Travaux', 'sdfghj', 0, 'annule', 'dossier incomplet!', NULL, NULL, NULL, '2026-08-29 12:22:54', NULL, '2026-08-29 12:24:34', '2026-08-29 12:24:34'),
+(3, 'RF-25-001', '2026', 850000.00, 'Services', 'service formation informatique', 4, 'en_attente', NULL, 10, NULL, NULL, '2026-08-29 20:17:56', NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `sigm_marche_documents`
+--
+
+DROP TABLE IF EXISTS `sigm_marche_documents`;
+CREATE TABLE IF NOT EXISTS `sigm_marche_documents` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `marche_id` int UNSIGNED NOT NULL,
+  `nom_original` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nom_fichier` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `chemin_fichier` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type_document` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `extension` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `taille` bigint UNSIGNED NOT NULL DEFAULT '0',
+  `statut` enum('en_attente','valide','annule') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en_attente',
+  `uploaded_by` int DEFAULT NULL,
+  `date_upload` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_marche_id` (`marche_id`),
+  KEY `idx_statut` (`statut`),
+  KEY `idx_type_document` (`type_document`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `sigm_marche_documents`
+--
+
+INSERT INTO `sigm_marche_documents` (`id`, `marche_id`, `nom_original`, `nom_fichier`, `chemin_fichier`, `type_document`, `extension`, `taille`, `statut`, `uploaded_by`, `date_upload`) VALUES
+(1, 1, 'BUDGET (3).xlsx', 'MARCHE_1_b14ab61e8703ab9c.xlsx', 'uploads/marches/MARCHE_1_b14ab61e8703ab9c.xlsx', 'pva', 'xlsx', 10115, 'valide', NULL, '2026-08-29 11:26:17'),
+(2, 1, 'Marchés.docx', 'MARCHE_1_cedfc03847256981.docx', 'uploads/marches/MARCHE_1_cedfc03847256981.docx', 'facture', 'docx', 104981, 'valide', NULL, '2026-08-29 11:26:17'),
+(3, 1, 'facture-001396.pdf', 'MARCHE_1_91d8d58730da1aa7.pdf', 'uploads/marches/MARCHE_1_91d8d58730da1aa7.pdf', 'preforma', 'pdf', 140825, 'valide', NULL, '2026-08-29 11:26:17'),
+(4, 2, 'Ameliorations_Medicoud.pdf', 'MARCHE_2_1ab35d75e0934940.pdf', 'uploads/marches/MARCHE_2_1ab35d75e0934940.pdf', 'gf', 'pdf', 143551, 'annule', NULL, '2026-08-29 12:22:54'),
+(5, 2, 'facture-001396.pdf', 'MARCHE_2_4634e4200e76d7dc.pdf', 'uploads/marches/MARCHE_2_4634e4200e76d7dc.pdf', 'fd', 'pdf', 140825, 'annule', NULL, '2026-08-29 12:22:54'),
+(6, 3, 'Ameliorations_Medicoud.pdf', 'MARCHE_3_a73478e02bc9fa4b.pdf', 'uploads/marches/MARCHE_3_a73478e02bc9fa4b.pdf', 'contrat', 'pdf', 143551, 'en_attente', 10, '2026-08-29 20:17:56'),
+(7, 3, 'facture-001396.pdf', 'MARCHE_3_726bfe2f2f9ad454.pdf', 'uploads/marches/MARCHE_3_726bfe2f2f9ad454.pdf', 'facture', 'pdf', 140825, 'en_attente', 10, '2026-08-29 20:17:56');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `sigm_marche_historique`
+--
+
+DROP TABLE IF EXISTS `sigm_marche_historique`;
+CREATE TABLE IF NOT EXISTS `sigm_marche_historique` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `marche_id` int UNSIGNED NOT NULL,
+  `ancien_statut` enum('en_attente','valide','annule') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nouveau_statut` enum('en_attente','valide','annule') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `commentaire` text COLLATE utf8mb4_unicode_ci,
+  `user_id` int DEFAULT NULL,
+  `date_action` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_historique_marche` (`marche_id`),
+  KEY `idx_historique_date` (`date_action`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `sigm_marche_historique`
+--
+
+INSERT INTO `sigm_marche_historique` (`id`, `marche_id`, `ancien_statut`, `nouveau_statut`, `commentaire`, `user_id`, `date_action`) VALUES
+(1, 1, NULL, 'en_attente', 'Création du dossier de marché.', NULL, '2026-08-29 11:26:17'),
+(2, 1, 'en_attente', 'valide', 'Dossier validé.', NULL, '2026-08-29 11:41:54'),
+(3, 2, NULL, 'en_attente', 'Création du dossier de marché.', NULL, '2026-08-29 12:22:54'),
+(4, 2, 'en_attente', 'annule', 'dossier incomplet!', NULL, '2026-08-29 12:24:34'),
+(5, 3, NULL, 'en_attente', 'Création du dossier de marché pour le fournisseur : MAYFAY GLOBAL BUSINESS', 10, '2026-08-29 20:17:56');
 
 --
 -- Contraintes pour les tables déchargées
@@ -656,6 +776,18 @@ ALTER TABLE `bud_ordre_recette_temp`
   ADD CONSTRAINT `bud_ordre_recette_temp_ibfk_1` FOREIGN KEY (`idFourn`) REFERENCES `bud_fournisseur` (`idFourn`),
   ADD CONSTRAINT `bud_ordre_recette_temp_ibfk_2` FOREIGN KEY (`idCompte`) REFERENCES `bud_compte` (`idCompte`),
   ADD CONSTRAINT `bud_ordre_recette_temp_ibfk_3` FOREIGN KEY (`idUser`) REFERENCES `bud_users` (`idUser`);
+
+--
+-- Contraintes pour la table `sigm_marche_documents`
+--
+ALTER TABLE `sigm_marche_documents`
+  ADD CONSTRAINT `fk_marche_documents` FOREIGN KEY (`marche_id`) REFERENCES `sigm_marches` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `sigm_marche_historique`
+--
+ALTER TABLE `sigm_marche_historique`
+  ADD CONSTRAINT `fk_historique_marche` FOREIGN KEY (`marche_id`) REFERENCES `sigm_marches` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

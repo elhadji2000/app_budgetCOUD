@@ -14,7 +14,7 @@ if (!isset($_SESSION['user'])) {
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-<main class="container-fluid mt-3">
+<main class="container-fluid mt-3"> 
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">

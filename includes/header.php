@@ -271,7 +271,7 @@ $anneeActuelle = date('Y');
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D'): ?>
+                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp' || $_SESSION['priv'] == 'admin'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
                                 href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs">Fournisseurs</a>
@@ -286,7 +286,7 @@ $anneeActuelle = date('Y');
                                 <?php if ($_SESSION['priv'] == 'Cs_pb' || $_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'eng_add' || $_SESSION['priv'] == 'eng_all'): ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="http://localhost/BUDGET/profiles/engagements/add_eng1">
+                                        href="http://localhost/BUDGET/profiles/engagements/ajouter">
                                         Nouveau
                                     </a>
                                 </li>
@@ -390,6 +390,36 @@ $anneeActuelle = date('Y');
                             </ul>
                         </li>
                         <?php endif; ?>
+
+                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp'): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">DRP</a>
+                            <ul class="dropdown-menu">
+                                <?php if ($anneeSession == $anneeActuelle): ?>
+                                <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp'): ?>
+                                <li>
+                                    <a class="dropdown-item" href="http://localhost/BUDGET/payement/add_drp">
+                                        Nouveau
+                                    </a>
+                                </li>
+                                <?php endif; ?>
+                                <?php else: ?>
+                                <li>
+                                    <span class="dropdown-item text-muted" style="cursor: not-allowed; opacity: 0.5;"
+                                        title="Lien désactivé car l'année de session est différente">
+                                        Nouveau
+                                    </span>
+                                </li>
+                                <?php endif; ?>
+
+                                <li><a class="dropdown-item"
+                                        href="http://localhost/BUDGET/payement/liste_all">liste(s)</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <?php endif; ?>
+
                         <?php if ($_SESSION['priv'] == 'admin' || $_SESSION['priv'] == 'Cf_D' || $_SESSION['priv'] == 'Cs_pb'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"

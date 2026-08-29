@@ -74,6 +74,7 @@ if ( !isset( $_SESSION[ 'user' ] ) ) {
                             <option value="admin">ADMIN</option>
                             <option value="Cf_D">Chef_Departement</option>
                             <option value="Cs_pb">Cs_pb</option>
+                            <option value="personnel">personnel</option>
                              <option value="eng_all">eng_all</option>
                             <option value="eng_add">eng_add</option>
                             <option value="eng_val">eng_val</option>
