@@ -64,6 +64,10 @@ include '../includes/header.php';
     background: #fff3cd;
     color: #856404;
 }
+.statut-badge.engager {
+    background: #2247c4;
+    color: #0a0745;
+}
 
 .statut-badge.valide {
     background: #d4edda;
@@ -362,6 +366,7 @@ include '../includes/header.php';
                                                 'en_attente' => 'En attente',
                                                 'valide' => 'Validé',
                                                 'annule' => 'Annulé',
+                                                'engager' => 'Engager',
                                                 'rejete' => 'Rejeté'
                                             ];
                                             echo $statuts[$row['statut']] ?? $row['statut'];

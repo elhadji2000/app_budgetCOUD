@@ -4,7 +4,7 @@ session_start();
 require_once '../includes/fonctions.php';
 
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../index.php");
+    header('Location: ../../index.php');
     exit();
 }
 
@@ -13,15 +13,15 @@ global $connexion;
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($id <= 0) {
-    header("Location: liste_marches.php");
+    header('Location: liste_all.php');
     exit();
 }
 
 /*
-|--------------------------------------------------------------------------
-| Récupération du marché avec le fournisseur
-|--------------------------------------------------------------------------
-*/
+ * |--------------------------------------------------------------------------
+ * | Récupération du marché avec le fournisseur
+ * |--------------------------------------------------------------------------
+ */
 
 $sql = "
     SELECT 
@@ -42,33 +42,33 @@ $sql = "
 ";
 
 $stmt = mysqli_prepare($connexion, $sql);
-mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_bind_param($stmt, 'i', $id);
 mysqli_stmt_execute($stmt);
 
 $result = mysqli_stmt_get_result($stmt);
 $marche = mysqli_fetch_assoc($result);
 
 if (!$marche) {
-    $_SESSION['error'] = "Dossier de marché introuvable.";
-    header("Location: liste_marches.php");
+    $_SESSION['error'] = 'Dossier de marché introuvable.';
+    header('Location: liste_marches.php');
     exit();
 }
 
 /*
-|--------------------------------------------------------------------------
-| Récupération des documents
-|--------------------------------------------------------------------------
-*/
+ * |--------------------------------------------------------------------------
+ * | Récupération des documents
+ * |--------------------------------------------------------------------------
+ */
 
-$sqlDocs = "
+$sqlDocs = '
     SELECT *
     FROM sigm_marche_documents
     WHERE marche_id = ?
     ORDER BY date_upload ASC
-";
+';
 
 $stmtDocs = mysqli_prepare($connexion, $sqlDocs);
-mysqli_stmt_bind_param($stmtDocs, "i", $id);
+mysqli_stmt_bind_param($stmtDocs, 'i', $id);
 mysqli_stmt_execute($stmtDocs);
 $documents = mysqli_stmt_get_result($stmtDocs);
 
@@ -76,242 +76,247 @@ include '../includes/header.php';
 ?>
 
 <style>
-    /* ========== STYLES COMMUNS AVEC LES AUTRES PAGES ========== */
-    .card-simple {
-        border: 0;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-    }
+/* ========== STYLES COMMUNS AVEC LES AUTRES PAGES ========== */
+.card-simple {
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
 
-    .section-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #2c3e50;
-        border-bottom: 2px solid #4655a4;
-        padding-bottom: 8px;
-        margin-bottom: 18px;
-        letter-spacing: 0.3px;
-    }
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #4655a4;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    letter-spacing: 0.3px;
+}
 
-    .section-title i {
-        color: #4655a4;
-        margin-right: 6px;
-    }
+.section-title i {
+    color: #4655a4;
+    margin-right: 6px;
+}
 
-    .info-label {
-        color: #6c757d;
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
+.info-label {
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
 
-    .info-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: #2c3e50;
-        margin-top: 2px;
-    }
+.info-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-top: 2px;
+}
 
-    .statut-badge {
-        font-size: 12px;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-weight: 500;
-        display: inline-block;
-    }
+.statut-badge {
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+}
 
-    .statut-badge.en_attente {
-        background: #fff3cd;
-        color: #856404;
-    }
+.statut-badge.en_attente {
+    background: #fff3cd;
+    color: #856404;
+}
 
-    .statut-badge.valide {
-        background: #d4edda;
-        color: #155724;
-    }
+.statut-badge.engager {
+    background: #2247c4;
+    color: #0a0745;
+}
 
-    .statut-badge.annule {
-        background: #f8d7da;
-        color: #721c24;
-    }
+.statut-badge.valide {
+    background: #d4edda;
+    color: #155724;
+}
 
-    .statut-badge.rejete {
-        background: #f8d7da;
-        color: #721c24;
-    }
+.statut-badge.annule {
+    background: #f8d7da;
+    color: #721c24;
+}
 
-    .document-item {
-        border-bottom: 1px solid #f0f0f0;
-        padding: 10px 0;
-    }
+.statut-badge.rejete {
+    background: #f8d7da;
+    color: #721c24;
+}
 
-    .document-item:last-child {
-        border-bottom: none;
-    }
+.document-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 0;
+}
 
-    .document-name {
-        font-size: 13px;
-        font-weight: 500;
-    }
+.document-item:last-child {
+    border-bottom: none;
+}
 
-    .document-meta {
-        font-size: 11px;
-        color: #6c757d;
-    }
+.document-name {
+    font-size: 13px;
+    font-weight: 500;
+}
 
-    .document-status {
-        font-size: 10px;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-weight: 500;
-    }
+.document-meta {
+    font-size: 11px;
+    color: #6c757d;
+}
 
-    .document-status.valide {
-        background: #d4edda;
-        color: #155724;
-    }
+.document-status {
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+}
 
-    .document-status.en_attente {
-        background: #fff3cd;
-        color: #856404;
-    }
+.document-status.valide {
+    background: #d4edda;
+    color: #155724;
+}
 
-    .document-status.rejete {
-        background: #f8d7da;
-        color: #721c24;
-    }
+.document-status.en_attente {
+    background: #fff3cd;
+    color: #856404;
+}
 
-    .btn-action {
-        font-size: 12px;
-        padding: 4px 12px;
-        border-radius: 6px;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
+.document-status.rejete {
+    background: #f8d7da;
+    color: #721c24;
+}
 
-    .btn-action.btn-validate {
-        background: #28a745;
-        color: #fff;
-    }
+.btn-action {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
 
-    .btn-action.btn-validate:hover {
-        background: #218838;
-        color: #fff;
-        transform: translateY(-1px);
-    }
+.btn-action.btn-validate {
+    background: #28a745;
+    color: #fff;
+}
 
-    .btn-action.btn-cancel {
-        background: #dc3545;
-        color: #fff;
-    }
+.btn-action.btn-validate:hover {
+    background: #218838;
+    color: #fff;
+    transform: translateY(-1px);
+}
 
-    .btn-action.btn-cancel:hover {
-        background: #c82333;
-        color: #fff;
-        transform: translateY(-1px);
-    }
+.btn-action.btn-cancel {
+    background: #dc3545;
+    color: #fff;
+}
 
-    .btn-action.btn-edit {
-        background: #4655a4;
-        color: #fff;
-    }
+.btn-action.btn-cancel:hover {
+    background: #c82333;
+    color: #fff;
+    transform: translateY(-1px);
+}
 
-    .btn-action.btn-edit:hover {
-        background: #35438a;
-        color: #fff;
-        transform: translateY(-1px);
-    }
+.btn-action.btn-edit {
+    background: #4655a4;
+    color: #fff;
+}
 
-    .btn-action.btn-back {
-        background: #6c757d;
-        color: #fff;
-    }
+.btn-action.btn-edit:hover {
+    background: #35438a;
+    color: #fff;
+    transform: translateY(-1px);
+}
 
-    .btn-action.btn-back:hover {
-        background: #5a6268;
-        color: #fff;
-        transform: translateY(-1px);
-    }
+.btn-action.btn-back {
+    background: #6c757d;
+    color: #fff;
+}
 
-    .btn-action.btn-danger {
-        background: #dc3545;
-        color: #fff;
-    }
+.btn-action.btn-back:hover {
+    background: #5a6268;
+    color: #fff;
+    transform: translateY(-1px);
+}
 
-    .btn-action.btn-danger:hover {
-        background: #c82333;
-        color: #fff;
-        transform: translateY(-1px);
-    }
+.btn-action.btn-danger {
+    background: #dc3545;
+    color: #fff;
+}
 
-    .fournisseur-info .nom {
-        font-weight: 600;
-        font-size: 14px;
-    }
+.btn-action.btn-danger:hover {
+    background: #c82333;
+    color: #fff;
+    transform: translateY(-1px);
+}
 
-    .fournisseur-info .num {
-        font-size: 12px;
-        color: #6c757d;
-    }
+.fournisseur-info .nom {
+    font-weight: 600;
+    font-size: 14px;
+}
 
-    .doc-count {
-        font-size: 13px;
-    }
+.fournisseur-info .num {
+    font-size: 12px;
+    color: #6c757d;
+}
 
-    .doc-count .total {
-        font-weight: 600;
-    }
+.doc-count {
+    font-size: 13px;
+}
 
-    .doc-count .valide {
-        color: #28a745;
-    }
+.doc-count .total {
+    font-weight: 600;
+}
 
-    .doc-count .attente {
-        color: #ffc107;
-    }
+.doc-count .valide {
+    color: #28a745;
+}
 
-    .doc-count .rejete {
-        color: #dc3545;
-    }
+.doc-count .attente {
+    color: #ffc107;
+}
 
+.doc-count .rejete {
+    color: #dc3545;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
     .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
+        grid-template-columns: 1fr;
     }
 
     .info-grid .full-width {
-        grid-column: 1 / -1;
+        grid-column: 1;
     }
 
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    .info-value {
+        font-size: 13px;
     }
 
-    @media (max-width: 768px) {
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .info-grid .full-width {
-            grid-column: 1;
-        }
-
-        .info-value {
-            font-size: 13px;
-        }
-
-        .document-item {
-            padding: 8px 0;
-        }
+    .document-item {
+        padding: 8px 0;
     }
+}
 </style>
 
 <main class="container-fluid mt-3">
@@ -331,7 +336,7 @@ include '../includes/header.php';
                     <small class="text-muted">
                         <?= htmlspecialchars($marche['reference']) ?>
                         <?php if (!empty($marche['annee'])): ?>
-                            · <?= htmlspecialchars($marche['annee']) ?>
+                        · <?= htmlspecialchars($marche['annee']) ?>
                         <?php endif; ?>
                         · Fournisseur : <?= htmlspecialchars($marche['nom_fournisseur'] ?? 'Non défini') ?>
                     </small>
@@ -342,6 +347,7 @@ include '../includes/header.php';
                         $statuts = [
                             'en_attente' => 'En attente',
                             'valide' => 'Validé',
+                            'engager' => 'Engager',
                             'annule' => 'Annulé',
                             'rejete' => 'Rejeté'
                         ];
@@ -414,13 +420,14 @@ include '../includes/header.php';
                             <div class="info-value doc-count">
                                 <span class="total"><?= (int) $marche['nombre_documents'] ?></span>
                                 <?php if ($marche['documents_valides'] > 0): ?>
-                                    <span class="valide" title="Validés">✓ <?= (int) $marche['documents_valides'] ?></span>
+                                <span class="valide" title="Validés">✓ <?= (int) $marche['documents_valides'] ?></span>
                                 <?php endif; ?>
                                 <?php if ($marche['documents_attente'] > 0): ?>
-                                    <span class="attente" title="En attente">⏰ <?= (int) $marche['documents_attente'] ?></span>
+                                <span class="attente" title="En attente">⏰
+                                    <?= (int) $marche['documents_attente'] ?></span>
                                 <?php endif; ?>
                                 <?php if ($marche['documents_rejetes'] > 0): ?>
-                                    <span class="rejete" title="Rejetés">✗ <?= (int) $marche['documents_rejetes'] ?></span>
+                                <span class="rejete" title="Rejetés">✗ <?= (int) $marche['documents_rejetes'] ?></span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -432,12 +439,12 @@ include '../includes/header.php';
                                 <?= nl2br(htmlspecialchars($marche['objet'])) ?>
                             </div>
                         </div>
-                         <!-- motif -->
+                        <!-- motif -->
 
-                         <?php if ($marche['statut'] === 'annule'): ?>
-                            
+                        <?php if ($marche['statut'] === 'rejete'): ?>
+
                         <div class="full-width">
-                            <div class="info-label">Motif d'annulation</div>
+                            <div class="info-label">Motif de rejet</div>
                             <div class="info-value">
                                 <?= nl2br(htmlspecialchars($marche['motif_annulation'])) ?>
                             </div>
@@ -451,25 +458,25 @@ include '../includes/header.php';
                     ====================================== -->
 
                     <?php if ($marche['nom_fournisseur']): ?>
-                        <div class="section-title mt-3">
-                            <i class="bi bi-building"></i>
-                            Fournisseur
-                        </div>
+                    <div class="section-title mt-3">
+                        <i class="bi bi-building"></i>
+                        Fournisseur
+                    </div>
 
-                        <div class="fournisseur-info">
-                            <div class="nom"><?= htmlspecialchars($marche['nom_fournisseur']) ?></div>
-                            <div class="num">
-                                <?php if ($marche['num_fournisseur']): ?>
-                                    Numéro : <?= htmlspecialchars($marche['num_fournisseur']) ?>
-                                <?php endif; ?>
-                                <?php if ($marche['contact_fournisseur']): ?>
-                                    · Contact : <?= htmlspecialchars($marche['contact_fournisseur']) ?>
-                                <?php endif; ?>
-                                <?php if ($marche['ninea_fournisseur']): ?>
-                                    · NINEA : <?= htmlspecialchars($marche['ninea_fournisseur']) ?>
-                                <?php endif; ?>
-                            </div>
+                    <div class="fournisseur-info">
+                        <div class="nom"><?= htmlspecialchars($marche['nom_fournisseur']) ?></div>
+                        <div class="num">
+                            <?php if ($marche['num_fournisseur']): ?>
+                            Numéro : <?= htmlspecialchars($marche['num_fournisseur']) ?>
+                            <?php endif; ?>
+                            <?php if ($marche['contact_fournisseur']): ?>
+                            · Contact : <?= htmlspecialchars($marche['contact_fournisseur']) ?>
+                            <?php endif; ?>
+                            <?php if ($marche['ninea_fournisseur']): ?>
+                            · NINEA : <?= htmlspecialchars($marche['ninea_fournisseur']) ?>
+                            <?php endif; ?>
                         </div>
+                    </div>
                     <?php endif; ?>
 
                 </div>
@@ -491,38 +498,38 @@ include '../includes/header.php';
                     </div>
 
                     <?php if (mysqli_num_rows($documents) > 0): ?>
-                        <?php while ($doc = mysqli_fetch_assoc($documents)): ?>
-                            <div class="document-item">
-                                <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width:0;">
-                                        <i class="bi bi-file-earmark-text text-secondary"></i>
-                                        <div class="flex-grow-1" style="min-width:0;">
-                                            <div class="document-name text-truncate">
-                                                <?= htmlspecialchars($doc['nom_original']) ?>
-                                            </div>
-                                            <div class="document-meta">
-                                                <?= htmlspecialchars($doc['type_document']) ?>
-                                                <?php if (!empty($doc['taille'])): ?>
-                                                    · <?= number_format($doc['taille'] / 1024 / 1024, 2) ?> Mo
-                                                <?php endif; ?>
-                                                · <span class="document-status <?= $doc['statut'] ?>">
-                                                    <?= $doc['statut'] === 'en_attente' ? 'En attente' : ($doc['statut'] === 'valide' ? 'Validé' : 'Rejeté') ?>
-                                                </span>
-                                            </div>
-                                        </div>
+                    <?php while ($doc = mysqli_fetch_assoc($documents)): ?>
+                    <div class="document-item">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width:0;">
+                                <i class="bi bi-file-earmark-text text-secondary"></i>
+                                <div class="flex-grow-1" style="min-width:0;">
+                                    <div class="document-name text-truncate">
+                                        <?= htmlspecialchars($doc['nom_original']) ?>
                                     </div>
-                                    <a href="../<?= htmlspecialchars($doc['chemin_fichier']) ?>" target="_blank"
-                                        class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-eye"></i> Voir
-                                    </a>
+                                    <div class="document-meta">
+                                        <?= htmlspecialchars($doc['type_document']) ?>
+                                        <?php if (!empty($doc['taille'])): ?>
+                                        · <?= number_format($doc['taille'] / 1024 / 1024, 2) ?> Mo
+                                        <?php endif; ?>
+                                        · <span class="document-status <?= $doc['statut'] ?>">
+                                            <?= $doc['statut'] === 'en_attente' ? 'En attente' : ($doc['statut'] === 'valide' ? 'Validé' : 'Rejeté') ?>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <div class="text-center text-muted py-4">
-                            <i class="bi bi-folder-x fs-3 d-block mb-2"></i>
-                            <small>Aucun document associé à ce marché.</small>
+                            <a href="../<?= htmlspecialchars($doc['chemin_fichier']) ?>" target="_blank"
+                                class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye"></i> Voir
+                            </a>
                         </div>
+                    </div>
+                    <?php endwhile; ?>
+                    <?php else: ?>
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-folder-x fs-3 d-block mb-2"></i>
+                        <small>Aucun document associé à ce marché.</small>
+                    </div>
                     <?php endif; ?>
 
                     <!-- =====================================
@@ -534,36 +541,35 @@ include '../includes/header.php';
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
                         <div class="d-flex gap-2">
-                            <!-- Retour -->
-                            <a href="liste_all" class="btn-action btn-back">
+                            <a href="javascript:history.back()" class="btn-action btn-back">
                                 <i class="bi bi-arrow-left"></i> Retour
                             </a>
                         </div>
 
                         <div class="d-flex gap-2">
                             <?php if ($marche['statut'] === 'en_attente'): ?>
-                                <!-- Valider -->
-                                <form method="POST" action="traiter_marche.php" class="m-0">
-                                    <input type="hidden" name="marche_id" value="<?= $id ?>">
-                                    <input type="hidden" name="action" value="valider">
-                                    <button type="submit" class="btn-action btn-validate"
-                                        onclick="return confirm('Voulez-vous valider ce dossier de marché ?')">
-                                        <i class="bi bi-check-circle"></i> Valider
-                                    </button>
-                                </form>
-
-                                <!-- Annuler -->
-                                <button type="button" class="btn-action btn-cancel" data-bs-toggle="modal"
-                                    data-bs-target="#annulationModal">
-                                    <i class="bi bi-x-circle"></i> Annuler
+                            <!-- Valider -->
+                            <form method="POST" action="traiter_marche.php" class="m-0">
+                                <input type="hidden" name="marche_id" value="<?= $id ?>">
+                                <input type="hidden" name="action" value="valider">
+                                <button type="submit" class="btn-action btn-validate"
+                                    onclick="return confirm('Voulez-vous valider ce dossier de marché ?')">
+                                    <i class="bi bi-check-circle"></i> Valider
                                 </button>
+                            </form>
 
-                            <?php elseif ($marche['statut'] === 'annule'): ?>
+                            <!-- Annuler -->
+                            <button type="button" class="btn-action btn-cancel" data-bs-toggle="modal"
+                                data-bs-target="#annulationModal">
+                                <i class="bi bi-x-circle"></i> Rejeter
+                            </button>
 
-                                <!-- Réactiver / Modifier après annulation -->
-                                <a href="add_drp.php?id=<?= $id ?>&reactiver=1" class="btn-action btn-edit">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Réactiver
-                                </a>
+                            <?php elseif ($marche['statut'] == 'rejete'): ?>
+
+                            <!-- Réactiver / Modifier après annulation -->
+                            <a href="add_drp?id=<?= $id ?>&reactiver=1" class="btn-action btn-edit">
+                                <i class="bi bi-arrow-counterclockwise"></i> Corriger
+                            </a>
 
                             <?php endif; ?>
                         </div>
@@ -595,7 +601,8 @@ include '../includes/header.php';
             <div class="modal-body">
                 <div class="alert alert-warning">
                     <i class="bi bi-info-circle me-1"></i>
-                    Vous êtes sur le point d'annuler le marché <strong><?= htmlspecialchars($marche['reference']) ?></strong>.
+                    Vous êtes sur le point de rejeter le document
+                    <strong><?= htmlspecialchars($marche['reference']) ?></strong>.
                 </div>
                 <p class="text-muted small">
                     Veuillez indiquer le motif de l'annulation. Cette action est irréversible.
@@ -612,7 +619,7 @@ include '../includes/header.php';
                     </div>
                 </div>
                 <input type="hidden" name="marche_id" value="<?= $id ?>">
-                <input type="hidden" name="action" value="annuler">
+                <input type="hidden" name="action" value="rejeter">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">

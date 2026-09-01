@@ -217,7 +217,7 @@ if ($action === 'valider') {
 |--------------------------------------------------------------------------
 */
 
-elseif ($action === 'annuler') {
+elseif ($action == 'rejeter') {
 
     $motif = trim(
         $_POST['motif'] ?? ''
@@ -247,7 +247,7 @@ elseif ($action === 'annuler') {
         $sql = "
             UPDATE sigm_marches
             SET
-                statut = 'annule',
+                statut = 'rejete',
                 motif_annulation = ?,
                 cancelled_by = ?,
                 date_annulation = NOW()
@@ -280,7 +280,7 @@ elseif ($action === 'annuler') {
 
         $sqlDocs = "
             UPDATE sigm_marche_documents
-            SET statut = 'annule'
+            SET statut = 'rejete'
             WHERE marche_id = ?
               AND statut = 'en_attente'
         ";
@@ -303,7 +303,7 @@ elseif ($action === 'annuler') {
         */
 
         $ancienStatut = 'en_attente';
-        $nouveauStatut = 'annule';
+        $nouveauStatut = 'rejete';
 
         $sqlHist = "
             INSERT INTO sigm_marche_historique

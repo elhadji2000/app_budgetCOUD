@@ -271,7 +271,7 @@ $anneeActuelle = date('Y');
                             </ul>
                         </li>
                         <?php endif; ?>
-                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp' || $_SESSION['priv'] == 'admin'): ?>
+                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
                                 href="http://localhost/BUDGET/profiles/fournisseurs/liste_fournisseurs">Fournisseurs</a>

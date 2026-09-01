@@ -234,6 +234,27 @@ function getFournisseurById($idFourn)
     return null;
 }
 
+function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn, $idMarche = null) {
+    global $connexion;
+    
+    $dateEng = mysqli_real_escape_string($connexion, $dateEng);
+    $type_eng = mysqli_real_escape_string($connexion, $type_eng);
+    $montant = mysqli_real_escape_string($connexion, $montant);
+    $objet = mysqli_real_escape_string($connexion, $objet);
+    $idCompte = intval($idCompte);
+    $idFourn = intval($idFourn);
+    $idMarche = $idMarche ? intval($idMarche) : 'NULL';
+    
+    $sql = "INSERT INTO bud_engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idMarche) 
+            VALUES ('$dateEng', '$type_eng', '$montant', '$objet', $idCompte, $idFourn, $idMarche)";
+    
+    if (mysqli_query($connexion, $sql)) {
+        return true;
+    } else {
+        return "Erreur: " . mysqli_error($connexion);
+    }
+}
+
 /*
  * Fonction pour recuperer les numeros de Compte
  * ********************************************************************************
@@ -334,7 +355,7 @@ function getComptesDotationsByEng()
 
     // Requête SQL pour récupérer les comptes déjà dotés et dont l'année de dotation est égale à l'année en cours
     $query = "
-        SELECT c.numCompte, c.code, c.libelle, cp.numCp, cp.nature
+        SELECT c.numCompte,c.idCompte, c.code, c.libelle, cp.numCp, cp.nature
         FROM bud_compte AS c
         JOIN bud_compteP AS cp ON c.idCp = cp.idCp
         WHERE EXISTS (
@@ -1579,7 +1600,7 @@ function getDetailsCompte($numCompte)
     }
 } */
 
-function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn)
+/* function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn)
 {
     global $connexion;
 
@@ -1616,7 +1637,7 @@ function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte
         return "Erreur lors de l'ajout : " . mysqli_error($connexion);
     }
 }
-
+ */
 function ajouter_Ordre_Recette_temp($dateOr, $objet_recette, $montant, $pieces_annexees, $idCompte, $idFourn)
 {
     global $connexion;
@@ -2491,4 +2512,22 @@ function getBordereauById($idBordereau)
     return null;
 }
 
+
+/**
+ * Formate la taille d'un fichier en octets en une chaîne lisible
+ * 
+ * @param int $bytes Taille en octets
+ * @param int $precision Nombre de décimales
+ * @return string Taille formatée
+ */
+function formatSize($bytes, $precision = 2) {
+    if ($bytes === 0) {
+        return '0 B';
+    }
+    
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    $i = floor(log($bytes, 1024));
+    
+    return round($bytes / pow(1024, $i), $precision) . ' ' . $units[$i];
+}
 ?>
