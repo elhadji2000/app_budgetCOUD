@@ -237,10 +237,10 @@ textarea.form-control {
     <div class="card card-simple">
         <div class="card-body">
 
-            <form action="traitement_fourn.php" method="POST" class="needs-validation" novalidate>
+            <form action="traitement_fourn.php" method="POST" class="needs-validation" novalidate
+                enctype="multipart/form-data">
 
                 <input type="hidden" name="idFourn" value="<?= htmlspecialchars($fournisseur['idFourn'] ?? '') ?>">
-
                 <!-- =================================================
                  IDENTIFICATION
                 ================================================== -->
@@ -253,7 +253,7 @@ textarea.form-control {
                 <div class="row g-3">
 
                     <!-- NUMERO FOURNISSEUR -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label fw-semibold">
                             Numéro fournisseur
                             <span class="required-star">*</span>
@@ -266,7 +266,7 @@ textarea.form-control {
                     </div>
 
                     <!-- NOM -->
-                    <div class="col-md-8">
+                    <div class="col-md-5">
                         <label class="form-label fw-semibold">
                             Nom / Raison sociale
                             <span class="required-star">*</span>
@@ -305,6 +305,39 @@ textarea.form-control {
                         </select>
                         <div class="invalid-feedback">
                             Veuillez sélectionner la nature.
+                        </div>
+                    </div>
+
+                    <!-- NUMERO D'AGREMENT -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Numéro d'agrément
+                        </label>
+                        <input type="text" name="numAgrement" class="form-control"
+                            value="<?= htmlspecialchars($fournisseur['numAgrement'] ?? '') ?>"
+                            placeholder="Ex : AGR-2025-001">
+                        <div class="invalid-feedback">
+                            Veuillez renseigner le numéro d'agrément.
+                        </div>
+                    </div>
+
+                    <!-- FICHIER D'AGREMENT -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Fichier d'agrément
+                        </label>
+                        <input type="file" name="fichierAgrement" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                        <?php if (!empty($fournisseur['fichierAgrement'])): ?>
+                        <small class="text-muted d-block mt-1">
+                            <i class="bi bi-paperclip me-1"></i>
+                            Fichier actuel :
+                            <a href="<?= htmlspecialchars($fournisseur['fichierAgrement']) ?>" target="_blank">
+                                Voir le fichier
+                            </a>
+                        </small>
+                        <?php endif; ?>
+                        <div class="invalid-feedback">
+                            Veuillez joindre le fichier d'agrément.
                         </div>
                     </div>
 

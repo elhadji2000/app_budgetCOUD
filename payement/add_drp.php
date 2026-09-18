@@ -525,29 +525,49 @@ include '../includes/header.php';
                             </div>
                         </div>
 
-                        <!-- Type -->
+                        <!-- Nature -->
                         <div class="mb-2">
                             <label class="form-label fw-semibold">
-                                <i class="bi bi-tags me-1"></i> Type de marché
+                                <i class="bi bi-tags me-1"></i> Type de Marché
                                 <span class="text-danger">*</span>
                             </label>
                             <select name="type" id="type" class="form-select" required>
                                 <option value="">Sélectionner</option>
+                                <option value="DRP"
+                                    <?= ($isEdit && $marcheData['type_marche'] == 'DRP') ? 'selected' : '' ?>>
+                                    DRP</option>
+                                <option value="Marché"
+                                    <?= ($isEdit && $marcheData['type_marche'] == 'Marché') ? 'selected' : '' ?>>
+                                    Marché</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner.
+                            </div>
+                        </div>
+
+                         <!-- Type -->
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-tags me-1"></i> Nature
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="nature" id="nature" class="form-select" required>
+                                <option value="">Sélectionner</option>
                                 <option value="Fourniture de biens"
-                                    <?= ($isEdit && $marcheData['type_marche'] == 'Fourniture de biens') ? 'selected' : '' ?>>
+                                    <?= ($isEdit && $marcheData['nature'] == 'Fourniture de biens') ? 'selected' : '' ?>>
                                     Fourniture de biens</option>
                                 <option value="Services"
-                                    <?= ($isEdit && $marcheData['type_marche'] == 'Services') ? 'selected' : '' ?>>
+                                    <?= ($isEdit && $marcheData['nature'] == 'Services') ? 'selected' : '' ?>>
                                     Services</option>
                                 <option value="Travaux"
-                                    <?= ($isEdit && $marcheData['type_marche'] == 'Travaux') ? 'selected' : '' ?>>
+                                    <?= ($isEdit && $marcheData['nature'] == 'Travaux') ? 'selected' : '' ?>>
                                     Travaux</option>
                                 <option value="Prestation intellectuelle"
-                                    <?= ($isEdit && $marcheData['type_marche'] == 'Prestation intellectuelle') ? 'selected' : '' ?>>
+                                    <?= ($isEdit && $marcheData['nature'] == 'Prestation intellectuelle') ? 'selected' : '' ?>>
                                     Prestation intellectuelle</option>
                             </select>
                             <div class="invalid-feedback">
-                                Veuillez sélectionner un type.
+                                Veuillez sélectionner.
                             </div>
                         </div>
 
@@ -713,6 +733,7 @@ include '../includes/header.php';
         const $idFourn = $('#idFourn');
         const $montant = $('#montant');
         const $type = $('#type');
+        const $nature = $('#nature');
         const $objet = $('#objet');
         const $reference = $('#reference');
 

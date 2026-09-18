@@ -1,0 +1,154 @@
+id;compte;libelle;dotation
+1;70611;Vente de repas Subv;1000000000
+2;70612;Vente petit déjner Subv,;250000000
+3;70613;Vente de repas express;0
+4;70614;Loyers subventionnés;280000000
+5;70615;Loyers « passager »;0
+6;70616;Vente de médicaments;10000000
+7;70617;Consultations externes (imagerie médicale+divers);90000000
+8;70618;Vente tickets / consultation;2000000
+9;70731;Location panneaux pub;21000000
+10;70732;Location terrain de foot;0
+11;70733;Location salles de spectacle;2000000
+12;70734;Location « Cantines »;31000000
+13;70735;Location Centre Commercial;10000000
+14;70736;Location kiosques;2000000
+15;70781;Imprimerie du COUD;0
+16;70782;Vente dossiers d'appel d'offres;3000000
+17;70783;Vente de guides des œuvres;1000000
+18;7181;Contribution Etat du Sénégal;25120015375
+19;7182;Contribution autres Etats et Organismes;5000000
+20;7183;Contributions versées par des tiers;2000000
+21;7582;Indemnités d'assurances reçues;0
+22;7583;Autres Produits Divers;5000000
+23;7584;Retenues imputables à des tiers;15000000
+24;7585;Reprises sur caution;15000000
+25;822;Produits des cessions d'immobilisations corporelles;9597350
+26;845;Dons et libéralités obtenus;5000000
+27;604111;Maçonnerie;75000000
+28;604112;Droguerie- Peinture;73000000
+29;604113;Petit outillage;15000000
+30;604114;Plomberie Sanitaire;100000000
+31;604115;Petit Matériel électrique;100000000
+32;604116;Quincaillerie;100000000
+33;604117;Menuiserie bois;80000000
+34;604118;Menuiserie Métallique;60000000
+35;604119;Fournitures consommées;70000000
+36;604121;Petit Matériel cuisine restaurant;15000000
+37;604122;Literie draps couvertures;88000000
+38;604123;Petit matériel ludique;90000000
+39;604124;Pieces détachées Auto;45000000
+40;604125;Linge Tissus Mercerie;19000000
+41;604126;Vetement de travail;70000000
+42;604127;Petit matériel d'entretien;39000000
+43;604128;Petit matériel et équipement de décoration;0
+44;604191;Produits pharma étudiants;160000000
+45;604192;Produits pharma personnel;10000000
+46;604193;Produits dentaires;30000000
+47;604194;Produits medicaux;30000000
+48;604195;Petit matériel médical;30000000
+49;604196;Produits laboratoire;20000000
+50;60421;Carburant Lubrifiant;140000000
+51;6043;Produits d' entretien;120000000
+52;60441;Fournitures d'imprimerie;0
+53;60478;Autres fournitures de bureau;140000000
+54;60472;Petit matériel Informatique;20000000
+55;60473;Imprimés;140000000
+56;60477;Consommables informatiques;0
+57;60481;Petit matériel de communication;0
+58;6051;Eau;300000000
+59;6052;Electricité;80000000
+60;614;Transport Personnel;0
+61;618;Autres Frais de Transport;30000000
+62;6211;Sous traitance restauration;5860000000
+63;6222;Loyer batiment;40000000
+64;6223;Locations de matériels et outillages;30000000
+65;623;Redevances de credit-bail et contrats assimilés;0
+66;62411;Entretien cours et jardins;4000000
+67;62412;Entretien Curage;30000000
+68;62413;Désinfection Cités;30000000
+69;62414;Entretien décharge ordures;45000000
+70;624151;Entretien et réfection bâtiments admin;2720745000
+71;624152;Entretien et aménagements;705000000
+72;624211;Entretien poste de transform;0
+73;624212;Entretien groupe électrogene;5000000
+74;624213;Entretien pompe à eau;10000000
+75;624223;Entretien matériel cuisine rest;20000000
+76;624224;Entretien matériel incendie;5000000
+77;624225;Entretien Véhicule;22000000
+78;624226;Entretien matériel medical;5000000
+79;62481;blanchissage;35000000
+80;62482;Autres entretiens et réparations;5000000
+81;6252;Assurance matériel de transport;15000000
+82;62581;Assurance incendie;0
+83;6261;Etudes et Recherches;44000000
+84;6265;Documentation générale;2000000
+85;62781;Autre activité de comm;20000000
+86;6271;Annonces, insertions;5000000
+87;6277;Frais de colloques, séminaires, conférences;25000000
+88;6281;Frais de téléphone;30000000
+89;6288;Autres charges de publicité et relations publiques;5000000
+90;6324;Honoraires internes;0
+91;63251;Frais d' actes;20000000
+92;63252;Frais de contentieux;0
+93;6327;Rémunérations des autres prestations de services;5000000
+94;632801;Frais de représentation;0
+95;631;Frais bancaires;2000000
+96;633;Frais formation personnel;20000000
+97;634;Redevances pour brevets, licences, logiciels et droits similaires;14000000
+98;635811;Remboursement frais lunettes;5000000
+99;635812;Analyses consultations étudiants;150000000
+100;635813;Soins externes étudiants;20000000
+101;635814;Hospitalisation étudiants;70000000
+102;635815;Subventions accordées aux amicales;65000000
+103;635816;Autres subventions accordées;70000000
+104;63830;Activités sportives;67000000
+105;63831;Activités culturelles;64000000
+106;63832;Réception;3000000
+107;6384;Mission;20000000
+108;6388;Charges externes diverses;270000000
+109;641;Impôts et taxes directs;0
+110;646;Droit d'enregistrement;200000
+111;647;Pénalités et amendes fiscales;0
+112;6580;Charges Diverses;80000000
+113;6581;Indemnités de fonction et autres rémunérations d'administrateurs;26597350
+114;6585;Secours Activités Sociales;70000000
+115;6584;Indemnisation sous-traitants restaurants;0
+116;66111;Rémunération personnel permanent;11000000000
+117;66112;Rémunération personnel Temporaire;2100000000
+118;6617;Médaille de travail;10000000
+119;6638;Indemnités Avantages;60000000
+120;664;Charges sociales;500000000
+121;66841;Hospitalisation personnel;25000000
+122;66842;Analyses consultations personnel;40000000
+123;66843;Accouchement personnel;10000000
+124;66844;Soins externes personnel;5000000
+125;6688;Charges sociales diverses;80070375
+126;674;Charges Financieres;0
+127;68131;Dotation aux amort. Mat. Cuisine;0
+128;68132;Dotation aux amort. Mat. D' exploitation;0
+129;68133;Dotation aux amort. Mat. Bureau;0
+130;68134;Dotation aux amort. Mat. Cités;0
+131;68135;Dotation aux amort. Ag. Installation;0
+132;68136;Dotation aux amort. Mat.Transport;0
+133;68137;Dotation aux amort. Charges à rétablir;0
+134;14;Subvention d'Investissement;1321000000
+135;23131;Refection batiment d'exploitation;0
+136;2340;Installation Téléphonique;0
+137;2381;Travaux Amenagements Installations;0
+138;2390;Bâtiments en cours;0
+139;2415;Matériel et outillage de cuisine et restaurant;50000000
+140;2416;Matériel et outillage thermique Appareil Froid;80000000
+141;2417;Matériel et outillage Atelier;10000000
+142;2418;Matériel et outillage incendie;15000000
+143;2440;Matériel et Mobilier de bureau;200000000
+144;2442;Materiel et outillage informatique;140000000
+145;24481;Materiel et mobilier de cités;420000000
+146;2450;Matériel de transport;116000000
+147;2484;Matériel Services Médicaux;220000000
+148;2482;Matériel Activités Culturelles;40000000
+149;2483;Matériel Mob Foyer Universitaire;15000000
+150;2488;Divers matériels et mobiliers;15000000
+151;2752;Depot et cautionnement Electricite;0
+152;2753;Depot et cautionnement Eau;0
+153;2758;Autres Depot cautionnement;0

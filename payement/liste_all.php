@@ -23,6 +23,7 @@ $sql = '
         m.annee,
         m.montant,
         m.type_marche,
+        m.nature,
         m.objet,
         m.statut,
         m.date_creation,
@@ -299,7 +300,7 @@ include '../includes/header.php';
                             <th>Référence</th>
                             <th>Fournisseur</th>
                             <th>Objet</th>
-                            <th>Type</th>
+                            <th>Nature</th>
                             <th>Montant</th>
                             <th>Pièces</th>
                             <th>Statut</th>
@@ -340,7 +341,7 @@ include '../includes/header.php';
 
                             <!-- Type -->
                             <td>
-                                <?= htmlspecialchars($row['type_marche']) ?>
+                                <?= htmlspecialchars($row['nature']) ?>
                             </td>
 
                             <!-- Montant -->

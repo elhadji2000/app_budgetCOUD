@@ -67,8 +67,9 @@ $montant = isset($_POST['montant'])
     : 0;
 
 $typeMarche = trim($_POST['type'] ?? '');
-$objet = trim($_POST['objet'] ?? '');
-$reference = trim($_POST['reference'] ?? '');
+$nature     = trim($_POST['nature'] ?? '');
+$objet      = trim($_POST['objet'] ?? '');
+$reference  = trim($_POST['reference'] ?? '');
 
 /*
  * |--------------------------------------------------------------------------
@@ -86,26 +87,26 @@ $isEdit = $idMarche > 0;
 
 if ($isEdit) {
     $existingDocIds = $_POST['existing_doc_ids'] ?? [];
-    $existingTypes = $_POST['existing_types'] ?? [];
-    $deletedDocIds = $_POST['deleted_doc_ids'] ?? [];
-    $newTypes = $_POST['new_types'] ?? [];
+    $existingTypes  = $_POST['existing_types'] ?? [];
+    $deletedDocIds  = $_POST['deleted_doc_ids'] ?? [];
+    $newTypes       = $_POST['new_types'] ?? [];
 
     $files = $_FILES['new_files'] ?? [
-        'name' => [],
-        'error' => [],
-        'size' => [],
+        'name'     => [],
+        'error'    => [],
+        'size'     => [],
         'tmp_name' => [],
-        'type' => []
+        'type'     => []
     ];
 } else {
     $typesDocuments = $_POST['types'] ?? [];
 
     $files = $_FILES['files'] ?? [
-        'name' => [],
-        'error' => [],
-        'size' => [],
+        'name'     => [],
+        'error'    => [],
+        'size'     => [],
         'tmp_name' => [],
-        'type' => []
+        'type'     => []
     ];
 }
 
@@ -148,6 +149,10 @@ if ($montant <= 0) {
 
 if ($typeMarche === '') {
     $erreurs[] = 'Le type de marché est obligatoire.';
+}
+
+if ($nature === '') {
+    $erreurs[] = 'La nature du marché est obligatoire.';
 }
 
 if ($objet === '') {
@@ -559,6 +564,7 @@ try {
             reference = ?,
             montant = ?,
             type_marche = ?,
+            nature = ?,
             objet = ?,
             id_fournisseur = ?,
             statut = 'en_attente'
@@ -579,10 +585,11 @@ try {
 
         mysqli_stmt_bind_param(
             $stmt,
-            'sdssii',
+            'sdsssii',
             $reference,
             $montant,
             $typeMarche,
+            $nature,
             $objet,
             $idFourn,
             $idMarche
@@ -1131,6 +1138,7 @@ try {
                 annee,
                 montant,
                 type_marche,
+                nature,
                 objet,
                 id_fournisseur,
                 statut,
@@ -1138,6 +1146,7 @@ try {
             )
             VALUES
             (
+                ?,
                 ?,
                 ?,
                 ?,
@@ -1164,11 +1173,12 @@ try {
 
         mysqli_stmt_bind_param(
             $stmt,
-            'sidssii',
+            'sidsssii',
             $reference,
             $annee,
             $montant,
             $typeMarche,
+            $nature,
             $objet,
             $idFourn,
             $userId

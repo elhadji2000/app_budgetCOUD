@@ -89,8 +89,19 @@ function getAllFournisseurs()
 /**
  * Ajouter un nouveau fournisseur
  */
-function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea, $rccm, $email, $observations)
-{
+function ajouterFournisseur(
+    $numFourn,
+    $nom,
+    $adresse,
+    $contact,
+    $nature,
+    $ninea,
+    $rccm,
+    $email,
+    $observations,
+    $numAgrement = null,
+    $fichierAgrement = null
+) {
     global $connexion;
 
     if (!$connexion) {
@@ -107,6 +118,8 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea
     $rccm = mysqli_real_escape_string($connexion, $rccm);
     $email = mysqli_real_escape_string($connexion, $email);
     $observations = mysqli_real_escape_string($connexion, $observations);
+    $numAgrement = mysqli_real_escape_string($connexion, $numAgrement ?? '');
+    $fichierAgrement = mysqli_real_escape_string($connexion, $fichierAgrement ?? '');
 
     // Vérifie si le numéro fournisseur existe déjà
     $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn'";
@@ -126,7 +139,9 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea
                 ninea, 
                 rccm, 
                 email, 
-                observations
+                observations,
+                numAgrement,
+                fichierAgrement
             ) VALUES (
                 '$numFourn', 
                 '$nom', 
@@ -136,7 +151,9 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea
                 '$ninea', 
                 '$rccm', 
                 '$email', 
-                '$observations'
+                '$observations',
+                '$numAgrement',
+                '$fichierAgrement'
             )";
 
     if (mysqli_query($connexion, $sql)) {
@@ -149,16 +166,34 @@ function ajouterFournisseur($numFourn, $nom, $adresse, $contact, $nature, $ninea
 /**
  * Modifier un fournisseur existant
  */
-function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nature, $ninea, $rccm, $email, $observations)
-{
+function modifierFournisseur(
+    $idFourn,
+    $numFourn,
+    $nom,
+    $adresse,
+    $contact,
+    $nature,
+    $ninea,
+    $rccm,
+    $email,
+    $observations,
+    $numAgrement = null,
+    $fichierAgrement = null
+) {
     global $connexion;
 
     if (!$connexion) {
         return 'Erreur de connexion : ' . mysqli_connect_error();
     }
 
+    // Échappement pour la requête de vérification
+    $numFourn_esc = mysqli_real_escape_string($connexion, $numFourn);
+    $idFourn_int = (int) $idFourn;
+
     // Vérifier si le numéro fournisseur existe déjà (pour un autre enregistrement)
-    $verif_sql = "SELECT idFourn FROM bud_fournisseur WHERE numFourn = '$numFourn' AND idFourn != $idFourn";
+    $verif_sql = "SELECT idFourn FROM bud_fournisseur 
+                  WHERE numFourn = '$numFourn_esc' 
+                  AND idFourn != $idFourn_int";
     $verif_res = mysqli_query($connexion, $verif_sql);
 
     if (mysqli_num_rows($verif_res) > 0) {
@@ -175,7 +210,9 @@ function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nat
                 ninea = ?, 
                 rccm = ?, 
                 email = ?, 
-                observations = ? 
+                observations = ?,
+                numAgrement = ?,
+                fichierAgrement = ?
             WHERE idFourn = ?';
 
     $stmt = $connexion->prepare($sql);
@@ -185,7 +222,7 @@ function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nat
     }
 
     $stmt->bind_param(
-        'sssssssssi',  // 9 strings + 1 int
+        'sssssssssssi',  // 11 strings + 1 int
         $numFourn,
         $nom,
         $adresse,
@@ -195,6 +232,8 @@ function modifierFournisseur($idFourn, $numFourn, $nom, $adresse, $contact, $nat
         $rccm,
         $email,
         $observations,
+        $numAgrement,
+        $fichierAgrement,
         $idFourn
     );
 
