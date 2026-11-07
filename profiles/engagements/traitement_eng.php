@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * |--------------------------------------------------------------------------
      */
 
-    if ($marche['statut'] !== 'valide') {
+    if ($marche['statut'] != 'budget') {
         header(
             'Location: ajouter.php?error='
             . urlencode(
@@ -512,7 +512,7 @@ if (isset($_GET['valider_id'])) {
         exit();
     }
 
-    if ($marche['statut'] !== 'valide') {
+    if ($marche['statut'] != 'budget') {
         header(
             'Location: liste_engs.php?error='
             . urlencode(
@@ -611,7 +611,7 @@ if (isset($_GET['valider_id'])) {
             UPDATE sigm_marches
             SET statut = 'engager'
             WHERE id = ?
-            AND statut = 'valide'
+            AND statut = 'budget'
         ";
 
         $stmtUpdate = mysqli_prepare(

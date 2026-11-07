@@ -1,4 +1,3 @@
-
 <?php
 
 session_start();
@@ -22,13 +21,16 @@ $userId = isset($_SESSION['idUser'])
     : null;
 
 $marcheId = (int) ($_POST['marche_id'] ?? 0);
-$action = $_POST['action'] ?? '';
+$action   = $_POST['action'] ?? '';
 
 if ($marcheId <= 0) {
+
     $_SESSION['error'] = "Dossier invalide.";
+
     header("Location: liste_marches.php");
     exit();
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -65,16 +67,44 @@ if (!$marche) {
     exit();
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| Le dossier doit être en attente
+| Vérifier les droits du profil connecté
+|--------------------------------------------------------------------------
+|
+| Correspondance PROFIL → STATUT attendu :
+|
+| drp       → en_entente
+| direction → direction
+| controle   → controle
+| budget    → budget
+|
+*/
+
+$profil = strtolower(trim($_SESSION['priv'] ?? ''));
+
+$statutsAutorises = [
+    'drp'       => 'en_entente',
+    'direction' => 'direction',
+    'controle'   => 'controle',
+    'budget'    => 'budget'
+];
+
+$statutAttendu = $statutsAutorises[$profil] ?? null;
+
+$statutMarche = strtolower(trim($marche['statut']));
+
+/*
+|--------------------------------------------------------------------------
+| Le profil connecté ne peut pas traiter ce dossier
 |--------------------------------------------------------------------------
 */
 
-if ($marche['statut'] !== 'en_attente') {
+if ($statutAttendu === null || $statutMarche !== $statutAttendu) {
 
     $_SESSION['error'] =
-        "Ce dossier a déjà été traité.";
+        "Vous n'êtes pas autorisé à traiter ce dossier à cette étape.";
 
     header(
         "Location: traitement_marche.php?id="
@@ -87,28 +117,62 @@ if ($marche['statut'] !== 'en_attente') {
 
 /*
 |--------------------------------------------------------------------------
+| Déterminer le statut suivant selon le profil
+|--------------------------------------------------------------------------
+*/
+
+$statutsSuivants = [
+    'drp'       => 'direction',
+    'direction' => 'controle',
+    'controle'   => 'budget',
+    'budget'    => 'valide'
+];
+
+$nouveauStatut = $statutsSuivants[$profil] ?? null;
+
+
+/*
+|--------------------------------------------------------------------------
 | VALIDATION
 |--------------------------------------------------------------------------
 */
 
 if ($action === 'valider') {
 
+    $ancienStatut = $marche['statut'];
+
+    if (!$nouveauStatut) {
+
+        $_SESSION['error'] =
+            "Impossible de déterminer le prochain statut.";
+
+        header(
+            "Location: traitement_marche.php?id="
+            . $marcheId
+        );
+
+        exit();
+    }
+
+
     mysqli_begin_transaction($connexion);
 
     try {
 
         /*
-        | Mise à jour marché
+        |--------------------------------------------------------------------------
+        | Mise à jour du marché
+        |--------------------------------------------------------------------------
         */
 
         $sql = "
             UPDATE sigm_marches
             SET
-                statut = 'valide',
+                statut = ?,
                 validated_by = ?,
                 date_validation = NOW()
             WHERE id = ?
-              AND statut = 'en_attente'
+              AND statut = ?
         ";
 
         $stmt = mysqli_prepare(
@@ -118,26 +182,32 @@ if ($action === 'valider') {
 
         mysqli_stmt_bind_param(
             $stmt,
-            "ii",
+            "siis",
+            $nouveauStatut,
             $userId,
-            $marcheId
+            $marcheId,
+            $ancienStatut
         );
 
         if (!mysqli_stmt_execute($stmt)) {
+
             throw new Exception(
                 "Erreur lors de la validation."
             );
         }
 
+
         /*
+        |--------------------------------------------------------------------------
         | Documents
+        |--------------------------------------------------------------------------
         */
 
         $sqlDocs = "
             UPDATE sigm_marche_documents
-            SET statut = 'valide'
+            SET statut = ?
             WHERE marche_id = ?
-              AND statut = 'en_attente'
+              AND statut = ?
         ";
 
         $stmtDocs = mysqli_prepare(
@@ -147,21 +217,23 @@ if ($action === 'valider') {
 
         mysqli_stmt_bind_param(
             $stmtDocs,
-            "i",
-            $marcheId
+            "sis",
+            $nouveauStatut,
+            $marcheId,
+            $ancienStatut
         );
 
         mysqli_stmt_execute($stmtDocs);
 
+
         /*
+        |--------------------------------------------------------------------------
         | Historique
+        |--------------------------------------------------------------------------
         */
 
-        $ancienStatut = 'en_attente';
-        $nouveauStatut = 'valide';
-
         $commentaire =
-            "Dossier validé.";
+            "Dossier validé et transmis à l'étape suivante.";
 
         $sqlHist = "
             INSERT INTO sigm_marche_historique
@@ -192,12 +264,19 @@ if ($action === 'valider') {
 
         mysqli_stmt_execute($stmtHist);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Valider la transaction
+        |--------------------------------------------------------------------------
+        */
+
         mysqli_commit($connexion);
 
         $_SESSION['success'] =
             "Le dossier "
             . htmlspecialchars($marche['reference'])
-            . " a été validé avec succès.";
+            . " a été validé et transmis avec succès.";
 
     } catch (Throwable $e) {
 
@@ -207,7 +286,6 @@ if ($action === 'valider') {
             "Erreur : "
             . $e->getMessage();
     }
-
 }
 
 
@@ -215,9 +293,19 @@ if ($action === 'valider') {
 |--------------------------------------------------------------------------
 | ANNULATION
 |--------------------------------------------------------------------------
+|
+| IMPORTANT :
+|
+| Annuler ne met PAS le dossier à "rejete".
+|
+| Il retourne le dossier à :
+|
+|                  en_entente
+|
+|--------------------------------------------------------------------------
 */
 
-elseif ($action == 'rejeter') {
+elseif ($action === 'annuler') {
 
     $motif = trim(
         $_POST['motif'] ?? ''
@@ -236,23 +324,43 @@ elseif ($action == 'rejeter') {
         exit();
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ancien statut
+    |--------------------------------------------------------------------------
+    */
+
+    $ancienStatut = $marche['statut'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nouveau statut après annulation
+    |--------------------------------------------------------------------------
+    */
+
+    $nouveauStatut = 'rejete';
+
+
     mysqli_begin_transaction($connexion);
 
     try {
 
         /*
+        |--------------------------------------------------------------------------
         | Mise à jour marché
+        |--------------------------------------------------------------------------
         */
 
         $sql = "
             UPDATE sigm_marches
             SET
-                statut = 'rejete',
+                statut = ?,
                 motif_annulation = ?,
                 cancelled_by = ?,
                 date_annulation = NOW()
             WHERE id = ?
-              AND statut = 'en_attente'
+              AND statut = ?
         ";
 
         $stmt = mysqli_prepare(
@@ -262,27 +370,33 @@ elseif ($action == 'rejeter') {
 
         mysqli_stmt_bind_param(
             $stmt,
-            "sii",
+            "ssiis",
+            $nouveauStatut,
             $motif,
             $userId,
-            $marcheId
+            $marcheId,
+            $ancienStatut
         );
 
         if (!mysqli_stmt_execute($stmt)) {
+
             throw new Exception(
                 "Erreur lors de l'annulation."
             );
         }
 
+
         /*
+        |--------------------------------------------------------------------------
         | Documents
+        |--------------------------------------------------------------------------
         */
 
         $sqlDocs = "
             UPDATE sigm_marche_documents
-            SET statut = 'rejete'
+            SET statut = ?
             WHERE marche_id = ?
-              AND statut = 'en_attente'
+              AND statut = ?
         ";
 
         $stmtDocs = mysqli_prepare(
@@ -292,18 +406,26 @@ elseif ($action == 'rejeter') {
 
         mysqli_stmt_bind_param(
             $stmtDocs,
-            "i",
-            $marcheId
+            "sis",
+            $nouveauStatut,
+            $marcheId,
+            $ancienStatut
         );
 
         mysqli_stmt_execute($stmtDocs);
 
+
         /*
+        |--------------------------------------------------------------------------
         | Historique
+        |--------------------------------------------------------------------------
         */
 
-        $ancienStatut = 'en_attente';
-        $nouveauStatut = 'rejete';
+        $commentaire =
+            "Dossier annulé à l'étape "
+            . $ancienStatut
+            . " et retourné en entente. Motif : "
+            . $motif;
 
         $sqlHist = "
             INSERT INTO sigm_marche_historique
@@ -328,18 +450,25 @@ elseif ($action == 'rejeter') {
             $marcheId,
             $ancienStatut,
             $nouveauStatut,
-            $motif,
+            $commentaire,
             $userId
         );
 
         mysqli_stmt_execute($stmtHist);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Valider la transaction
+        |--------------------------------------------------------------------------
+        */
 
         mysqli_commit($connexion);
 
         $_SESSION['success'] =
             "Le dossier "
             . htmlspecialchars($marche['reference'])
-            . " a été annulé.";
+            . " a été annulé et retourné en entente.";
 
     } catch (Throwable $e) {
 
@@ -351,6 +480,13 @@ elseif ($action == 'rejeter') {
     }
 
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Action inconnue
+|--------------------------------------------------------------------------
+*/
 
 else {
 
@@ -365,9 +501,12 @@ else {
 |--------------------------------------------------------------------------
 */
 
-header(
+/* header(
     "Location: traitement_marche.php?id="
     . $marcheId
+); */
+header(
+    "Location: liste_all.php"
 );
 
 exit();

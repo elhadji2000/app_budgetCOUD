@@ -391,10 +391,10 @@ $anneeActuelle = date('Y');
                         </li>
                         <?php endif; ?>
 
-                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp'): ?>
+                        <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp' || $_SESSION['priv'] == 'direction' || $_SESSION['priv'] == 'controle'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
-                                href="http://localhost/BUDGET/payement/liste_all">DRP</a>
+                                href="http://localhost/BUDGET/payement/liste_all">MARCHE(S)</a>
                         </li>
                         <?php endif; ?>
 

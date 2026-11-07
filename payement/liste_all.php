@@ -1,48 +1,36 @@
 <?php
-session_start();
+include '../includes/fonctions.php';
 
 if (!isset($_SESSION['user'])) {
     header('Location: ../../index.php');
     exit();
 }
 
-include '../includes/fonctions.php';
+
 
 global $connexion;
 
-/*
-|--------------------------------------------------------------------------
-| Récupération des marchés avec le fournisseur
-|--------------------------------------------------------------------------
-*/
-
-$sql = '
-    SELECT 
-        m.id,
-        m.reference,
-        m.annee,
-        m.montant,
-        m.type_marche,
-        m.nature,
-        m.objet,
-        m.statut,
-        m.date_creation,
-        m.id_fournisseur,
-        f.nom AS nom_fournisseur,
-        f.numFourn AS num_fournisseur,
-        COUNT(d.id) AS nombre_documents
-    FROM sigm_marches m
-    LEFT JOIN bud_fournisseur f ON f.idFourn = m.id_fournisseur
-    LEFT JOIN sigm_marche_documents d ON d.marche_id = m.id
-    GROUP BY m.id
-    ORDER BY m.date_creation DESC
-';
-
-$result = mysqli_query($connexion, $sql);
+$result = getMarchesSelonProfil();
 
 if (!$result) {
-    die('Erreur SQL : ' . mysqli_error($connexion));
+    echo '<div class="alert alert-danger">
+            Une erreur est survenue lors du chargement des marchés.
+          </div>';
 }
+
+// Récupération du profil de l'utilisateur connecté (en minuscules)
+$profil = strtolower(trim($_SESSION['priv_2'] ?? ''));
+
+// Correspondance profil => statut que l'utilisateur peut traiter
+$statutsAutorises = [
+    'dba_drp'       => 'en_entente',
+    'dba_direction' => 'direction',
+    'dba_controle'   => 'controle',
+    'dba_budget'    => 'budget'
+];
+
+// Statut attendu pour ce profil
+$statutAttendu = $statutsAutorises[$profil] ?? null;
 
 include '../includes/header.php';
 ?>
@@ -53,6 +41,7 @@ include '../includes/header.php';
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <style>
+/* ... (vos styles restent identiques) ... */
 .statut-badge {
     font-size: 11px;
     padding: 3px 12px;
@@ -61,16 +50,31 @@ include '../includes/header.php';
     display: inline-block;
 }
 
-.statut-badge.en_attente {
+.statut-badge.en_entente {
     background: #fff3cd;
     color: #856404;
 }
+
 .statut-badge.engager {
     background: #2247c4;
     color: #0a0745;
 }
 
 .statut-badge.valide {
+    background: #d4edda;
+    color: #155724;
+}
+
+.statut-badge.controle {
+    background: #d4edda;
+    color: #155724;
+}
+.statut-badge.budget {
+    background: #717867;
+    color: #adc90f;
+}
+
+.statut-badge.direction {
     background: #d4edda;
     color: #155724;
 }
@@ -255,14 +259,20 @@ include '../includes/header.php';
         padding: 1px 6px;
     }
 }
+
+.btn-action.btn-disabled,
+.btn-action.btn-disabled:hover {
+    background: #d6d6d6 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+    pointer-events: none;
+}
 </style>
 
 <main class="container-fluid mt-3">
 
-    <!-- =====================================================
-     EN-TÊTE
-    ====================================================== -->
-
+    <!-- EN-TÊTE -->
     <div class="card shadow-sm border-0 mb-3">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
@@ -274,24 +284,22 @@ include '../includes/header.php';
                     Gestion des dossiers de marchés
                 </small>
             </div>
+            <?php if (strtolower(trim($_SESSION['priv'] ?? '')) == 'drp'): ?>
             <div>
                 <a href="add_drp.php" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-lg"></i>
                     Nouveau
                 </a>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- =====================================================
-     TABLEAU
-    ====================================================== -->
-
+    <!-- TABLEAU -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
 
             <div class="table-responsive">
-
                 <table id="tableMarches" class="table table-striped table-hover align-middle">
 
                     <thead>
@@ -311,9 +319,13 @@ include '../includes/header.php';
 
                     <tbody>
                         <?php if (mysqli_num_rows($result) > 0): ?>
-                        <?php  $n = 1; while ($row = mysqli_fetch_assoc($result)): ?>
+                        <?php
+            $n = 1;
+            while ($row = mysqli_fetch_assoc($result)):
+            ?>
                         <tr>
                             <td><?= $n; ?></td>
+
                             <!-- Référence -->
                             <td>
                                 <strong>
@@ -325,7 +337,9 @@ include '../includes/header.php';
                             <td>
                                 <?php if ($row['nom_fournisseur']): ?>
                                 <div class="fournisseur-info">
-                                    <span class="nom"><?= htmlspecialchars($row['nom_fournisseur']) ?></span>
+                                    <span class="nom">
+                                        <?= htmlspecialchars($row['nom_fournisseur']) ?>
+                                    </span>
                                 </div>
                                 <?php else: ?>
                                 <span class="text-muted">Non défini</span>
@@ -339,7 +353,7 @@ include '../includes/header.php';
                                 </span>
                             </td>
 
-                            <!-- Type -->
+                            <!-- Nature -->
                             <td>
                                 <?= htmlspecialchars($row['nature']) ?>
                             </td>
@@ -361,17 +375,19 @@ include '../includes/header.php';
 
                             <!-- Statut -->
                             <td>
-                                <span class="statut-badge <?= $row['statut'] ?>">
+                                <span class="statut-badge <?= htmlspecialchars($row['statut']) ?>">
                                     <?php
-                                            $statuts = [
-                                                'en_attente' => 'En attente',
-                                                'valide' => 'Validé',
-                                                'annule' => 'Annulé',
-                                                'engager' => 'Engager',
-                                                'rejete' => 'Rejeté'
-                                            ];
-                                            echo $statuts[$row['statut']] ?? $row['statut'];
-                                            ?>
+                            $statuts = [
+                                'en_entente' => 'En attente',
+                                'valide'     => 'Validé',
+                                'annule'     => 'Annulé',
+                                'budget'    => 'Budget',
+                                'engager'    => 'Engagé',
+                                'rejete'     => 'Rejeté'
+                            ];
+
+                            echo $statuts[$row['statut']] ?? htmlspecialchars($row['statut']);
+                            ?>
                                 </span>
                             </td>
 
@@ -382,45 +398,84 @@ include '../includes/header.php';
 
                             <!-- Actions -->
                             <td>
-                                <div class="d-flex gap-1">
+                                <div class="d-flex gap-1 align-items-center">
 
                                     <!-- Voir -->
-                                    <a href="traitement_marche.php?id=<?= $row['id'] ?>" class="btn-action btn-view"
-                                        title="Voir">
+                                    <a href="traitement_marche.php?id=<?= (int)$row['id'] ?>"
+                                        class="btn-action btn-view" title="Voir">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
-                                    <?php if ($row['statut'] === 'en_attente'): ?>
+                                    <?php
+                            // Vérifier si l'utilisateur peut traiter ce marché
+                            $peutTraiter = false;
+
+                            if (
+                                $statutAttendu !== null &&
+                                strtolower(trim($row['statut'])) === $statutAttendu
+                            ) {
+                                $peutTraiter = true;
+                            }
+
+                            // Vérifier la présence de l'autorisation d'engagement
+                            $aAutorisation = (int)($row['nombre_autorisations'] ?? 0) > 0;
+
+                            // Blocage uniquement pour la Direction
+                            $directionBloquee = (
+                                $profil === 'dba_direction' &&
+                                !$aAutorisation
+                            );
+                            ?>
+
+                                    <?php if ($peutTraiter): ?>
+
                                     <!-- Valider -->
-                                    <form method="POST" action="traiter_marche.php" class="d-inline">
-                                        <input type="hidden" name="marche_id" value="<?= $row['id'] ?>">
+                                    <form method="POST" action="traiter_marche.php" class="d-inline m-0">
+
+                                        <input type="hidden" name="marche_id" value="<?= (int)$row['id'] ?>">
+
                                         <input type="hidden" name="action" value="valider">
-                                        <button type="submit" class="btn-action btn-validate" title="Valider"
+
+                                        <button type="submit"
+                                            class="btn-action btn-validate <?= $directionBloquee ? 'btn-disabled' : '' ?>"
+                                            title="<?= $directionBloquee ? 'Autorisation d’engagement manquante' : 'Valider' ?>"
+                                            <?= $directionBloquee ? 'disabled' : '' ?>
                                             onclick="return confirm('Voulez-vous valider ce marché ?')">
+
                                             <i class="bi bi-check-lg"></i>
                                         </button>
                                     </form>
 
-                                    <!-- Annuler -->
-                                    <button type="button" class="btn-action btn-cancel" title="Annuler"
+                                    <!-- Rejeter -->
+                                    <button type="button"
+                                        class="btn-action btn-cancel <?= $directionBloquee ? 'btn-disabled' : '' ?>"
+                                        title="<?= $directionBloquee ? 'Autorisation d’engagement manquante' : 'Rejeter' ?>"
+                                        <?= $directionBloquee ? 'disabled' : '' ?> <?php if (!$directionBloquee): ?>
                                         data-bs-toggle="modal" data-bs-target="#annulationModal"
-                                        data-id="<?= $row['id'] ?>">
+                                        data-id="<?= (int)$row['id'] ?>" <?php endif; ?>>
+
                                         <i class="bi bi-x-lg"></i>
                                     </button>
+
                                     <?php endif; ?>
 
                                 </div>
                             </td>
                         </tr>
+
                         <?php $n++; ?>
+
                         <?php endwhile; ?>
+
                         <?php else: ?>
+
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">
+                            <td colspan="10" class="text-center text-muted py-4">
                                 <i class="bi bi-folder2-open d-block mb-2"></i>
                                 Aucun marché enregistré
                             </td>
                         </tr>
+
                         <?php endif; ?>
                     </tbody>
 
@@ -433,10 +488,7 @@ include '../includes/header.php';
 
 </main>
 
-<!-- =========================================================
-     MODAL ANNULATION
-========================================================= -->
-
+<!-- MODAL ANNULATION -->
 <div class="modal fade" id="annulationModal" tabindex="-1">
     <div class="modal-dialog">
         <form method="POST" action="traiter_marche.php" class="modal-content">
@@ -470,10 +522,7 @@ include '../includes/header.php';
 
 <?php include '../includes/footer.php'; ?>
 
-<!-- =========================================================
-     JAVASCRIPT
-========================================================= -->
-
+<!-- JAVASCRIPT -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -520,7 +569,6 @@ $(document).ready(function() {
     | Modal annulation
     |--------------------------------------------------------------------------
     */
-
     $('#annulationModal').on('show.bs.modal', function(event) {
         const button = $(event.relatedTarget);
         const id = button.data('id');

@@ -273,9 +273,10 @@ function getFournisseurById($idFourn)
     return null;
 }
 
-function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn, $idMarche = null) {
+function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn, $idMarche = null)
+{
     global $connexion;
-    
+
     $dateEng = mysqli_real_escape_string($connexion, $dateEng);
     $type_eng = mysqli_real_escape_string($connexion, $type_eng);
     $montant = mysqli_real_escape_string($connexion, $montant);
@@ -283,14 +284,14 @@ function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte
     $idCompte = intval($idCompte);
     $idFourn = intval($idFourn);
     $idMarche = $idMarche ? intval($idMarche) : 'NULL';
-    
+
     $sql = "INSERT INTO bud_engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idMarche) 
             VALUES ('$dateEng', '$type_eng', '$montant', '$objet', $idCompte, $idFourn, $idMarche)";
-    
+
     if (mysqli_query($connexion, $sql)) {
         return true;
     } else {
-        return "Erreur: " . mysqli_error($connexion);
+        return 'Erreur: ' . mysqli_error($connexion);
     }
 }
 
@@ -543,27 +544,52 @@ function getNumCompteForOr()
 function getEngs()
 {
     global $connexion;
-    // $anneeEnCours = date("Y"); // Récupère l'année en cours
+
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT c.numCompte,cp.numCp, cp.libelle as libelleCp, c.libelle as libelleC, eng.idEng, eng.dateEng, eng.objet, eng.type_eng, eng.montant, f.nom, f.numFourn 
-            FROM bud_engagements as eng
-            JOIN bud_compte as c ON c.idCompte = eng.idCompte 
-            JOIN bud_comptep as cp ON c.idCp=cp.idCp 
-            JOIN bud_fournisseur as f ON f.idFourn= eng.idFourn 
-            WHERE EXISTS (
-            SELECT 1 FROM bud_dotations d 
-            WHERE d.idCompte = c.idCompte AND d.an = '$anneeEnCours'
-            )
-            ORDER BY eng.idEng DESC
-            ";
+    $query = "SELECT 
+                c.numCompte,
+                cp.numCp,
+                cp.libelle AS libelleCp,
+                c.libelle AS libelleC,
+                eng.idEng,
+                eng.dateEng,
+                eng.objet,
+                eng.type_eng,
+                eng.montant,
+                f.nom,
+                f.numFourn,
+                d.an
 
-    $result = $connexion->query($query);
-    if ($result->num_rows > 0) {
-        return $result->fetch_all(MYSQLI_ASSOC);
-    } else {
+            FROM bud_engagements AS eng
+
+            JOIN bud_compte AS c 
+                ON c.idCompte = eng.idCompte
+
+            JOIN bud_comptep AS cp 
+                ON c.idCp = cp.idCp
+
+            JOIN bud_fournisseur AS f 
+                ON f.idFourn = eng.idFourn
+
+            JOIN bud_dotations AS d 
+                ON d.idCompte = c.idCompte
+                AND d.an = ?
+
+            ORDER BY eng.idEng DESC";
+
+    $stmt = $connexion->prepare($query);
+
+    if (!$stmt) {
         return [];
     }
+
+    $stmt->bind_param("s", $anneeEnCours);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
 
 function getOperationsSansBordereau()
@@ -1639,43 +1665,44 @@ function getDetailsCompte($numCompte)
     }
 } */
 
-/* function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn)
-{
-    global $connexion;
-
-    if (!$connexion) {
-        return 'Erreur de connexion : ' . mysqli_connect_error();
-    }
-
-    // Sécurité de base
-    if ($montant < 0) {
-        return 'Le montant ne peut pas être négatif.';
-    }
-
-    // Récupération de l'idUser depuis la session
-    if (!isset($_SESSION['idUser'])) {
-        return 'Utilisateur non identifié.';
-    }
-    $idUser = $_SESSION['idUser'];
-
-    // Échappement des données
-    $dateEng = mysqli_real_escape_string($connexion, $dateEng);
-    $type_eng = mysqli_real_escape_string($connexion, $type_eng);
-    $objet = mysqli_real_escape_string($connexion, $objet);
-    $idCompte = (int) $idCompte;
-    $idFourn = (int) $idFourn;
-    $montant = (float) $montant;
-
-    // Requête d'insertion
-    $sql = "INSERT INTO bud_engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idUser) 
-            VALUES ('$dateEng', '$type_eng', $montant, '$objet', $idCompte, $idFourn, $idUser)";
-
-    if (mysqli_query($connexion, $sql)) {
-        return true;
-    } else {
-        return "Erreur lors de l'ajout : " . mysqli_error($connexion);
-    }
-}
+/*
+ * function ajouterEngagement_temp($dateEng, $type_eng, $montant, $objet, $idCompte, $idFourn)
+ * {
+ *     global $connexion;
+ *
+ *     if (!$connexion) {
+ *         return 'Erreur de connexion : ' . mysqli_connect_error();
+ *     }
+ *
+ *     // Sécurité de base
+ *     if ($montant < 0) {
+ *         return 'Le montant ne peut pas être négatif.';
+ *     }
+ *
+ *     // Récupération de l'idUser depuis la session
+ *     if (!isset($_SESSION['idUser'])) {
+ *         return 'Utilisateur non identifié.';
+ *     }
+ *     $idUser = $_SESSION['idUser'];
+ *
+ *     // Échappement des données
+ *     $dateEng = mysqli_real_escape_string($connexion, $dateEng);
+ *     $type_eng = mysqli_real_escape_string($connexion, $type_eng);
+ *     $objet = mysqli_real_escape_string($connexion, $objet);
+ *     $idCompte = (int) $idCompte;
+ *     $idFourn = (int) $idFourn;
+ *     $montant = (float) $montant;
+ *
+ *     // Requête d'insertion
+ *     $sql = "INSERT INTO bud_engagements_temp (dateEng, type_eng, montant, objet, idCompte, idFourn, idUser)
+ *             VALUES ('$dateEng', '$type_eng', $montant, '$objet', $idCompte, $idFourn, $idUser)";
+ *
+ *     if (mysqli_query($connexion, $sql)) {
+ *         return true;
+ *     } else {
+ *         return "Erreur lors de l'ajout : " . mysqli_error($connexion);
+ *     }
+ * }
  */
 function ajouter_Ordre_Recette_temp($dateOr, $objet_recette, $montant, $pieces_annexees, $idCompte, $idFourn)
 {
@@ -2551,22 +2578,245 @@ function getBordereauById($idBordereau)
     return null;
 }
 
-
 /**
  * Formate la taille d'un fichier en octets en une chaîne lisible
- * 
+ *
  * @param int $bytes Taille en octets
  * @param int $precision Nombre de décimales
  * @return string Taille formatée
  */
-function formatSize($bytes, $precision = 2) {
+function formatSize($bytes, $precision = 2)
+{
     if ($bytes === 0) {
         return '0 B';
     }
-    
+
     $units = ['B', 'KB', 'MB', 'GB', 'TB'];
     $i = floor(log($bytes, 1024));
-    
+
     return round($bytes / pow(1024, $i), $precision) . ' ' . $units[$i];
+}
+
+/**
+ * Récupérer les marchés accessibles selon le profil de l'utilisateur
+ *
+ * La fonction prend automatiquement le profil depuis $_SESSION['priv'].
+ *
+ * @return mysqli_result|false
+ */
+function getMarchesSelonProfil()
+{
+    global $connexion;
+
+    $profil = strtolower(trim($_SESSION['priv'] ?? ''));
+
+    /*
+     * |--------------------------------------------------------------------------
+     * | Conditions selon le profil
+     * |--------------------------------------------------------------------------
+     */
+
+    switch ($profil) {
+
+        case 'drp':
+            $condition = '1=1';
+            break;
+
+        case 'direction':
+            $condition = "
+                m.statut IN (
+                    'direction',
+                    'controle',
+                    'budget',
+                    'entente',
+                    'engager'
+                )
+            ";
+            break;
+
+        case 'controle':
+            $condition = "
+                m.statut IN (
+                    'controle',
+                    'budget',
+                    'engager'
+                )
+            ";
+            break;
+
+        case 'budget':
+            $condition = "
+                m.statut IN ('budget', 'engager')
+            ";
+            break;
+
+        default:
+            $condition = '1=0';
+            break;
+    }
+
+    /*
+     * |--------------------------------------------------------------------------
+     * | Requête
+     * |--------------------------------------------------------------------------
+     */
+
+    $sql = "
+        SELECT 
+            m.id,
+            m.reference,
+            m.annee,
+            m.montant,
+            m.type_marche,
+            m.nature,
+            m.objet,
+            m.statut,
+            m.date_creation,
+            m.id_fournisseur,
+
+            f.nom AS nom_fournisseur,
+            f.numFourn AS num_fournisseur,
+
+            COUNT(d.id) AS nombre_documents,
+
+            (
+                SELECT COUNT(*)
+                FROM sigm_marche_documents da
+                WHERE da.marche_id = m.id
+                AND LOWER(TRIM(da.type_document)) = LOWER('Autorisation d''engagement')
+            ) AS nombre_autorisations
+
+        FROM sigm_marches m
+
+        LEFT JOIN bud_fournisseur f 
+            ON f.idFourn = m.id_fournisseur
+
+        LEFT JOIN sigm_marche_documents d 
+            ON d.marche_id = m.id
+
+        WHERE $condition
+
+        GROUP BY m.id
+
+        ORDER BY m.date_creation DESC
+    ";
+
+    /*
+     * |--------------------------------------------------------------------------
+     * | Exécution
+     * |--------------------------------------------------------------------------
+     */
+
+    $result = mysqli_query($connexion, $sql);
+
+    if (!$result) {
+        error_log(
+            'Erreur getMarchesSelonProfil() : ' . mysqli_error($connexion)
+        );
+
+        return false;
+    }
+
+    return $result;
+}
+
+/**
+ * Vérifie si l'utilisateur connecté peut traiter un marché
+ * et retourne les informations nécessaires pour les actions.
+ *
+ * @param string $statut
+ * @return array
+ */
+function getActionsMarcheSelonProfil($statut)
+{
+    $profil = strtolower(trim($_SESSION['profil'] ?? ''));
+    $statut = strtolower(trim($statut));
+
+    /*
+    |--------------------------------------------------------------------------
+    | Correspondance PROFIL → STATUT qu'il peut traiter
+    |--------------------------------------------------------------------------
+    */
+
+    $statutsAutorises = [
+        'drp'       => 'en_entente',
+        'direction' => 'direction',
+        'controle'   => 'controle',
+        'budget'    => 'budget'
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vérifier si le profil existe
+    |--------------------------------------------------------------------------
+    */
+
+    if (!isset($statutsAutorises[$profil])) {
+        return [
+            'peut_traiter' => false,
+            'profil'       => $profil,
+            'statut'       => $statut,
+            'statut_suivant' => null
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Statut attendu pour ce profil
+    |--------------------------------------------------------------------------
+    */
+
+    $statutAttendu = $statutsAutorises[$profil];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Le marché n'est pas au niveau de l'utilisateur
+    |--------------------------------------------------------------------------
+    */
+
+    if ($statut !== $statutAttendu) {
+        return [
+            'peut_traiter' => false,
+            'profil'       => $profil,
+            'statut'       => $statut,
+            'statut_suivant' => null
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Déterminer le statut après validation
+    |--------------------------------------------------------------------------
+    */
+
+    switch ($profil) {
+
+        case 'drp':
+            $statutSuivant = 'direction';
+            break;
+
+        case 'direction':
+            $statutSuivant = 'controle';
+            break;
+
+        case 'controle':
+            $statutSuivant = 'budget';
+            break;
+
+        case 'budget':
+            $statutSuivant = 'valide';
+            break;
+
+        default:
+            $statutSuivant = null;
+            break;
+    }
+
+    return [
+        'peut_traiter'   => true,
+        'profil'         => $profil,
+        'statut'         => $statut,
+        'statut_suivant' => $statutSuivant
+    ];
 }
 ?>

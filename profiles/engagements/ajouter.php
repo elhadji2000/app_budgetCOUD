@@ -28,7 +28,7 @@ $sql = "
         f.nom AS nom_fournisseur
     FROM sigm_marches m
     LEFT JOIN bud_fournisseur f ON f.idFourn = m.id_fournisseur
-    WHERE m.statut = 'valide'
+    WHERE m.statut = 'budget'
     ORDER BY m.date_creation DESC
 ";
 
@@ -469,11 +469,7 @@ include '../../includes/header.php';
                             </thead>
 
                             <tbody>
-                                <?php 
-                                $hasMarches = false;
-                                while ($marche = mysqli_fetch_assoc($resultMarches)): 
-                                    $hasMarches = true;
-                                ?>
+                                <?php while ($marche = mysqli_fetch_assoc($resultMarches)): ?>
                                 <tr id="marche-<?= $marche['id'] ?>" data-id="<?= $marche['id'] ?>">
                                     <td>
                                         <input type="radio" name="marche_select" class="radio-custom radio-marche"
@@ -484,43 +480,42 @@ include '../../includes/header.php';
                                             data-montant="<?= $marche['montant'] ?>"
                                             data-fournisseur="<?= htmlspecialchars($marche['nom_fournisseur'] ?? 'Non défini', ENT_QUOTES) ?>">
                                     </td>
+
                                     <td>
                                         <strong><?= htmlspecialchars($marche['reference']) ?></strong>
                                     </td>
+
                                     <td>
                                         <?= date('d/m/Y', strtotime($marche['date_creation'])) ?>
                                     </td>
+
                                     <td>
                                         <span class="text-truncate d-block" style="max-width:120px;"
                                             title="<?= htmlspecialchars($marche['nom_fournisseur'] ?? 'Non défini') ?>">
                                             <?= htmlspecialchars($marche['nom_fournisseur'] ?? 'Non défini') ?>
                                         </span>
                                     </td>
+
                                     <td>
                                         <span class="text-ellipsis" title="<?= htmlspecialchars($marche['objet']) ?>">
                                             <?= htmlspecialchars($marche['objet']) ?>
                                         </span>
                                     </td>
+
                                     <td class="text-end">
-                                        <strong><?= number_format($marche['montant'], 0, ',', ' ') ?></strong>
+                                        <strong>
+                                            <?= number_format($marche['montant'], 0, ',', ' ') ?>
+                                        </strong>
                                     </td>
+
                                     <td>
-                                        <a href="../../payement/traitement_marche.php?id=<?= $marche['id'] ?>" class="btn-view"
-                                            title="Voir le marché" target="_blank">
+                                        <a href="../../payement/traitement_marche.php?id=<?= $marche['id'] ?>"
+                                            class="btn-view" title="Voir le marché" target="_blank">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
                                 <?php endwhile; ?>
-
-                                <?php if (!$hasMarches): ?>
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">
-                                        <i class="bi bi-folder-x fs-3 d-block mb-2"></i>
-                                        Aucun marché validé disponible
-                                    </td>
-                                </tr>
-                                <?php endif; ?>
                             </tbody>
 
                         </table>
@@ -583,7 +578,7 @@ include '../../includes/header.php';
                                 <option value="">Sélectionner un compte</option>
                                 <?php 
                                 //mysqli_data_seek($resultComptes, 0);
-                                 foreach ($comptes as $compte): ?> 
+                                 foreach ($comptes as $compte): ?>
                                 <option value="<?= $compte['idCompte'] ?>"
                                     data-numcompte="<?= htmlspecialchars($compte['numCompte']) ?>"
                                     data-idcompte="<?= $compte['idCompte'] ?>">
@@ -752,7 +747,7 @@ $(document).ready(function() {
         const selected = $(this).find(':selected');
         const numCompte = selected.data('numcompte') || '';
         const idCompte = selected.data('idcompte') || '';
-        
+
         $('#numc').val(numCompte);
 
         // Vérifier si un compte est sélectionné
@@ -763,27 +758,32 @@ $(document).ready(function() {
             $('#detailEngagements').text('Chargement...');
             $('#detailCredit').text('Chargement...');
             $('#detailMandats').text('Chargement...');
-            
+
             // Charger les informations du compte via AJAX
             $.ajax({
                 url: 'get_compte_details.php',
                 method: 'GET',
-                data: { idCompte: idCompte },
+                data: {
+                    idCompte: idCompte
+                },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
                         const data = response.data;
-                        
+
                         // Afficher les infos du compte
-                        $('#detailDotation').text(data.dotationTotale ? data.dotationTotale.toLocaleString('fr-FR') : '0');
-                        $('#detailEngagements').text(data.engagement ? data.engagement.toLocaleString('fr-FR') : '0');
-                        $('#detailMandats').text(data.mandat ? data.mandat.toLocaleString('fr-FR') : '0');
-                        
+                        $('#detailDotation').text(data.dotationTotale ? data.dotationTotale
+                            .toLocaleString('fr-FR') : '0');
+                        $('#detailEngagements').text(data.engagement ? data.engagement
+                            .toLocaleString('fr-FR') : '0');
+                        $('#detailMandats').text(data.mandat ? data.mandat.toLocaleString(
+                            'fr-FR') : '0');
+
                         // Crédit disponible avec couleur
                         const credit = data.credit || 0;
                         const creditSpan = $('#detailCredit');
                         creditSpan.text(credit.toLocaleString('fr-FR'));
-                        
+
                         // Changer la couleur du crédit
                         creditSpan.removeClass('credit-dispo credit-epuise');
                         if (credit > 0) {
@@ -791,7 +791,7 @@ $(document).ready(function() {
                         } else if (credit < 0) {
                             creditSpan.addClass('credit-epuise');
                         }
-                        
+
                         // Afficher le bloc des infos du compte
                         $('#infoCompte').show();
                     } else {

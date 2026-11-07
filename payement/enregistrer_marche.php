@@ -567,7 +567,7 @@ try {
             nature = ?,
             objet = ?,
             id_fournisseur = ?,
-            statut = 'en_attente'
+            statut = 'en_entente'
         WHERE id = ?
         ";
 
@@ -977,7 +977,7 @@ try {
                         ?,
                         ?,
                         ?,
-                        'en_attente',
+                        'en_entente',
                         ?
                     )
                 ";
@@ -1051,10 +1051,10 @@ try {
         /*
          * | IMPORTANT :
          * | bind_param() ne peut pas recevoir directement
-         * | 'en_attente'. Il faut une variable.
+         * | 'en_entente'. Il faut une variable.
          */
 
-        $nouveauStatut = 'en_attente';
+        $nouveauStatut = 'en_entente';
 
         /*
          * | L'ancien statut doit également être dans une variable.
@@ -1153,7 +1153,7 @@ try {
                 ?,
                 ?,
                 ?,
-                'en_attente',
+                'en_entente',
                 ?
             )
         ";
@@ -1225,7 +1225,7 @@ try {
             (
                 ?,
                 NULL,
-                'en_attente',
+                'en_entente',
                 ?,
                 ?
             )
@@ -1460,7 +1460,7 @@ try {
                     ?,
                     ?,
                     ?,
-                    'en_attente',
+                    'en_entente',
                     ?
                 )
             ";

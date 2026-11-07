@@ -20,6 +20,7 @@ if (!empty($_POST['utilisateur']) && !empty($_POST['motdepasse']) && !empty($_PO
         // Stocker les informations de l'utilisateur dans la session
         $_SESSION['user'] = $row['nom']; // Stocker le nom de l'utilisateur
         $_SESSION['priv'] = $row['priv']; // Stocker le rôle si nécessaire
+        $_SESSION['priv_2'] = $row['priv_dba'];
         $_SESSION['an'] = $an;
         $_SESSION['matricule'] = $row['log'];
         $_SESSION['idUser'] = $row['idUser'];

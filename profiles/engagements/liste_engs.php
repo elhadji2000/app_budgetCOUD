@@ -5,8 +5,14 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 ?>
-<?php include '../../includes/fonctions.php';?>
-<?php include '../../includes/header.php';?>
+<?php include '../../includes/fonctions.php';
+
+$engs = getEngs();
+//var_dump($engs);
+?>
+<?php include '../../includes/header.php';
+
+?>
 
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">

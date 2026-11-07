@@ -33,7 +33,7 @@ $sql = "
         COUNT(d.id) AS nombre_documents,
         SUM(CASE WHEN d.statut = 'valide' THEN 1 ELSE 0 END) AS documents_valides,
         SUM(CASE WHEN d.statut = 'rejete' THEN 1 ELSE 0 END) AS documents_rejetes,
-        SUM(CASE WHEN d.statut = 'en_attente' THEN 1 ELSE 0 END) AS documents_attente
+        SUM(CASE WHEN d.statut = 'en_entente' THEN 1 ELSE 0 END) AS documents_attente
     FROM sigm_marches m
     LEFT JOIN bud_fournisseur f ON f.idFourn = m.id_fournisseur
     LEFT JOIN sigm_marche_documents d ON d.marche_id = m.id
@@ -121,7 +121,7 @@ include '../includes/header.php';
     display: inline-block;
 }
 
-.statut-badge.en_attente {
+.statut-badge.en_entente {
     background: #fff3cd;
     color: #856404;
 }
@@ -177,7 +177,7 @@ include '../includes/header.php';
     color: #155724;
 }
 
-.document-status.en_attente {
+.document-status.en_entente {
     background: #fff3cd;
     color: #856404;
 }
@@ -345,7 +345,7 @@ include '../includes/header.php';
                     <span class="statut-badge <?= $marche['statut'] ?>">
                         <?php
                         $statuts = [
-                            'en_attente' => 'En attente',
+                            'en_entente' => 'En_entente',
                             'valide' => 'Validé',
                             'engager' => 'Engager',
                             'annule' => 'Annulé',
@@ -358,6 +358,14 @@ include '../includes/header.php';
             </div>
         </div>
     </div>
+
+    <?php if (isset($_GET['upload']) || isset($_GET['delete'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Opération effectuée avec succès.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+    <?php endif; ?>
 
     <!-- =====================================================
      CONTENU
@@ -441,7 +449,7 @@ include '../includes/header.php';
                         </div>
                         <!-- motif -->
 
-                        <?php if ($marche['statut'] === 'rejete'): ?>
+                        <?php if ($marche['statut'] == 'rejete'): ?>
 
                         <div class="full-width">
                             <div class="info-label">Motif de rejet</div>
@@ -497,34 +505,94 @@ include '../includes/header.php';
                         <span class="badge bg-secondary ms-2"><?= (int) $marche['nombre_documents'] ?></span>
                     </div>
 
+                    <?php if (isset($_SESSION['user']) && $_SESSION['priv'] == 'direction' && $marche['statut'] == 'direction'): ?>
+
+                    <form method="POST" action="upload_autorisation.php" enctype="multipart/form-data" class="mb-3">
+
+                        <input type="hidden" name="marche_id" value="<?= $id ?>">
+
+                        <label class="form-label fw-semibold">
+                            Autorisation d'engagement
+                        </label>
+
+                        <div class="input-group">
+                            <input type="file" name="document" class="form-control form-control-sm"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-upload"></i> Envoyer
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="type_document" value="Autorisation d'Engagement">
+
+                    </form>
+
+                    <hr>
+
+                    <?php endif; ?>
+
                     <?php if (mysqli_num_rows($documents) > 0): ?>
                     <?php while ($doc = mysqli_fetch_assoc($documents)): ?>
+
                     <div class="document-item">
                         <div class="d-flex justify-content-between align-items-center gap-2">
+
                             <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width:0;">
                                 <i class="bi bi-file-earmark-text text-secondary"></i>
+
                                 <div class="flex-grow-1" style="min-width:0;">
                                     <div class="document-name text-truncate">
                                         <?= htmlspecialchars($doc['nom_original']) ?>
                                     </div>
+
                                     <div class="document-meta">
                                         <?= htmlspecialchars($doc['type_document']) ?>
+
                                         <?php if (!empty($doc['taille'])): ?>
                                         · <?= number_format($doc['taille'] / 1024 / 1024, 2) ?> Mo
                                         <?php endif; ?>
-                                        · <span class="document-status <?= $doc['statut'] ?>">
-                                            <?= $doc['statut'] === 'en_attente' ? 'En attente' : ($doc['statut'] === 'valide' ? 'Validé' : 'Rejeté') ?>
+
+                                        · <span class="document-status <?= htmlspecialchars($doc['statut']) ?>">
+                                            <?= $doc['statut'] === 'en_entente' ? 'En entente' : ($doc['statut'] == 'valide' ? 'Validé' : 'Valider') ?>
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <a href="../<?= htmlspecialchars($doc['chemin_fichier']) ?>" target="_blank"
-                                class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-eye"></i> Voir
-                            </a>
+
+                            <div class="d-flex align-items-center gap-1">
+
+                                <a href="../<?= htmlspecialchars($doc['chemin_fichier']) ?>" target="_blank"
+                                    class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-eye"></i> Voir
+                                </a>
+
+                                <?php if (
+                                    isset($_SESSION['priv']) &&
+                                    $_SESSION['priv'] == 'direction' &&
+                                    strtolower(trim($doc['type_document'])) == "autorisation d'engagement" &&
+                                    $marche['statut'] == 'direction'
+                                ): ?>
+                                <form method="POST" action="upload_autorisation.php" class="m-0"
+                                    onsubmit="return confirm('Voulez-vous vraiment supprimer cette autorisation d’engagement ?');">
+
+                                    <input type="hidden" name="id_document" value="<?= (int) $doc['id'] ?>">
+
+                                    <input type="hidden" name="marche_id" value="<?= (int) $doc['marche_id'] ?>">
+
+                                    <button type="submit" name="supprimer_document"
+                                        class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                        <i class="bi bi-trash">suppr</i>
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+
+                            </div>
                         </div>
                     </div>
+
                     <?php endwhile; ?>
+
                     <?php else: ?>
                     <div class="text-center text-muted py-4">
                         <i class="bi bi-folder-x fs-3 d-block mb-2"></i>
@@ -547,7 +615,7 @@ include '../includes/header.php';
                         </div>
 
                         <div class="d-flex gap-2">
-                            <?php if ($marche['statut'] === 'en_attente'): ?>
+                            <?php if ($marche['statut'] === 'en_entente'): ?>
                             <!-- Valider -->
                             <form method="POST" action="traiter_marche.php" class="m-0">
                                 <input type="hidden" name="marche_id" value="<?= $id ?>">
