@@ -53,11 +53,11 @@ if (!isset($_SESSION['user'])) {
                     <?php $n++; ?>
                     <tr>
                         <td><?= $n ?></td>
-                        <td><?= htmlspecialchars($compte['numCp']) ?></td>
-                        <td><?= htmlspecialchars($compte['numCompte']) ?></td>
-                        <td><?= htmlspecialchars($compte['libelle']) ?></td>
-                        <td><?= htmlspecialchars($compte['code']) ?></td>
-                        <td><?= htmlspecialchars(strtoupper($compte['nature'])) ?></td>
+                        <td><?= htmlspecialchars($compte['numCp']??"--") ?></td>
+                        <td><?= htmlspecialchars($compte['numCompte']??"--") ?></td>
+                        <td><?= htmlspecialchars($compte['libelle']??"--") ?></td>
+                        <td><?= htmlspecialchars($compte['code']??"--") ?></td>
+                        <td><?= htmlspecialchars(strtoupper($compte['nature']??"--")) ?></td>
                         <td>
                             <a href="#" onclick="return confirm('Voulez-vous archiver ce compte ?')"
                                 class="btn btn-sm btn-outline-danger">

@@ -489,23 +489,33 @@ function getAllFourniseurs()
 function getNumCompteForOp()
 {
     global $connexion;
-    $query = "SELECT DISTINCT bud_compte.idCompte, bud_compte.numCompte,bud_compte.libelle
-        FROM bud_compte
-        JOIN bud_comptep ON bud_compte.idCp = bud_comptep.idCp
-        JOIN bud_engagements ON bud_compte.idCompte = bud_engagements.idCompte
-        WHERE (bud_comptep.nature = 'charge' OR bud_comptep.nature = 'emploi')
-        AND bud_engagements.idEng NOT IN (
-            SELECT DISTINCT idEng FROM bud_operations WHERE idEng IS NOT NULL
-        )
-        ORDER BY bud_compte.numCompte ASC
+
+    $query = "
+        SELECT DISTINCT
+            c.idCompte,
+            c.numCompte,
+            c.libelle
+        FROM bud_compte c
+        INNER JOIN bud_comptep cp
+            ON c.idCp = cp.idCp
+        INNER JOIN bud_engagements eng
+            ON c.idCompte = eng.idCompte
+        WHERE cp.nature IN ('charge', 'emploi')
+        AND (
+            SELECT COALESCE(SUM(op.montant), 0)
+            FROM bud_operations op
+            WHERE op.idEng = eng.idEng
+        ) < eng.montant
+        ORDER BY c.numCompte ASC
     ";
 
     $result = $connexion->query($query);
-    if ($result->num_rows > 0) {
+
+    if ($result && $result->num_rows > 0) {
         return $result->fetch_all(MYSQLI_ASSOC);
-    } else {
-        return [];
     }
+
+    return [];
 }
 
 /*
@@ -547,7 +557,7 @@ function getEngs()
 
     $anneeEnCours = $_SESSION['an'];
 
-    $query = "SELECT 
+    $query = 'SELECT 
                 c.numCompte,
                 cp.numCp,
                 cp.libelle AS libelleCp,
@@ -576,7 +586,7 @@ function getEngs()
                 ON d.idCompte = c.idCompte
                 AND d.an = ?
 
-            ORDER BY eng.idEng DESC";
+            ORDER BY eng.idEng DESC';
 
     $stmt = $connexion->prepare($query);
 
@@ -584,7 +594,7 @@ function getEngs()
         return [];
     }
 
-    $stmt->bind_param("s", $anneeEnCours);
+    $stmt->bind_param('s', $anneeEnCours);
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -2617,7 +2627,6 @@ function getMarchesSelonProfil()
      */
 
     switch ($profil) {
-
         case 'drp':
             $condition = '1=1';
             break;
@@ -2733,64 +2742,63 @@ function getActionsMarcheSelonProfil($statut)
     $statut = strtolower(trim($statut));
 
     /*
-    |--------------------------------------------------------------------------
-    | Correspondance PROFIL → STATUT qu'il peut traiter
-    |--------------------------------------------------------------------------
-    */
+     * |--------------------------------------------------------------------------
+     * | Correspondance PROFIL → STATUT qu'il peut traiter
+     * |--------------------------------------------------------------------------
+     */
 
     $statutsAutorises = [
-        'drp'       => 'en_entente',
+        'drp' => 'en_entente',
         'direction' => 'direction',
-        'controle'   => 'controle',
-        'budget'    => 'budget'
+        'controle' => 'controle',
+        'budget' => 'budget'
     ];
 
     /*
-    |--------------------------------------------------------------------------
-    | Vérifier si le profil existe
-    |--------------------------------------------------------------------------
-    */
+     * |--------------------------------------------------------------------------
+     * | Vérifier si le profil existe
+     * |--------------------------------------------------------------------------
+     */
 
     if (!isset($statutsAutorises[$profil])) {
         return [
             'peut_traiter' => false,
-            'profil'       => $profil,
-            'statut'       => $statut,
+            'profil' => $profil,
+            'statut' => $statut,
             'statut_suivant' => null
         ];
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Statut attendu pour ce profil
-    |--------------------------------------------------------------------------
-    */
+     * |--------------------------------------------------------------------------
+     * | Statut attendu pour ce profil
+     * |--------------------------------------------------------------------------
+     */
 
     $statutAttendu = $statutsAutorises[$profil];
 
     /*
-    |--------------------------------------------------------------------------
-    | Le marché n'est pas au niveau de l'utilisateur
-    |--------------------------------------------------------------------------
-    */
+     * |--------------------------------------------------------------------------
+     * | Le marché n'est pas au niveau de l'utilisateur
+     * |--------------------------------------------------------------------------
+     */
 
     if ($statut !== $statutAttendu) {
         return [
             'peut_traiter' => false,
-            'profil'       => $profil,
-            'statut'       => $statut,
+            'profil' => $profil,
+            'statut' => $statut,
             'statut_suivant' => null
         ];
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Déterminer le statut après validation
-    |--------------------------------------------------------------------------
-    */
+     * |--------------------------------------------------------------------------
+     * | Déterminer le statut après validation
+     * |--------------------------------------------------------------------------
+     */
 
     switch ($profil) {
-
         case 'drp':
             $statutSuivant = 'direction';
             break;
@@ -2813,9 +2821,9 @@ function getActionsMarcheSelonProfil($statut)
     }
 
     return [
-        'peut_traiter'   => true,
-        'profil'         => $profil,
-        'statut'         => $statut,
+        'peut_traiter' => true,
+        'profil' => $profil,
+        'statut' => $statut,
         'statut_suivant' => $statutSuivant
     ];
 }

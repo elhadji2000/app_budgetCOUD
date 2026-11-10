@@ -163,7 +163,7 @@ if (!move_uploaded_file($files['tmp_name'], $destination)) {
 // Chemin enregistré en base
 $chemin = 'uploads/marches/' . $nomFichier;
 
-$typeDocument = "Autorisation d'engagement";
+$typeDocument = $_POST['type_document'];
 $taille = (int) $files['size'];
 
 // Insertion

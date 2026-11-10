@@ -21,7 +21,7 @@ if ($id <= 0) {
  * |--------------------------------------------------------------------------
  * | Récupération du marché avec le fournisseur
  * |--------------------------------------------------------------------------
- */
+*/
 
 $sql = "
     SELECT 
@@ -331,7 +331,7 @@ include '../includes/header.php';
                 <div>
                     <h5 class="fw-bold text-dark mb-1">
                         <i class="bi bi-folder2-open me-2"></i>
-                        Détail du marché
+                        Détail du dossier
                     </h5>
                     <small class="text-muted">
                         <?= htmlspecialchars($marche['reference']) ?>
@@ -524,13 +524,50 @@ include '../includes/header.php';
                             </button>
                         </div>
 
-                        <input type="hidden" name="type_document" value="Autorisation d'Engagement">
+                        <input type="hidden" name="type_document" value="Autorisation d'engagement">
 
                     </form>
 
                     <hr>
 
                     <?php endif; ?>
+
+                    <!-- <?php if (isset($_SESSION['user']) && $_SESSION['priv'] == 'direction' && $marche['statut'] == 'engager'): ?>
+
+                    <form method="POST" action="upload_autorisation.php" enctype="multipart/form-data" class="mb-2">
+
+                        <input type="hidden" name="marche_id" value="<?= (int)$id ?>">
+
+                        <div class="row g-2 align-items-end">
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold mb-1">
+                                    Nom du document
+                                </label>
+                                <input type="text" name="type_document" class="form-control form-control-sm"
+                                    placeholder="Ex : Autorisation d'engagement" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold mb-1">
+                                    Document à joindre
+                                </label>
+                                <input type="file" name="document" class="form-control form-control-sm"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+                            </div>
+
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-upload"></i> Envoyer
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+
+                    <hr class="my-2">
+
+                    <?php endif; ?> -->
 
                     <?php if (mysqli_num_rows($documents) > 0): ?>
                     <?php while ($doc = mysqli_fetch_assoc($documents)): ?>
@@ -543,18 +580,18 @@ include '../includes/header.php';
 
                                 <div class="flex-grow-1" style="min-width:0;">
                                     <div class="document-name text-truncate">
-                                        <?= htmlspecialchars($doc['nom_original']) ?>
+                                        <?= htmlspecialchars($doc['type_document']) ?>
                                     </div>
 
                                     <div class="document-meta">
-                                        <?= htmlspecialchars($doc['type_document']) ?>
+                                        <?= htmlspecialchars($doc['nom_original']) ?>
 
                                         <?php if (!empty($doc['taille'])): ?>
                                         · <?= number_format($doc['taille'] / 1024 / 1024, 2) ?> Mo
                                         <?php endif; ?>
 
                                         · <span class="document-status <?= htmlspecialchars($doc['statut']) ?>">
-                                            <?= $doc['statut'] === 'en_entente' ? 'En entente' : ($doc['statut'] == 'valide' ? 'Validé' : 'Valider') ?>
+                                            <?= $doc['statut'] ?>
                                         </span>
                                     </div>
                                 </div>

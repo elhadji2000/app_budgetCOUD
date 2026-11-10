@@ -394,7 +394,7 @@ $anneeActuelle = date('Y');
                         <?php if ($_SESSION['priv'] == 'csa' || $_SESSION['priv'] == 'drp' || $_SESSION['priv'] == 'direction' || $_SESSION['priv'] == 'controle'): ?>
                         <li class="nav-item">
                             <a class="nav-link active"
-                                href="http://localhost/BUDGET/payement/liste_all">MARCHE(S)</a>
+                                href="http://localhost/BUDGET/payement/liste_all">DEPENSE(S)</a>
                         </li>
                         <?php endif; ?>
 
